@@ -1,11 +1,11 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
-	"version": "1.0.0",
+	"id": "better-daily-notes",
+	"name": "Better Daily Notes Plugin",
+	"version": "0.0.1",
 	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"description": "A better structure daily notes plugin for Obsidian",
+	"author": "showay",
+	"authorUrl": "https://github.com/showaykerker/better-daily-notes-obsidian-plugin",
+	"fundingUrl": "",
 	"isDesktopOnly": false
 }
