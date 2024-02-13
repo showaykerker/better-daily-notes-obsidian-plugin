@@ -91,7 +91,69 @@ export default class BetterDailyNotes extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
+
+	getMonthDirPath(date_: Date = new Date()) {
+		const date = date_ || new Date();
+		const year = date.getFullYear();
+		const month = (date.getMonth() + 1).toString().padStart(2, '0');
+		return `${this.settings.rootDir}/${year}-${month}`;
+	}
+
+	getTodaysDailyNotePath() {
+		const date = new Date();
+		const dirPath = this.getMonthDirPath(date);
+		const year = date.getFullYear();
+		const month = (date.getMonth() + 1).toString().padStart(2, '0');
+		const day = date.getDate().toString().padStart(2, '0');
+		return `${dirPath}/${year}-${month}-${day}.md`;
+	}
+
+	async createMonthlyImageDirIfNotExists() {
+		const dirPath = `${this.getMonthDirPath()}/${this.settings.imageSubDir}`;
+		if (this.app.vault.getAbstractFileByPath(dirPath)) {
+			console.log(`Directory ${dirPath} exists.`);
+		}
+		else {
+			console.log(`Directory ${dirPath} does not exist.`);
+			await this.app.vault.createFolder(dirPath);
+			new Notice(`Directory ${dirPath} created.`);
+			console.log(`Directory ${dirPath} created.`);
+		}
+	}
+
+	async createMonthlyDirIfNotExists() {
+		const dirPath = this.getMonthDirPath();
+		if (this.app.vault.getAbstractFileByPath(dirPath)) {
+			console.log(`Directory ${dirPath} exists.`);
+		}
+		else {
+			console.log(`Directory ${dirPath} does not exist.`);
+			await this.app.vault.createFolder(dirPath);
+			new Notice(`Directory ${dirPath} created.`);
+			console.log(`Directory ${dirPath} created.`);		}
+	}
+
+	async openTodaysDailyNote() {
+		const dailyNotePath = this.getTodaysDailyNotePath();
+		const dailyNote = this.app.vault.getAbstractFileByPath(dailyNotePath);
+		this.createMonthlyDirIfNotExists();
+		if (!dailyNote) {
+			console.log(`Daily note ${dailyNotePath} not exists.`);
+			new Notice(`Daily note ${dailyNotePath} not exists.`);
+			await this.app.vault.create(dailyNotePath, '');
+			new Notice(`Daily note ${dailyNotePath} created.`);
+			console.log(`Daily note ${dailyNotePath} created.`);
+		}
+		if (dailyNote) {
+			await this.app.workspace.openLinkText(dailyNotePath, '', true);
+		}
+		else {
+			await this.app.workspace.openLinkText(dailyNotePath, '', true);
+		}
+	}
 }
+
+
 
 class SampleModal extends Modal {
 	constructor(app: App) {
