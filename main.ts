@@ -3,11 +3,13 @@ import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Set
 // Remember to rename these classes and interfaces!
 
 interface BetterDailyNotesSettings {
-	mySetting: string;
+	rootDir: string;
+	imageSubDir: string;
 }
 
 const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
-	mySetting: 'default'
+	rootDir: 'daily-notes',
+	imageSubDir: 'images'
 }
 
 export default class BetterDailyNotes extends Plugin {
@@ -121,13 +123,23 @@ class BetterDailyNotesSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
+			.setName('Root Directory')
+			.setDesc('The root directory for the daily notes.')
 			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
+				.setPlaceholder(this.plugin.settings.rootDir)
+				.setValue(this.plugin.settings.rootDir)
 				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
+					this.plugin.settings.rootDir = value;
+					await this.plugin.saveSettings();
+				}));
+		new Setting(containerEl)
+			.setName('Image Subdirectory')
+			.setDesc('The subdirectory for images.')
+			.addText(text => text
+				.setPlaceholder(this.plugin.settings.imageSubDir)
+				.setValue(this.plugin.settings.imageSubDir)
+				.onChange(async (value) => {
+					this.plugin.settings.imageSubDir = value;
 					await this.plugin.saveSettings();
 				}));
 	}
