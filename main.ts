@@ -30,6 +30,14 @@ export default class BetterDailyNotes extends Plugin {
 		const statusBarItemEl = this.addStatusBarItem();
 		statusBarItemEl.setText('Status Bar Text');
 
+		this.addCommand({
+			id: 'open-todays-daily-note',
+			name: 'Open today\'s daily note',
+			callback: () => {
+				this.openTodaysDailyNote();
+			}
+		})
+
 		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
 			id: 'open-sample-modal-simple',
