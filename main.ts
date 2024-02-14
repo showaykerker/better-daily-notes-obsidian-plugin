@@ -19,16 +19,15 @@ export default class BetterDailyNotes extends Plugin {
 		await this.loadSettings();
 
 		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
+		const ribbonIconEl = this.addRibbonIcon(
+			'book-open-check',
+			'Open today\'s daily note',
+			(evt: MouseEvent) => {
+				this.openTodaysDailyNote();
+			}
+		);
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('better-daily-notes-ribbon-class');
-
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
 
 		this.addCommand({
 			id: 'open-todays-daily-note',
@@ -50,6 +49,7 @@ export default class BetterDailyNotes extends Plugin {
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
+
 
 	onunload() {
 
