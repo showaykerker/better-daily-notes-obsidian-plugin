@@ -155,10 +155,51 @@ export default class BetterDailyNotes extends Plugin {
 		return bytes.buffer;
 	}
 
-	handleSingleImage(
+	async limitImageFileWidth(file: File, width: number, reader: FileReader = new FileReader()): Promise<File>{
+		// if width is -1, do nothing. Otherwise
+		// Modify image size to fit the width while keeping the aspect ratio
+		// and keep all other properties of the file
+		if (width === -1) {
+			return Promise.resolve(file);
+		}
+		return new Promise((resolve, reject) => {
+			reader.onloadend = (e) => {
+				let result = reader.result;
+				if (typeof result !== "string") {
+					reject("Failed to read the file.");
+					return;
+				}
+				let img = new Image();
+				img.src = result;
+				img.onload = () => {
+					let canvas = document.createElement('canvas');
+					let ctx = canvas.getContext('2d');
+					if (!ctx) {
+						reject("Failed to create canvas.");
+						return;
+					}
+					canvas.width = width;
+					canvas.height = img.height * width / img.width;
+					ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+					canvas.toBlob((blob) => {
+						if (!blob) {
+							reject("Failed to create blob.");
+							return;
+						}
+						let newFile = new File([blob], file.name, {type: file.type});
+						resolve(newFile);
+					}, file.type);
+				}
+			}
+			reader.readAsDataURL(file);
+		});
+	}
+
+	async handleSingleImage(
 		file: File,
 		editor: Editor,
 		markdownView: MarkdownView,
+		reader: FileReader = new FileReader(),
 		) {
 		// rename and move a image to the image directory of the month
 		// and replace the markdown link with the new path
@@ -175,7 +216,8 @@ export default class BetterDailyNotes extends Plugin {
 			return;
 		}
 
-		let reader = new FileReader();
+		file = await this.limitImageFileWidth(file, this.settings.defaultImageWidth, reader);
+
 		reader.onloadend = async (e) => {
 			new Notice(`Image ${file.name} dropped.`);
 			let result = reader.result;
@@ -202,11 +244,7 @@ export default class BetterDailyNotes extends Plugin {
 			await this.createMonthlyImageDirIfNotExists(date);
 			let imageArrayBuffer = this.base64ToArrayBuffer(base64);
 			await this.app.vault.createBinary(imagePath, imageArrayBuffer);
-			var suffix = "";
-			if (this.settings.defaultImageWidth > 0) {
-				suffix = `|${this.settings.defaultImageWidth}`;
-			}
-			let imageLink = `![[${imagePath}${suffix}]]`;
+			let imageLink = `![[${imagePath}]]`;
 			editor.replaceSelection(imageLink);
 		};
 		reader.readAsDataURL(file);
@@ -227,7 +265,7 @@ export default class BetterDailyNotes extends Plugin {
 						let files = evt.dataTransfer.files;
 						for (let i = 0; i < files.length; i++) {
 							console.log(files[i]);
-							this.handleSingleImage(files[i], editor, markdownView);
+							await this.handleSingleImage(files[i], editor, markdownView);
 						}
 					}
 				}
