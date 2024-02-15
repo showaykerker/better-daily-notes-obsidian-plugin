@@ -126,6 +126,107 @@ export default class BetterDailyNotes extends Plugin {
 			await this.app.workspace.openLinkText(dailyNotePath, '', true);
 		}
 	}
+
+	getDateFromNotePath(notePath: string): Date | null{
+		// return None if the notePath is not a daily note
+		const noteName = notePath.split("/").pop();
+		if (!noteName) {
+			return null;
+		}
+		const dateStr = noteName.split(".")[0];
+		const year = parseInt(dateStr.split("-")[0]);
+		const month = parseInt(dateStr.split("-")[1]);
+		const day = parseInt(dateStr.split("-")[2]);
+		if (isNaN(year) || isNaN(month) || isNaN(day)) {
+			return null;
+		}
+		return new Date(year, month - 1, day);
+	}
+
+	base64ToArrayBuffer(base64: string): ArrayBuffer {
+		const binaryString = window.atob(base64);
+		const length = binaryString.length;
+		const bytes = new Uint8Array(length);
+		for (let i = 0; i < length; i++) {
+			bytes[i] = binaryString.charCodeAt(i);
+		}
+		return bytes.buffer;
+	}
+
+	handleSingleImage(
+		file: File,
+		editor: Editor,
+		markdownView: MarkdownView,
+		) {
+		// rename and move a image to the image directory of the month
+		// and replace the markdown link with the new path
+
+		if (!file.type.startsWith("image")) {
+			return;
+		}
+		if (!markdownView || !markdownView.file) {
+			return;
+		}
+		const date = this.getDateFromNotePath(markdownView.file.path);
+		if (!date) {
+			console.log("Not a daily note.")
+			return;
+		}
+
+		let reader = new FileReader();
+		reader.onloadend = async (e) => {
+			new Notice(`Image ${file.name} dropped.`);
+			let result = reader.result;
+			if (typeof result !== "string") {
+				return;
+			}
+			let base64 = result.split(",")[1];
+			let imageDirPath = `${this.getMonthDirPath(date)}/${this.settings.imageSubDir}`;
+			let imageFilePrefix = `${this.getTodaysDailyNoteName(date)}-image`;
+			// count current images under imageDirPath that starts with imageFilePrefix
+			const countImageFiles = (dirPath: string) => {
+				let count = 0;
+				for (let file of this.app.vault.getFiles()) {
+					if (file.path.startsWith(dirPath) &&
+						file.path.contains(imageFilePrefix) &&
+						!file.path.endsWith(".md")) {count += 1;}
+				}
+				return count;
+			};
+			const imageCount = countImageFiles(imageDirPath);
+			console.log(`Number of images today: ${imageCount}`);
+			var imageFileName = `${imageFilePrefix}${imageCount}.${file.type.split("/")[1]}`;
+			let imagePath = `${imageDirPath}/${imageFileName}`;
+			await this.createMonthlyImageDirIfNotExists(date);
+			await this.app.vault.createBinary(imagePath, this.base64ToArrayBuffer(base64));
+			let imageLink = `![[${imagePath}]]`;
+			editor.replaceSelection(imageLink);
+		};
+		reader.readAsDataURL(file);
+	}
+
+	setupImageHandler() {
+		this.registerEvent(
+			this.app.workspace.on(
+				"editor-drop",
+				async (evt: DragEvent, editor: Editor, markdownView: MarkdownView) => {
+					evt.preventDefault();
+					console.log("editor-drop", evt, editor, markdownView);
+					const date = new Date();
+					if (evt.dataTransfer &&
+						evt.dataTransfer.files.length !== 0 &&
+						evt.dataTransfer.files[0].type.startsWith("image")) {
+						// only handle images
+						let files = evt.dataTransfer.files;
+						for (let i = 0; i < files.length; i++) {
+							console.log(files[i]);
+							this.handleSingleImage(files[i], editor, markdownView);
+						}
+					}
+				}
+			)
+		)
+	}
 }
 
 
