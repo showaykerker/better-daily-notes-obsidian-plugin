@@ -5,11 +5,13 @@ import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Set
 interface BetterDailyNotesSettings {
 	rootDir: string;
 	imageSubDir: string;
+	defaultImageWidth: number;
 }
 
 const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	rootDir: 'daily-notes',
-	imageSubDir: 'images'
+	imageSubDir: 'images',
+	defaultImageWidth: -1,
 }
 
 export default class BetterDailyNotes extends Plugin {
@@ -200,7 +202,11 @@ export default class BetterDailyNotes extends Plugin {
 			await this.createMonthlyImageDirIfNotExists(date);
 			let imageArrayBuffer = this.base64ToArrayBuffer(base64);
 			await this.app.vault.createBinary(imagePath, imageArrayBuffer);
-			let imageLink = `![[${imagePath}|200]]`;
+			var suffix = "";
+			if (this.settings.defaultImageWidth > 0) {
+				suffix = `|${this.settings.defaultImageWidth}`;
+			}
+			let imageLink = `![[${imagePath}${suffix}]]`;
 			editor.replaceSelection(imageLink);
 		};
 		reader.readAsDataURL(file);
@@ -279,6 +285,16 @@ class BetterDailyNotesSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.imageSubDir)
 				.onChange(async (value) => {
 					this.plugin.settings.imageSubDir = value;
+					await this.plugin.saveSettings();
+				}));
+		new Setting(containerEl)
+			.setName('Default Image Width')
+			.setDesc('The default width of images. -1 means no width specified.')
+			.addText(text => text
+				.setPlaceholder(this.plugin.settings.defaultImageWidth.toString())
+				.setValue(this.plugin.settings.defaultImageWidth.toString())
+				.onChange(async (value) => {
+					this.plugin.settings.defaultImageWidth = parseInt(value);
 					await this.plugin.saveSettings();
 				}));
 	}
