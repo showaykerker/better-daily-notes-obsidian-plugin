@@ -70,7 +70,9 @@ export default class BetterDailyNotes extends Plugin {
 	getMonthDirPath(date: Date = new Date()) {
 		const year = date.getFullYear();
 		const month = (date.getMonth() + 1).toString().padStart(2, '0');
-		return `${this.settings.rootDir}/${year}-${month}`;
+		// turn Month into Jan, Feb, ...
+		const monthStr = date.toLocaleString('en-GB', { month: 'short' });
+		return `${this.settings.rootDir}/${year}/${monthStr}`;
 	}
 
 	getTodaysDailyNoteName(date: Date = new Date()) {
