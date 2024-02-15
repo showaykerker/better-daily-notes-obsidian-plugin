@@ -48,6 +48,8 @@ export default class BetterDailyNotes extends Plugin {
 
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+
+		this.setupImageHandler();
 	}
 
 
@@ -63,24 +65,26 @@ export default class BetterDailyNotes extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	getMonthDirPath(date_: Date = new Date()) {
-		const date = date_ || new Date();
+	getMonthDirPath(date: Date = new Date()) {
 		const year = date.getFullYear();
 		const month = (date.getMonth() + 1).toString().padStart(2, '0');
 		return `${this.settings.rootDir}/${year}-${month}`;
 	}
 
-	getTodaysDailyNotePath() {
-		const date = new Date();
-		const dirPath = this.getMonthDirPath(date);
+	getTodaysDailyNoteName(date: Date = new Date()) {
 		const year = date.getFullYear();
 		const month = (date.getMonth() + 1).toString().padStart(2, '0');
 		const day = date.getDate().toString().padStart(2, '0');
-		return `${dirPath}/${year}-${month}-${day}.md`;
+		return `${year}-${month}-${day}`;
 	}
 
-	async createMonthlyImageDirIfNotExists() {
-		const dirPath = `${this.getMonthDirPath()}/${this.settings.imageSubDir}`;
+	getTodaysDailyNotePath(date: Date = new Date(), noteName: string = this.getTodaysDailyNoteName()){
+		const dirPath = this.getMonthDirPath(date);
+		return `${dirPath}/${noteName}.md`;
+	}
+
+	async createMonthlyImageDirIfNotExists(date: Date = new Date()) {
+		const dirPath = `${this.getMonthDirPath(date)}/${this.settings.imageSubDir}`;
 		if (this.app.vault.getAbstractFileByPath(dirPath)) {
 			console.log(`Directory ${dirPath} exists.`);
 		}
@@ -92,8 +96,8 @@ export default class BetterDailyNotes extends Plugin {
 		}
 	}
 
-	async createMonthlyDirIfNotExists() {
-		const dirPath = this.getMonthDirPath();
+	async createMonthlyDirIfNotExists(date: Date = new Date()) {
+		const dirPath = this.getMonthDirPath(date);
 		if (this.app.vault.getAbstractFileByPath(dirPath)) {
 			console.log(`Directory ${dirPath} exists.`);
 		}
