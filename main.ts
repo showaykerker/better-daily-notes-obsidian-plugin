@@ -198,8 +198,9 @@ export default class BetterDailyNotes extends Plugin {
 			var imageFileName = `${imageFilePrefix}${imageCount}.${file.type.split("/")[1]}`;
 			let imagePath = `${imageDirPath}/${imageFileName}`;
 			await this.createMonthlyImageDirIfNotExists(date);
-			await this.app.vault.createBinary(imagePath, this.base64ToArrayBuffer(base64));
-			let imageLink = `![[${imagePath}]]`;
+			let imageArrayBuffer = this.base64ToArrayBuffer(base64);
+			await this.app.vault.createBinary(imagePath, imageArrayBuffer);
+			let imageLink = `![[${imagePath}|200]]`;
 			editor.replaceSelection(imageLink);
 		};
 		reader.readAsDataURL(file);
