@@ -88,16 +88,16 @@ export default class BetterDailyNotes extends Plugin {
 	async createDirsIfNotExists(dir: string) {
 		// check and create from parent to child
 		let dirPath = "";
-		new Notice(`Target: ${dir}`);
+		// new Notice(`Target: ${dir}`);
 		for (let dirName of dir.split("/")) {
 			dirPath = `${dirPath}${dirName}`;
 			console.log(dirPath);
 			const hasDirPath = this.app.vault.getAbstractFileByPath(dirPath);
-			new Notice(`${dirPath}: ${hasDirPath}`);
+			// new Notice(`${dirPath}: ${hasDirPath}`);
 			console.log(`${dirPath}: ${hasDirPath}`);
 			if (hasDirPath) {
 				console.log(`Directory ${dirPath} exists.`);
-				new Notice(`Directory ${dirPath} exists.`);
+				// new Notice(`Directory ${dirPath} exists.`);
 			}
 			else {
 				console.log(`Directory ${dirPath} does not exist.`);
@@ -226,7 +226,7 @@ export default class BetterDailyNotes extends Plugin {
 		file = await this.limitImageFileWidth(file, this.settings.defaultImageWidth, reader);
 
 		reader.onloadend = async (e) => {
-			new Notice(`Image ${file.name} dropped.`);
+			// new Notice(`Image ${file.name} dropped.`);
 			let result = reader.result;
 			if (typeof result !== "string") {
 				return;
