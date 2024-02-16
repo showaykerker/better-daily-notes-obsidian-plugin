@@ -87,38 +87,45 @@ export default class BetterDailyNotes extends Plugin {
 		return `${dirPath}/${noteName}.md`;
 	}
 
-	async createMonthlyImageDirIfNotExists(date: Date = new Date()) {
-		const dirPath = `${this.getMonthDirPath(date)}/${this.settings.imageSubDir}`;
-		if (this.app.vault.getAbstractFileByPath(dirPath)) {
-			console.log(`Directory ${dirPath} exists.`);
-		}
-		else {
-			console.log(`Directory ${dirPath} does not exist.`);
-			await this.app.vault.createFolder(dirPath);
-			new Notice(`Directory ${dirPath} created.`);
-			console.log(`Directory ${dirPath} created.`);
+	async createDirsIfNotExists(dir: string) {
+		// check and create from parent to child
+		let dirPath = "";
+		new Notice(`Target: ${dir}`);
+		for (let dirName of dir.split("/")) {
+			dirPath = `${dirPath}${dirName}`;
+			console.log(dirPath);
+			const hasDirPath = this.app.vault.getAbstractFileByPath(dirPath);
+			new Notice(`${dirPath}: ${hasDirPath}`);
+			console.log(`${dirPath}: ${hasDirPath}`);
+			if (hasDirPath) {
+				console.log(`Directory ${dirPath} exists.`);
+				new Notice(`Directory ${dirPath} exists.`);
+			}
+			else {
+				console.log(`Directory ${dirPath} does not exist.`);
+				await this.app.vault.createFolder(dirPath);
+				new Notice(`Directory ${dirPath} created.`);
+				console.log(`Directory ${dirPath} created.`);
+			}
+			dirPath = `${dirPath}/`
 		}
 	}
 
-	async createMonthlyDirIfNotExists(date: Date = new Date()) {
+	async createImageDirIfNotExists(date: Date = new Date()) {
+		const dirPath = `${this.getMonthDirPath(date)}/${this.settings.imageSubDir}`;
+		this.createDirsIfNotExists(dirPath);
+	}
+
+	async createDirIfNotExists(date: Date = new Date()) {
 		const dirPath = this.getMonthDirPath(date);
-		if (this.app.vault.getAbstractFileByPath(dirPath)) {
-			console.log(`Directory ${dirPath} exists.`);
-		}
-		else {
-			console.log(`Directory ${dirPath} does not exist.`);
-			await this.app.vault.createFolder(dirPath);
-			new Notice(`Directory ${dirPath} created.`);
-			console.log(`Directory ${dirPath} created.`);		}
+		await this.createDirsIfNotExists(dirPath);
 	}
 
 	async openTodaysDailyNote() {
 		const dailyNotePath = this.getTodaysDailyNotePath();
+		await this.createDirIfNotExists();
 		const dailyNote = this.app.vault.getAbstractFileByPath(dailyNotePath);
-		this.createMonthlyDirIfNotExists();
 		if (!dailyNote) {
-			console.log(`Daily note ${dailyNotePath} not exists.`);
-			new Notice(`Daily note ${dailyNotePath} not exists.`);
 			await this.app.vault.create(dailyNotePath, '');
 			new Notice(`Daily note ${dailyNotePath} created.`);
 			console.log(`Daily note ${dailyNotePath} created.`);
@@ -272,7 +279,26 @@ export default class BetterDailyNotes extends Plugin {
 					}
 				}
 			)
-		)
+		);
+		this.registerEvent(
+			this.app.workspace.on(
+				"editor-paste",
+				async (evt: ClipboardEvent, editor: Editor, markdownView: MarkdownView) => {
+					console.log("editor-paste", editor, markdownView, evt);
+					const date = new Date();
+					if (evt.clipboardData &&
+						evt.clipboardData.files.length !== 0 &&
+						evt.clipboardData.files[0].type.startsWith("image")) {
+						// only handle images
+						let files = evt.clipboardData.files;
+						for (let i = 0; i < files.length; i++) {
+							console.log(files[i]);
+							await this.handleSingleImage(files[i], editor, markdownView);
+						}
+					}
+				}
+			)
+		);
 	}
 }
 
