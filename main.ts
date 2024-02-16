@@ -69,20 +69,18 @@ export default class BetterDailyNotes extends Plugin {
 
 	getMonthDirPath(date: Date = new Date()) {
 		const year = date.getFullYear();
-		const month = (date.getMonth() + 1).toString().padStart(2, '0');
-		// turn Month into Jan, Feb, ...
 		const monthStr = date.toLocaleString('en-GB', { month: 'short' });
 		return `${this.settings.rootDir}/${year}/${monthStr}`;
 	}
 
-	getTodaysDailyNoteName(date: Date = new Date()) {
+	getDailyNoteName(date: Date = new Date()) {
 		const year = date.getFullYear();
 		const month = (date.getMonth() + 1).toString().padStart(2, '0');
 		const day = date.getDate().toString().padStart(2, '0');
 		return `${year}-${month}-${day}`;
 	}
 
-	getTodaysDailyNotePath(date: Date = new Date(), noteName: string = this.getTodaysDailyNoteName()){
+	getDailyNotePath(date: Date = new Date(), noteName: string = this.getDailyNoteName()){
 		const dirPath = this.getMonthDirPath(date);
 		return `${dirPath}/${noteName}.md`;
 	}
@@ -112,8 +110,8 @@ export default class BetterDailyNotes extends Plugin {
 	}
 
 	async createImageDirIfNotExists(date: Date = new Date()) {
-		const dirPath = `${this.getMonthDirPath(date)}/${this.settings.imageSubDir}`;
-		this.createDirsIfNotExists(dirPath);
+		const imgDirPath = `${this.getMonthDirPath(date)}/${this.settings.imageSubDir}`;
+		this.createDirsIfNotExists(imgDirPath);
 	}
 
 	async createDirIfNotExists(date: Date = new Date()) {
@@ -122,7 +120,7 @@ export default class BetterDailyNotes extends Plugin {
 	}
 
 	async openTodaysDailyNote() {
-		const dailyNotePath = this.getTodaysDailyNotePath();
+		const dailyNotePath = this.getDailyNotePath();
 		await this.createDirIfNotExists();
 		const dailyNote = this.app.vault.getAbstractFileByPath(dailyNotePath);
 		if (!dailyNote) {
@@ -235,7 +233,7 @@ export default class BetterDailyNotes extends Plugin {
 			}
 			let base64 = result.split(",")[1];
 			let imageDirPath = `${this.getMonthDirPath(date)}/${this.settings.imageSubDir}`;
-			let imageFilePrefix = `${this.getTodaysDailyNoteName(date)}-image`;
+			let imageFilePrefix = `${this.getDailyNoteName(date)}-image`;
 			// count current images under imageDirPath that starts with imageFilePrefix
 			const countImageFiles = (dirPath: string) => {
 				let count = 0;
@@ -250,7 +248,7 @@ export default class BetterDailyNotes extends Plugin {
 			console.log(`Number of images today: ${imageCount}`);
 			var imageFileName = `${imageFilePrefix}${imageCount}.${file.type.split("/")[1]}`;
 			let imagePath = `${imageDirPath}/${imageFileName}`;
-			await this.createMonthlyImageDirIfNotExists(date);
+			await this.createImageDirIfNotExists(date);
 			let imageArrayBuffer = this.base64ToArrayBuffer(base64);
 			await this.app.vault.createBinary(imagePath, imageArrayBuffer);
 			let imageLink = `![[${imagePath}]]`;
