@@ -73,6 +73,28 @@ export default class BetterDailyNotes extends Plugin {
 		})
 
 		this.addCommand({
+			id: 'open-yesterdays-daily-note',
+			name: 'Open yesterday\'s daily note',
+			callback: () => {
+				var date = new Date();
+				date.setDate(date.getDate() - 1);
+				const dailyNotePath = this.getDailyNotePath(date);
+				this.app.workspace.openLinkText(dailyNotePath, '', true);
+			}
+		})
+
+		this.addCommand({
+			id: 'open-tomorrows-daily-note',
+			name: 'Open tomorrow\'s daily note',
+			callback: () => {
+				var date = new Date();
+				date.setDate(date.getDate() + 1);
+				const dailyNotePath = this.getDailyNotePath(date);
+				this.app.workspace.openLinkText(dailyNotePath, '', true);
+			}
+		})
+
+		this.addCommand({
 			id: 'check-valid-daily-note-path',
 			name: 'Check if the current note is a valid daily note',
 			callback: () => {
@@ -135,7 +157,8 @@ export default class BetterDailyNotes extends Plugin {
 		return formatDate(this.settings.dateFormat, date);
 	}
 
-	getDailyNotePath(date: Date = new Date(), noteName: string = this.getDailyNoteName()){
+	getDailyNotePath(date: Date = new Date()){
+		const noteName = this.getDailyNoteName(date);
 		const dirPath = this.getMonthDirPath(date);
 		return `${dirPath}/${noteName}.md`;
 	}
