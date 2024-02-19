@@ -207,20 +207,20 @@ export default class BetterDailyNotes extends Plugin {
 		editor: Editor,
 		markdownView: MarkdownView,
 		reader: FileReader = new FileReader(),
-		) {
+	 	): Promise<boolean>{
 		// rename and move a image to the image directory of the month
 		// and replace the markdown link with the new path
 
 		if (!file.type.startsWith("image")) {
-			return;
+			return false;
 		}
 		if (!markdownView || !markdownView.file) {
-			return;
+			return false;
 		}
-		const date = this.getDateFromNotePath(markdownView.file.path);
+		const date = this.checkValidDailyNotePath(markdownView.file.path);
 		if (!date) {
 			console.log("Not a daily note.")
-			return;
+			return false;
 		}
 
 		file = await this.limitImageFileWidth(file, this.settings.defaultImageWidth, reader);
@@ -229,7 +229,7 @@ export default class BetterDailyNotes extends Plugin {
 			// new Notice(`Image ${file.name} dropped.`);
 			let result = reader.result;
 			if (typeof result !== "string") {
-				return;
+				return false;
 			}
 			let base64 = result.split(",")[1];
 			let imageDirPath = `${this.getMonthDirPath(date)}/${this.settings.imageSubDir}`;
@@ -255,6 +255,7 @@ export default class BetterDailyNotes extends Plugin {
 			editor.replaceSelection(imageLink);
 		};
 		reader.readAsDataURL(file);
+		return true;
 	}
 
 	setupImageHandler() {
@@ -262,7 +263,6 @@ export default class BetterDailyNotes extends Plugin {
 			this.app.workspace.on(
 				"editor-drop",
 				async (evt: DragEvent, editor: Editor, markdownView: MarkdownView) => {
-					evt.preventDefault();
 					console.log("editor-drop", evt, editor, markdownView);
 					const date = new Date();
 					if (evt.dataTransfer &&
@@ -272,7 +272,10 @@ export default class BetterDailyNotes extends Plugin {
 						let files = evt.dataTransfer.files;
 						for (let i = 0; i < files.length; i++) {
 							console.log(files[i]);
-							await this.handleSingleImage(files[i], editor, markdownView);
+							let result = await this.handleSingleImage(files[i], editor, markdownView);
+							if (result) {
+								evt.preventDefault();
+							}
 						}
 					}
 				}
@@ -291,7 +294,10 @@ export default class BetterDailyNotes extends Plugin {
 						let files = evt.clipboardData.files;
 						for (let i = 0; i < files.length; i++) {
 							console.log(files[i]);
-							await this.handleSingleImage(files[i], editor, markdownView);
+							let result = await this.handleSingleImage(files[i], editor, markdownView);
+							if (result) {
+								evt.preventDefault();
+							}
 						}
 					}
 				}
