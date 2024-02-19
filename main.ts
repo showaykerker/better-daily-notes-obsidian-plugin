@@ -1,4 +1,5 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import dayjs from 'dayjs';
 
 // Remember to rename these classes and interfaces!
 
@@ -6,12 +7,33 @@ interface BetterDailyNotesSettings {
 	rootDir: string;
 	imageSubDir: string;
 	defaultImageWidth: number;
+	dateFormat: string;
 }
 
 const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	rootDir: 'daily-notes',
 	imageSubDir: 'images',
 	defaultImageWidth: -1,
+	dateFormat: 'YYYY-MM-DD',
+}
+
+function formatDate(format: string = DEFAULT_SETTINGS.dateFormat, date: Date = new Date()): string {
+	return dayjs(date).format(format);
+}
+
+function isValidDateFormat(format: string): boolean {
+	// if format contains invalid slashes, even if dayjs accepts it, it is not a valid format
+	if (format.match("/")) {
+		return false;
+	}
+	try {
+		dayjs().format(format);
+		return true;
+	}
+	catch (e) {
+		console.log(e);
+		return false;
+	}
 }
 
 export default class BetterDailyNotes extends Plugin {
@@ -19,6 +41,10 @@ export default class BetterDailyNotes extends Plugin {
 
 	async onload() {
 		await this.loadSettings();
+
+		var customParseFormat = require('dayjs/plugin/customParseFormat');
+		dayjs.extend(customParseFormat);
+
 
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon(
@@ -36,6 +62,27 @@ export default class BetterDailyNotes extends Plugin {
 			name: 'Open today\'s daily note',
 			callback: () => {
 				this.openTodaysDailyNote();
+			}
+		})
+
+		this.addCommand({
+			id: 'check-valid-daily-note-path',
+			name: 'Check if the current note is a valid daily note',
+			callback: () => {
+				const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
+				if (!activeView || !activeView.file) {
+					new Notice(`No active view.`);
+					return;
+				}
+				if (activeView instanceof MarkdownView) {
+					const date = this.checkValidDailyNotePath(activeView.file.path);
+					if (date) {
+						new Notice(`${activeView.file.path} is a valid daily note on ${date}`);
+					}
+					else {
+						new Notice(`This is not a valid daily note.`);
+					}
+				}
 			}
 		})
 
@@ -74,10 +121,7 @@ export default class BetterDailyNotes extends Plugin {
 	}
 
 	getDailyNoteName(date: Date = new Date()) {
-		const year = date.getFullYear();
-		const month = (date.getMonth() + 1).toString().padStart(2, '0');
-		const day = date.getDate().toString().padStart(2, '0');
-		return `${year}-${month}-${day}`;
+		return formatDate(this.settings.dateFormat, date);
 	}
 
 	getDailyNotePath(date: Date = new Date(), noteName: string = this.getDailyNoteName()){
@@ -136,21 +180,28 @@ export default class BetterDailyNotes extends Plugin {
 		}
 	}
 
-	getDateFromNotePath(notePath: string): Date | null{
+	checkValidDailyNotePath(notePath: string): Date | null{
 		// return None if the notePath is not a daily note
-		const noteName = notePath.split("/").pop();
+		const noteName = notePath.split("/").slice(-1)[0].split(".")[0];
 		if (!noteName) {
+			console.log("No note name.");
 			return null;
 		}
-		const dateStr = noteName.split(".")[0];
-		const year = parseInt(dateStr.split("-")[0]);
-		const month = parseInt(dateStr.split("-")[1]);
-		const day = parseInt(dateStr.split("-")[2]);
-		if (isNaN(year) || isNaN(month) || isNaN(day)) {
+		// first check if the file name matches the settings.dateFormat
+		const date = dayjs(noteName, this.settings.dateFormat, true);
+		if (!date.isValid()) {
+			console.log("Invalid date.");
 			return null;
 		}
-		return new Date(year, month - 1, day);
+		// then check if the file is monthly note directory
+		const monthDir = notePath.split("/").slice(-2, -1);
+		if (!monthDir) {
+			console.log("No month directory.");
+			return null;
+		}
+		return date.toDate();
 	}
+
 
 	base64ToArrayBuffer(base64: string): ArrayBuffer {
 		const binaryString = window.atob(base64);
@@ -334,9 +385,29 @@ class BetterDailyNotesSettingTab extends PluginSettingTab {
 
 	display(): void {
 		const {containerEl} = this;
-
+		function getDescription() {
+			return 'The date format for the daily notes. (Using Dayjs) \n' +
+				'Current format looks like:' +
+				formatDate(this.plugin.settings.dateFormat);
+		}
 		containerEl.empty();
-
+		new Setting(containerEl)
+			.setName('Date Format')
+			.setDesc(getDescription.bind(this)())
+			.addText(text => text
+				.setPlaceholder(this.plugin.settings.dateFormat)
+				.setValue(this.plugin.settings.dateFormat)
+				.onChange(async (value) => {
+					if (!isValidDateFormat(value)) {
+						return;
+					}
+					this.plugin.settings.dateFormat = value;
+					const previewElement = containerEl.querySelector('.setting-item-description');
+					if (previewElement instanceof HTMLDivElement) {
+						previewElement.innerText = getDescription.bind(this)();
+					}
+					await this.plugin.saveSettings();
+				}));
 		new Setting(containerEl)
 			.setName('Root Directory')
 			.setDesc('The root directory for the daily notes.')
