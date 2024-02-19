@@ -1,12 +1,13 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import dayjs from 'dayjs';
+import imageCompression from 'browser-image-compression';
 
 // Remember to rename these classes and interfaces!
 
 interface BetterDailyNotesSettings {
 	rootDir: string;
 	imageSubDir: string;
-	defaultImageWidth: number;
+	maxImageSizeKB: number;
 	dateFormat: string;
 	resizeWidth: number;
 }
@@ -14,7 +15,7 @@ interface BetterDailyNotesSettings {
 const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	rootDir: 'daily-notes',
 	imageSubDir: 'images',
-	defaultImageWidth: -1,
+	maxImageSizeKB: -1,
 	dateFormat: 'YYYY-MM-DD',
 	resizeWidth: -1
 }
@@ -215,44 +216,18 @@ export default class BetterDailyNotes extends Plugin {
 		return bytes.buffer;
 	}
 
-	async limitImageFileWidth(file: File, width: number, reader: FileReader = new FileReader()): Promise<File>{
-		// if width is -1, do nothing. Otherwise
-		// Modify image size to fit the width while keeping the aspect ratio
-		// and keep all other properties of the file
-		if (width === -1) {
+	async limitImageFileSize(file: File, size: number, reader: FileReader = new FileReader()): Promise<File>{
+		// if size is -1, do nothing. Otherwise
+		// Modify image size to be less than size KB
+		if (size === -1) {
 			return Promise.resolve(file);
 		}
-		return new Promise((resolve, reject) => {
-			reader.onloadend = (e) => {
-				let result = reader.result;
-				if (typeof result !== "string") {
-					reject("Failed to read the file.");
-					return;
-				}
-				let img = new Image();
-				img.src = result;
-				img.onload = () => {
-					let canvas = document.createElement('canvas');
-					let ctx = canvas.getContext('2d');
-					if (!ctx) {
-						reject("Failed to create canvas.");
-						return;
-					}
-					canvas.width = width;
-					canvas.height = img.height * width / img.width;
-					ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-					canvas.toBlob((blob) => {
-						if (!blob) {
-							reject("Failed to create blob.");
-							return;
-						}
-						let newFile = new File([blob], file.name, {type: file.type});
-						resolve(newFile);
-					}, file.type);
-				}
-			}
-			reader.readAsDataURL(file);
-		});
+		const options = {
+			maxSizeMB: size / 1024.0,
+			useWebWorker: true
+		};
+		const compressedFile = await imageCompression(file, options);
+		return compressedFile;
 	}
 
 	async handleSingleImage(
@@ -264,12 +239,12 @@ export default class BetterDailyNotes extends Plugin {
 		// rename and move a image to the image directory of the month
 		// and replace the markdown link with the new path
 
-		const date = this.checkValidDailyNotePath(markdownView.file.path);
 		if (!file.type.startsWith("image")) { return false; }
 		if (!markdownView || !markdownView.file) { return false; }
+		const date = this.checkValidDailyNotePath(markdownView.file.path);
 		if (!date) { return false; }
 
-		file = await this.limitImageFileWidth(file, this.settings.defaultImageWidth, reader);
+		file = await this.limitImageFileSize(file, this.settings.maxImageSizeKB, reader);
 
 		var handleSuccess = true;
 
@@ -457,16 +432,13 @@ class BetterDailyNotesSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 		new Setting(containerEl)
-			.setName('Default Image Width')
-			.setDesc('The default width of images. -1 means no width specified.' +
-				'This will reduce the size of the image file.' +
-				'If the image\'s original width is smaller than the specified width, ' +
-				'the image will be pixelated.')
+			.setName('Max Image Size (KB)')
+			.setDesc('Compress images added to the daily note to this size. -1 means no compression.')
 			.addText(text => text
-				.setPlaceholder(this.plugin.settings.defaultImageWidth.toString())
-				.setValue(this.plugin.settings.defaultImageWidth.toString())
+				.setPlaceholder(this.plugin.settings.maxImageSizeKB.toString())
+				.setValue(this.plugin.settings.maxImageSizeKB.toString())
 				.onChange(async (value) => {
-					this.plugin.settings.defaultImageWidth = parseInt(value);
+					this.plugin.settings.maxImageSizeKB = parseInt(value);
 					await this.plugin.saveSettings();
 				}));
 		new Setting(containerEl)
