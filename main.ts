@@ -8,6 +8,7 @@ interface BetterDailyNotesSettings {
 	rootDir: string;
 	imageSubDir: string;
 	maxImageSizeKB: number;
+	preserveExifData: boolean;
 	dateFormat: string;
 	resizeWidth: number;
 }
@@ -16,6 +17,7 @@ const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	rootDir: 'daily-notes',
 	imageSubDir: 'images',
 	maxImageSizeKB: -1,
+	preserveExifData: true,
 	dateFormat: 'YYYY-MM-DD',
 	resizeWidth: -1
 }
@@ -224,8 +226,11 @@ export default class BetterDailyNotes extends Plugin {
 		}
 		const options = {
 			maxSizeMB: size / 1024.0,
-			useWebWorker: true
+			useWebWorker: true,
+			maxIteration: 10,
+			preserveExifData: this.settings.preserveExifData,
 		};
+		new Notice(`Compressing image ${file.name}.`);
 		const compressedFile = await imageCompression(file, options);
 		return compressedFile;
 	}
@@ -439,6 +444,15 @@ class BetterDailyNotesSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.maxImageSizeKB.toString())
 				.onChange(async (value) => {
 					this.plugin.settings.maxImageSizeKB = parseInt(value);
+					await this.plugin.saveSettings();
+				}));
+		new Setting(containerEl)
+			.setName('Preserve EXIF Data')
+			.setDesc('Preserve EXIF data when compressing images.')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.preserveExifData)
+				.onChange(async (value) => {
+					this.plugin.settings.preserveExifData = value;
 					await this.plugin.saveSettings();
 				}));
 		new Setting(containerEl)
