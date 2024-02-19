@@ -33,3 +33,18 @@ This plugin is built with TypeScript. Here's how to contribute:
 3. Make changes in `main.ts` or create new `.ts` files.
 4. Compile changes with `$ npm run dev`.
 5. Reload Obsidian to load the updated plugin.
+
+## Known Bugs
+- [ ] Assume same day before hour logic error.
+  > Will need to set actual value + 1 for now.
+
+## Features to be Added
+- [ ] Create daily note with template.
+- [ ] Open daily note on startup.
+- [ ] A modal to ask if image compress is required.
+- [ ] Create daily note for arbitrary date.
+- [ ] Support of month directory custom naming.
+- [ ] Compress images and rename file for existing notes.
+- [ ] Daily note one line summary by LLM.
+- [ ] Generate tags by LLM.
+- [ ] Image one line summary by LLM.
