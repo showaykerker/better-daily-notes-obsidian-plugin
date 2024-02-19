@@ -169,19 +169,13 @@ export default class BetterDailyNotes extends Plugin {
 		// new Notice(`Target: ${dir}`);
 		for (let dirName of dir.split("/")) {
 			dirPath = `${dirPath}${dirName}`;
-			console.log(dirPath);
 			const hasDirPath = this.app.vault.getAbstractFileByPath(dirPath);
-			// new Notice(`${dirPath}: ${hasDirPath}`);
-			console.log(`${dirPath}: ${hasDirPath}`);
 			if (hasDirPath) {
 				console.log(`Directory ${dirPath} exists.`);
-				// new Notice(`Directory ${dirPath} exists.`);
 			}
 			else {
-				console.log(`Directory ${dirPath} does not exist.`);
 				await this.app.vault.createFolder(dirPath);
 				new Notice(`Directory ${dirPath} created.`);
-				console.log(`Directory ${dirPath} created.`);
 			}
 			dirPath = `${dirPath}/`
 		}
@@ -204,7 +198,6 @@ export default class BetterDailyNotes extends Plugin {
 		if (!dailyNote) {
 			await this.app.vault.create(dailyNotePath, '');
 			new Notice(`Daily note ${dailyNotePath} created.`);
-			console.log(`Daily note ${dailyNotePath} created.`);
 		}
 		if (dailyNote) {
 			await this.app.workspace.openLinkText(dailyNotePath, '', true);
