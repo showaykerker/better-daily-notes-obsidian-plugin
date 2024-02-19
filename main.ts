@@ -8,6 +8,7 @@ interface BetterDailyNotesSettings {
 	imageSubDir: string;
 	defaultImageWidth: number;
 	dateFormat: string;
+	resizeWidth: number;
 }
 
 const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
@@ -15,6 +16,7 @@ const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	imageSubDir: 'images',
 	defaultImageWidth: -1,
 	dateFormat: 'YYYY-MM-DD',
+	resizeWidth: -1
 }
 
 function formatDate(format: string = DEFAULT_SETTINGS.dateFormat, date: Date = new Date()): string {
@@ -298,7 +300,10 @@ export default class BetterDailyNotes extends Plugin {
 			await this.createImageDirIfNotExists(date);
 			let imageArrayBuffer = this.base64ToArrayBuffer(base64);
 			await this.app.vault.createBinary(imagePath, imageArrayBuffer);
-			let imageLink = `![[${imagePath}]]`;
+			var imageLink = `![[${imagePath}]]`;
+			if (this.settings.resizeWidth !== -1) {
+				imageLink = `![[${imagePath}|${this.settings.resizeWidth}]]`;
+			}
 			editor.replaceSelection(imageLink);
 		};
 		reader.readAsDataURL(file);
@@ -453,12 +458,27 @@ class BetterDailyNotesSettingTab extends PluginSettingTab {
 				}));
 		new Setting(containerEl)
 			.setName('Default Image Width')
-			.setDesc('The default width of images. -1 means no width specified.')
+			.setDesc('The default width of images. -1 means no width specified.' +
+				'This will reduce the size of the image file.' +
+				'If the image\'s original width is smaller than the specified width, ' +
+				'the image will be pixelated.')
 			.addText(text => text
 				.setPlaceholder(this.plugin.settings.defaultImageWidth.toString())
 				.setValue(this.plugin.settings.defaultImageWidth.toString())
 				.onChange(async (value) => {
 					this.plugin.settings.defaultImageWidth = parseInt(value);
+					await this.plugin.saveSettings();
+				}));
+		new Setting(containerEl)
+			.setName('Resize Width')
+			.setDesc('The width to resize images. -1 means no resizing.' +
+				'This only add a suffix to the image\s markdown link. ' +
+				'No compression is done.')
+			.addText(text => text
+				.setPlaceholder(this.plugin.settings.resizeWidth.toString())
+				.setValue(this.plugin.settings.resizeWidth.toString())
+				.onChange(async (value) => {
+					this.plugin.settings.resizeWidth = parseInt(value);
 					await this.plugin.saveSettings();
 				}));
 	}
