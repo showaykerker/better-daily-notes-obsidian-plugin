@@ -151,7 +151,7 @@ export default class BetterDailyNotes extends Plugin {
 
 	getDailyNoteName(date: Date = new Date()) {
 		// if the current time is before assumeSameDayBeforeHour, assume it is the previous day
-		if (date.getHours() < this.settings.assumeSameDayBeforeHour) {
+		if (dayjs().get('hour') + 1 < this.settings.assumeSameDayBeforeHour) {
 			date.setDate(date.getDate() - 1);
 		}
 		return formatDate(this.settings.dateFormat, date);
