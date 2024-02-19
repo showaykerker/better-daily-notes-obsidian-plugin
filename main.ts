@@ -262,24 +262,20 @@ export default class BetterDailyNotes extends Plugin {
 		// rename and move a image to the image directory of the month
 		// and replace the markdown link with the new path
 
-		if (!file.type.startsWith("image")) {
-			return false;
-		}
-		if (!markdownView || !markdownView.file) {
-			return false;
-		}
 		const date = this.checkValidDailyNotePath(markdownView.file.path);
-		if (!date) {
-			console.log("Not a daily note.")
-			return false;
-		}
+		if (!file.type.startsWith("image")) { return false; }
+		if (!markdownView || !markdownView.file) { return false; }
+		if (!date) { return false; }
 
 		file = await this.limitImageFileWidth(file, this.settings.defaultImageWidth, reader);
+
+		var handleSuccess = true;
 
 		reader.onloadend = async (e) => {
 			// new Notice(`Image ${file.name} dropped.`);
 			let result = reader.result;
 			if (typeof result !== "string") {
+				handleSuccess = false;
 				return false;
 			}
 			let base64 = result.split(",")[1];
@@ -306,7 +302,7 @@ export default class BetterDailyNotes extends Plugin {
 			editor.replaceSelection(imageLink);
 		};
 		reader.readAsDataURL(file);
-		return true;
+		return handleSuccess;
 	}
 
 	setupImageHandler() {
@@ -320,12 +316,26 @@ export default class BetterDailyNotes extends Plugin {
 						evt.dataTransfer.files.length !== 0 &&
 						evt.dataTransfer.files[0].type.startsWith("image")) {
 						// only handle images
+						evt.preventDefault();
 						let files = evt.dataTransfer.files;
 						for (let i = 0; i < files.length; i++) {
 							console.log(files[i]);
 							let result = await this.handleSingleImage(files[i], editor, markdownView);
-							if (result) {
-								evt.preventDefault();
+							console.log("result:", result);
+							if (!result) {
+								const file = evt.dataTransfer.files[0];
+								const reader = new FileReader();
+								reader.onloadend = async () => {
+									const base64 = reader.result?.toString().split(",")[1];
+									if (base64) {
+										const imageArrayBuffer = this.base64ToArrayBuffer(base64);
+										const imagePath = `/${file.name}`;
+										await this.app.vault.createBinary(imagePath, imageArrayBuffer);
+										const imageLink = `![[${imagePath}]]`;
+										editor.replaceSelection(imageLink);
+									}
+								};
+								reader.readAsDataURL(file);
 							}
 						}
 					}
@@ -337,17 +347,30 @@ export default class BetterDailyNotes extends Plugin {
 				"editor-paste",
 				async (evt: ClipboardEvent, editor: Editor, markdownView: MarkdownView) => {
 					console.log("editor-paste", editor, markdownView, evt);
-					const date = new Date();
 					if (evt.clipboardData &&
 						evt.clipboardData.files.length !== 0 &&
 						evt.clipboardData.files[0].type.startsWith("image")) {
 						// only handle images
+						evt.preventDefault();
 						let files = evt.clipboardData.files;
 						for (let i = 0; i < files.length; i++) {
 							console.log(files[i]);
 							let result = await this.handleSingleImage(files[i], editor, markdownView);
-							if (result) {
-								evt.preventDefault();
+							console.log("result:", result);
+							if (!result) {
+								const file = evt.clipboardData.files[0];
+								const reader = new FileReader();
+								reader.onloadend = async () => {
+									const base64 = reader.result?.toString().split(",")[1];
+									if (base64) {
+										const imageArrayBuffer = this.base64ToArrayBuffer(base64);
+										const imagePath = `/${file.name}`;
+										await this.app.vault.createBinary(imagePath, imageArrayBuffer);
+										const imageLink = `![[${imagePath}]]`;
+										editor.replaceSelection(imageLink);
+									}
+								};
+								reader.readAsDataURL(file);
 							}
 						}
 					}
