@@ -11,6 +11,7 @@ interface BetterDailyNotesSettings {
 	preserveExifData: boolean;
 	dateFormat: string;
 	resizeWidth: number;
+	assumeSameDayBeforeHour: number;
 }
 
 const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
@@ -19,7 +20,8 @@ const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	maxImageSizeKB: -1,
 	preserveExifData: true,
 	dateFormat: 'YYYY-MM-DD',
-	resizeWidth: -1
+	resizeWidth: -1,
+	assumeSameDayBeforeHour: 2,
 }
 
 function formatDate(format: string = DEFAULT_SETTINGS.dateFormat, date: Date = new Date()): string {
@@ -126,6 +128,10 @@ export default class BetterDailyNotes extends Plugin {
 	}
 
 	getDailyNoteName(date: Date = new Date()) {
+		// if the current time is before assumeSameDayBeforeHour, assume it is the previous day
+		if (date.getHours() < this.settings.assumeSameDayBeforeHour) {
+			date.setDate(date.getDate() - 1);
+		}
 		return formatDate(this.settings.dateFormat, date);
 	}
 
@@ -465,6 +471,19 @@ class BetterDailyNotesSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.resizeWidth.toString())
 				.onChange(async (value) => {
 					this.plugin.settings.resizeWidth = parseInt(value);
+					await this.plugin.saveSettings();
+				}));
+		new Setting(containerEl)
+			.setName('Assume Same Day Before Hour')
+			.setDesc('If the current time is before this hour, assume it is the previous day. (Range: 0-23)')
+			.addText(text => text
+				.setPlaceholder(this.plugin.settings.assumeSameDayBeforeHour.toString())
+				.setValue(this.plugin.settings.assumeSameDayBeforeHour.toString())
+				.onChange(async (value) => {
+					if (parseInt(value) < 0) { value = "0"; }
+					if (parseInt(value) > 23) { value = "23"; }
+					value = parseInt(value).toString();
+					this.plugin.settings.assumeSameDayBeforeHour = parseInt(value);
 					await this.plugin.saveSettings();
 				}));
 	}
