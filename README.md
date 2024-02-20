@@ -35,8 +35,8 @@ This plugin is built with TypeScript. Here's how to contribute:
 5. Reload Obsidian to load the updated plugin.
 
 ## Known Bugs
-- [ ] Assume same day before hour logic error.
-  > Will need to set actual value + 1 for now.
+- [x] ~~Assume same day before hour logic error.~~
+  > ~~Will need to set actual value + 1 for now.~~
 
 ## Features to be Added
 - [ ] Create daily note with template.
