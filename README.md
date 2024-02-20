@@ -4,7 +4,7 @@ Transform your daily note-taking experience with the **Better Daily Notes** Plug
 
 Seamlessly integrated, this plugin empowers you to organize and manage your daily notes effortlessly.
 
-<img src='2024-02-20-image2.png' width='200'/> <img src='better-daily-note-demo.gif' height='500'/>
+<img src='2024-02-20-image2.png' width='140'/> <img src='better-daily-note-demo.gif' width='560'/>
 
 
 ## Features
