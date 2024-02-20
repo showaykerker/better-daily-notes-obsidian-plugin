@@ -25,11 +25,10 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
   - Provides commands to open today's, yesterday's, and tomorrow's daily notes.
 
 ## Installation
-### Manual Installation
-1. Navigate to your vault's plugin folder (`<vault>/.obsidian/plugins`).
-2. Create a folder named `better-daily-notes` and move plugin files into it.
-3. Download `main.js`, `styles.css`, `manifest.json` from the latest release and place them in the folder created in step 2.
-4. Reload Obsidian and enable the plugin in `Settings -> Community Plugins`.
+For manual installation,
+1. navigate to your vault's plugin folder (`<vault>/.obsidian/plugins`)
+2. Download `better-daily-notes-obsidian-plugin-version.zip` from the release page and extract them in the `plugin` folder.
+3. Reload Obsidian and enable the plugin in `Settings` -> `Community Plugins`.
 
 ## Development
 This plugin is built with TypeScript. Here's how to contribute:
