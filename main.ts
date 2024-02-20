@@ -143,22 +143,28 @@ export default class BetterDailyNotes extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	getMonthDirPath(date: Date = new Date()) {
+	getMonthDirPath(date: Date = new Date(), considerAssumeSameDayBeforeHour: boolean = false) {
+		// if the current time is before assumeSameDayBeforeHour, assume it is the previous day
+		if (dayjs().get('hour') + 1 < this.settings.assumeSameDayBeforeHour &&
+				considerAssumeSameDayBeforeHour) {
+			date.setDate(date.getDate() - 1);
+		}
 		const year = date.getFullYear();
 		const monthStr = date.toLocaleString('en-GB', { month: 'short' });
 		return `${this.settings.rootDir}/${year}/${monthStr}`;
 	}
 
-	getDailyNoteName(date: Date = new Date()) {
+	getDailyNoteName(date: Date = new Date(), considerAssumeSameDayBeforeHour: boolean = false) {
 		// if the current time is before assumeSameDayBeforeHour, assume it is the previous day
-		if (dayjs().get('hour') < this.settings.assumeSameDayBeforeHour) {
+		if (dayjs().get('hour') + 1 < this.settings.assumeSameDayBeforeHour &&
+				considerAssumeSameDayBeforeHour) {
 			date.setDate(date.getDate() - 1);
 		}
 		return formatDate(this.settings.dateFormat, date);
 	}
 
 	getDailyNotePath(date: Date = new Date()){
-		const noteName = this.getDailyNoteName(date);
+		const noteName = this.getDailyNoteName(date, true);
 		const dirPath = this.getMonthDirPath(date);
 		return `${dirPath}/${noteName}.md`;
 	}
@@ -187,7 +193,7 @@ export default class BetterDailyNotes extends Plugin {
 	}
 
 	async createDirIfNotExists(date: Date = new Date()) {
-		const dirPath = this.getMonthDirPath(date);
+		const dirPath = this.getMonthDirPath(date, true);
 		await this.createDirsIfNotExists(dirPath);
 	}
 
