@@ -1,6 +1,10 @@
 # Better Daily Notes Plugin
 
-This plugin enhances the daily notes experience in Obsidian.
+Transform your daily note-taking experience with the **Better Daily Notes** Plugin. 
+
+Seamlessly integrated, this plugin empowers you to organize and manage your daily notes effortlessly.
+
+![better-daily-notes-plugin-demo](better-daily-note-demo.gif)
 
 ## Features
 - **Structured Daily Notes:** Organizes daily notes in a structured folder format `[DailyNoteRootDirectory]/[Mon.]/[DateFormat].md`.
@@ -41,7 +45,8 @@ This plugin is built with TypeScript. Here's how to contribute:
 ## Features to be Added
 - [ ] Create daily note with template.
 - [ ] Open daily note on startup.
-- [ ] A modal to ask if image compress is required.
+- [ ] A modal to ask if image compression is required.
+- [ ] Commands to toggle image compression.
 - [ ] Create daily note for arbitrary date.
 - [ ] Support of month directory custom naming.
 - [ ] Compress images and rename file for existing notes.
