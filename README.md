@@ -1,6 +1,6 @@
 # Better Daily Notes Plugin
 
-Transform your daily note-taking experience with the **Better Daily Notes** Plugin. 
+Transform your daily note-taking experience with the **Better Daily Notes** Plugin.
 
 Seamlessly integrated, this plugin empowers you to organize and manage your daily notes effortlessly.
 
