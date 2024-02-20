@@ -27,7 +27,7 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
 ## Installation
 For manual installation,
 1. navigate to your vault's plugin folder (`<vault>/.obsidian/plugins`)
-2. Download `better-daily-notes-obsidian-plugin-version.zip` from the release page and extract them in the `plugin` folder.
+2. Download `better-daily-notes-obsidian-plugin-version.zip` from the release page and extract them in the `plugins` folder.
 3. Reload Obsidian and enable the plugin in `Settings` -> `Community Plugins`.
 
 ## Development
