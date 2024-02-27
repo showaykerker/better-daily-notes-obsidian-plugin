@@ -1,3 +1,4 @@
+import { Notice } from "obsidian";
 import imageCompression from 'browser-image-compression';
 
 export async function limitImageFileSize(file: File, size: number, preserveExifData: boolean): Promise<File> {
@@ -10,6 +11,7 @@ export async function limitImageFileSize(file: File, size: number, preserveExifD
         maxIteration: 10,
         preserveExifData: preserveExifData,
     };
+    new Notice(`Compressing image "${file.name}" to ${size}KB`);
     const compressedFile = await imageCompression(file, options);
     return compressedFile;
 }

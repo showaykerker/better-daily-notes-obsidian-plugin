@@ -1,9 +1,8 @@
 import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
 import dayjs from 'dayjs';
 import { checkValidDailyNotePath, base64ToArrayBuffer } from './utils';
-import { getDailyNoteName, getDailyNotePath, getMonthDirPath } from './utils';
 import { limitImageFileSize } from './imageHandler';
-import { createImageDirIfNotExists } from './fileSystem';
+import { createDirsIfNotExists } from './fileSystem';
 import { openDailyNote } from './commands';
 import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
 import { BetterDailyNotesSettingTab } from './settings/settingTab';
@@ -109,13 +108,17 @@ export default class BetterDailyNotes extends Plugin {
 		markdownView: MarkdownView,
 		reader: FileReader = new FileReader(),
 	 	): Promise<boolean>{
-		// rename and move a image to the image directory of the month
+		// rename and move a image to the image directory under current parent
 		// and replace the markdown link with the new path
-
 		if (!file.type.startsWith("image")) { return false; }
 		if (!markdownView || !markdownView.file) { return false; }
+		if (this.settings.imageHandlingScenario === "disabled") { return false; }
+
 		const date = checkValidDailyNotePath(markdownView.file.path, this.settings.dateFormat);
-		if (!date) { return false; }
+		if (this.settings.imageHandlingScenario === "daily notes only" && !date) { return false; }
+
+		let viewParentPath = markdownView.file.parent?.path ?? "";
+		let viewFileName = markdownView.file.basename;
 
 		file = await limitImageFileSize(
 			file,
@@ -125,38 +128,35 @@ export default class BetterDailyNotes extends Plugin {
 		var handleSuccess = true;
 
 		reader.onloadend = async (e) => {
-			// new Notice(`Image ${file.name} dropped.`);
 			let result = reader.result;
 			if (typeof result !== "string") {
 				handleSuccess = false;
 				return false;
 			}
 			let base64 = result.split(",")[1];
-			let rootDir = this.settings.rootDir;
-			let assumeSameDayBeforeHour = this.settings.assumeSameDayBeforeHour;
-			let dateFormat = this.settings.dateFormat;
-			let imageDirPath = `${getMonthDirPath(rootDir, assumeSameDayBeforeHour, date)}/${this.settings.imageSubDir}`;
-			let imageFilePrefix = `${getDailyNoteName(assumeSameDayBeforeHour, dateFormat, date)}-image`;
+			var imageDirPath = `${this.settings.imageSubDir}`;
+			if (viewParentPath !== "/") {
+				imageDirPath = `${viewParentPath}/${imageDirPath}`;
+			}
+			let imageFilePrefix = `${viewFileName}-image`;
 			// count current images under imageDirPath that starts with imageFilePrefix
-			const countImageFiles = (dirPath: string) => {
+			const countImageFiles = (dirPath: string, prefix: string) => {
+				let files = this.app.vault.getFiles();
 				let count = 0;
-				for (let file of this.app.vault.getFiles()) {
+				for (let file of files.filter(file => file.path.startsWith(dirPath))) {
 					if (file.path.startsWith(dirPath) &&
-						file.path.contains(imageFilePrefix) &&
+						file.path.contains(prefix) &&
 						!file.path.endsWith(".md")) {count += 1;}
 				}
 				return count;
 			};
-			const imageCount = countImageFiles(imageDirPath);
-			console.log(`Number of images today: ${imageCount}`);
+			const imageCount = countImageFiles(imageDirPath, imageFilePrefix);
+			console.log(`Number of images with same prefix "${imageFilePrefix}" under "${imageDirPath}": ${imageCount}`);
 			var imageFileName = `${imageFilePrefix}${imageCount}.${file.type.split("/")[1]}`;
 			let imagePath = `${imageDirPath}/${imageFileName}`;
-			await createImageDirIfNotExists(
-				this.app,
-				rootDir,
-				assumeSameDayBeforeHour,
-				this.settings.imageSubDir,
-				date);
+			await createDirsIfNotExists(this.app, imageDirPath);
+			console.log("Save to:", imagePath);
+			new Notice(`Creating file "${imagePath}"`);
 			let imageArrayBuffer = base64ToArrayBuffer(base64);
 			await this.app.vault.createBinary(imagePath, imageArrayBuffer);
 			var imageLink = `![[${imagePath}]]`;
@@ -183,9 +183,7 @@ export default class BetterDailyNotes extends Plugin {
 						evt.preventDefault();
 						let files = evt.dataTransfer.files;
 						for (let i = 0; i < files.length; i++) {
-							console.log(files[i]);
 							let result = await this.handleSingleImage(files[i], editor, markdownView);
-							console.log("result:", result);
 							if (!result) {
 								const file = evt.dataTransfer.files[0];
 								const reader = new FileReader();
@@ -193,8 +191,15 @@ export default class BetterDailyNotes extends Plugin {
 									const base64 = reader.result?.toString().split(",")[1];
 									if (base64) {
 										const imageArrayBuffer = base64ToArrayBuffer(base64);
-										const imagePath = `/${file.name}`;
-										await this.app.vault.createBinary(imagePath, imageArrayBuffer);
+										const imagePath = `${file.name}`;
+										// check if the file already exists
+										if (this.app.vault.getAbstractFileByPath(imagePath)) {
+											new Notice(`File "${imagePath}" already exists.`);
+										}
+										else {
+											new Notice(`Creating file "${imagePath}"`);
+											await this.app.vault.createBinary(imagePath, imageArrayBuffer);
+										}
 										const imageLink = `![[${imagePath}]]`;
 										editor.replaceSelection(imageLink);
 									}
@@ -218,9 +223,7 @@ export default class BetterDailyNotes extends Plugin {
 						evt.preventDefault();
 						let files = evt.clipboardData.files;
 						for (let i = 0; i < files.length; i++) {
-							console.log(files[i]);
 							let result = await this.handleSingleImage(files[i], editor, markdownView);
-							console.log("result:", result);
 							if (!result) {
 								const file = evt.clipboardData.files[0];
 								const reader = new FileReader();
@@ -228,8 +231,15 @@ export default class BetterDailyNotes extends Plugin {
 									const base64 = reader.result?.toString().split(",")[1];
 									if (base64) {
 										const imageArrayBuffer = base64ToArrayBuffer(base64);
-										const imagePath = `/${file.name}`;
-										await this.app.vault.createBinary(imagePath, imageArrayBuffer);
+										const imagePath = `${file.name}`;
+										// check if the file already exists
+										if (this.app.vault.getAbstractFileByPath(imagePath)) {
+											new Notice(`File "${imagePath}" already exists.`);
+										}
+										else {
+											new Notice(`Creating file "${imagePath}"`);
+											await this.app.vault.createBinary(imagePath, imageArrayBuffer);
+										}
 										const imageLink = `![[${imagePath}]]`;
 										editor.replaceSelection(imageLink);
 									}
