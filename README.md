@@ -12,12 +12,15 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
   - Customize the root directory and date format in the settings.
   - Month represented in short form (e.g., Jan, Feb, Mar).
 - **Image Management:**
-  - Images dropped or pasted to a daily note are saved to `[DailyNoteRootDirectory]/[Mon.]/[CustomImageFolder]` and renamed to `[DateFormat]-image#.[OriginalExt]`
-    - Only notes with the right path and name will be considered to be a daily note.
-    - Set custom image folder name in the settings.
+  - ***[New in v0.1.2]*** Configuration of image handling
+    - `Disable All Handling`
+    - `Only in Daily Notes`
+    - `Handle in All Files`
+  - Images dropped or pasted to a note are saved to `[CustomImageFolder]/` under the same parent of current note, and renamed to `[CurrentNoteBasename]-image#.[OriginalExt]`
+  - Set custom image folder name in the settings.
   - Images are compressed using [browser-image-compression](https://github.com/Donaldcwl/browser-image-compression#readme). Adjust compression settings like max image size and EXIF data removal.
   - Images can be resized with markdown syntax to a specified width. Customize resizing width in the settings.
-  - Only images added to a daily note will be modified.
+  - ~~***[Removed in v0.1.2]*** Only images added to a daily note will be modified.~~
 - **Assume Same Day Before Hour:**
   - Considers it the same day before a specified hour after midnight.
 - **Convenient Navigation:**
@@ -41,8 +44,11 @@ This plugin is built with TypeScript. Here's how to contribute:
 ## Known Bugs
 - [x] ~~Assume same day before hour logic error.~~
   > ~~Will need to set actual value + 1 for now.~~
+- [x] Images will still be resized with markdown syntax in notes that's not wishes to handle images.
 
 ## Features to be Added
+- [ ] Support of other file types. e.g. `.dill`.
+- [ ] Support of customizing drag and paste behavior.
 - [ ] Create daily note with template.
 - [ ] Open daily note on startup.
 - [ ] A modal to ask if image compression is required.
