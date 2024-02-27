@@ -1,47 +1,13 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
 import dayjs from 'dayjs';
-import imageCompression from 'browser-image-compression';
+import { checkValidDailyNotePath, base64ToArrayBuffer } from './utils';
+import { getDailyNoteName, getDailyNotePath, getMonthDirPath } from './utils';
+import { limitImageFileSize } from './imageHandler';
+import { createImageDirIfNotExists } from './fileSystem';
+import { openDailyNote } from './commands';
+import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
+import { BetterDailyNotesSettingTab } from './settings/settingTab';
 
-// Remember to rename these classes and interfaces!
-
-interface BetterDailyNotesSettings {
-	rootDir: string;
-	imageSubDir: string;
-	maxImageSizeKB: number;
-	preserveExifData: boolean;
-	dateFormat: string;
-	resizeWidth: number;
-	assumeSameDayBeforeHour: number;
-}
-
-const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
-	rootDir: 'daily-notes',
-	imageSubDir: 'images',
-	maxImageSizeKB: -1,
-	preserveExifData: true,
-	dateFormat: 'YYYY-MM-DD',
-	resizeWidth: -1,
-	assumeSameDayBeforeHour: 2,
-}
-
-function formatDate(format: string = DEFAULT_SETTINGS.dateFormat, date: Date = new Date()): string {
-	return dayjs(date).format(format);
-}
-
-function isValidDateFormat(format: string): boolean {
-	// if format contains invalid slashes, even if dayjs accepts it, it is not a valid format
-	if (format.match("/")) {
-		return false;
-	}
-	try {
-		dayjs().format(format);
-		return true;
-	}
-	catch (e) {
-		console.log(e);
-		return false;
-	}
-}
 
 export default class BetterDailyNotes extends Plugin {
 	settings: BetterDailyNotesSettings;
@@ -58,7 +24,7 @@ export default class BetterDailyNotes extends Plugin {
 			'book-open-check',
 			'Open today\'s daily note',
 			(evt: MouseEvent) => {
-				this.openTodaysDailyNote();
+				openDailyNote(this.app, this.settings, 0);
 			}
 		);
 		// Perform additional things with the ribbon
@@ -68,7 +34,7 @@ export default class BetterDailyNotes extends Plugin {
 			id: 'open-todays-daily-note',
 			name: 'Open today\'s daily note',
 			callback: () => {
-				this.openTodaysDailyNote();
+				openDailyNote(this.app, this.settings, 0);
 			}
 		})
 
@@ -76,10 +42,7 @@ export default class BetterDailyNotes extends Plugin {
 			id: 'open-yesterdays-daily-note',
 			name: 'Open yesterday\'s daily note',
 			callback: () => {
-				var date = new Date();
-				date.setDate(date.getDate() - 1);
-				const dailyNotePath = this.getDailyNotePath(date);
-				this.app.workspace.openLinkText(dailyNotePath, '', true);
+				openDailyNote(this.app, this.settings, -1);
 			}
 		})
 
@@ -87,10 +50,7 @@ export default class BetterDailyNotes extends Plugin {
 			id: 'open-tomorrows-daily-note',
 			name: 'Open tomorrow\'s daily note',
 			callback: () => {
-				var date = new Date();
-				date.setDate(date.getDate() + 1);
-				const dailyNotePath = this.getDailyNotePath(date);
-				this.app.workspace.openLinkText(dailyNotePath, '', true);
+				openDailyNote(this.app, this.settings, +1);
 			}
 		})
 
@@ -104,7 +64,7 @@ export default class BetterDailyNotes extends Plugin {
 					return;
 				}
 				if (activeView instanceof MarkdownView) {
-					const date = this.checkValidDailyNotePath(activeView.file.path);
+					const date = checkValidDailyNotePath(activeView.file.path, this.settings.dateFormat);
 					if (date) {
 						new Notice(`${activeView.file.path} is a valid daily note on ${date}`);
 					}
@@ -143,126 +103,6 @@ export default class BetterDailyNotes extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	getMonthDirPath(date: Date = new Date(), considerAssumeSameDayBeforeHour: boolean = false) {
-		// if the current time is before assumeSameDayBeforeHour, assume it is the previous day
-		if (dayjs().get('hour') + 1 < this.settings.assumeSameDayBeforeHour &&
-				considerAssumeSameDayBeforeHour) {
-			date.setDate(date.getDate() - 1);
-		}
-		const year = date.getFullYear();
-		const monthStr = date.toLocaleString('en-GB', { month: 'short' });
-		return `${this.settings.rootDir}/${year}/${monthStr}`;
-	}
-
-	getDailyNoteName(date: Date = new Date(), considerAssumeSameDayBeforeHour: boolean = false) {
-		// if the current time is before assumeSameDayBeforeHour, assume it is the previous day
-		if (dayjs().get('hour') < this.settings.assumeSameDayBeforeHour &&
-				considerAssumeSameDayBeforeHour) {
-			date.setDate(date.getDate() - 1);
-		}
-		return formatDate(this.settings.dateFormat, date);
-	}
-
-	getDailyNotePath(date: Date = new Date()){
-		const noteName = this.getDailyNoteName(date, true);
-		const dirPath = this.getMonthDirPath(date);
-		return `${dirPath}/${noteName}.md`;
-	}
-
-	async createDirsIfNotExists(dir: string) {
-		// check and create from parent to child
-		let dirPath = "";
-		// new Notice(`Target: ${dir}`);
-		for (let dirName of dir.split("/")) {
-			dirPath = `${dirPath}${dirName}`;
-			const hasDirPath = this.app.vault.getAbstractFileByPath(dirPath);
-			if (hasDirPath) {
-				console.log(`Directory ${dirPath} exists.`);
-			}
-			else {
-				await this.app.vault.createFolder(dirPath);
-				new Notice(`Directory ${dirPath} created.`);
-			}
-			dirPath = `${dirPath}/`
-		}
-	}
-
-	async createImageDirIfNotExists(date: Date = new Date()) {
-		const imgDirPath = `${this.getMonthDirPath(date)}/${this.settings.imageSubDir}`;
-		this.createDirsIfNotExists(imgDirPath);
-	}
-
-	async createDirIfNotExists(date: Date = new Date()) {
-		const dirPath = this.getMonthDirPath(date, true);
-		await this.createDirsIfNotExists(dirPath);
-	}
-
-	async openTodaysDailyNote() {
-		const dailyNotePath = this.getDailyNotePath();
-		await this.createDirIfNotExists();
-		const dailyNote = this.app.vault.getAbstractFileByPath(dailyNotePath);
-		if (!dailyNote) {
-			await this.app.vault.create(dailyNotePath, '');
-			new Notice(`Daily note ${dailyNotePath} created.`);
-		}
-		if (dailyNote) {
-			await this.app.workspace.openLinkText(dailyNotePath, '', true);
-		}
-		else {
-			await this.app.workspace.openLinkText(dailyNotePath, '', true);
-		}
-	}
-
-	checkValidDailyNotePath(notePath: string): Date | null{
-		// return None if the notePath is not a daily note
-		const noteName = notePath.split("/").slice(-1)[0].split(".")[0];
-		if (!noteName) {
-			console.log("No note name.");
-			return null;
-		}
-		// first check if the file name matches the settings.dateFormat
-		const date = dayjs(noteName, this.settings.dateFormat, true);
-		if (!date.isValid()) {
-			console.log("Invalid date.");
-			return null;
-		}
-		// then check if the file is monthly note directory
-		const monthDir = notePath.split("/").slice(-2, -1);
-		if (!monthDir) {
-			console.log("No month directory.");
-			return null;
-		}
-		return date.toDate();
-	}
-
-
-	base64ToArrayBuffer(base64: string): ArrayBuffer {
-		const binaryString = window.atob(base64);
-		const length = binaryString.length;
-		const bytes = new Uint8Array(length);
-		for (let i = 0; i < length; i++) {
-			bytes[i] = binaryString.charCodeAt(i);
-		}
-		return bytes.buffer;
-	}
-
-	async limitImageFileSize(file: File, size: number, reader: FileReader = new FileReader()): Promise<File>{
-		// if size is -1, do nothing. Otherwise
-		// Modify image size to be less than size KB
-		if (size === -1) {
-			return Promise.resolve(file);
-		}
-		const options = {
-			maxSizeMB: size / 1024.0,
-			useWebWorker: true,
-			maxIteration: 10,
-			preserveExifData: this.settings.preserveExifData,
-		};
-		new Notice(`Compressing image ${file.name}.`);
-		const compressedFile = await imageCompression(file, options);
-		return compressedFile;
-	}
-
 	async handleSingleImage(
 		file: File,
 		editor: Editor,
@@ -274,10 +114,13 @@ export default class BetterDailyNotes extends Plugin {
 
 		if (!file.type.startsWith("image")) { return false; }
 		if (!markdownView || !markdownView.file) { return false; }
-		const date = this.checkValidDailyNotePath(markdownView.file.path);
+		const date = checkValidDailyNotePath(markdownView.file.path, this.settings.dateFormat);
 		if (!date) { return false; }
 
-		file = await this.limitImageFileSize(file, this.settings.maxImageSizeKB, reader);
+		file = await limitImageFileSize(
+			file,
+			this.settings.maxImageSizeKB,
+			this.settings.preserveExifData);
 
 		var handleSuccess = true;
 
@@ -289,8 +132,11 @@ export default class BetterDailyNotes extends Plugin {
 				return false;
 			}
 			let base64 = result.split(",")[1];
-			let imageDirPath = `${this.getMonthDirPath(date)}/${this.settings.imageSubDir}`;
-			let imageFilePrefix = `${this.getDailyNoteName(date)}-image`;
+			let rootDir = this.settings.rootDir;
+			let assumeSameDayBeforeHour = this.settings.assumeSameDayBeforeHour;
+			let dateFormat = this.settings.dateFormat;
+			let imageDirPath = `${getMonthDirPath(rootDir, assumeSameDayBeforeHour, date)}/${this.settings.imageSubDir}`;
+			let imageFilePrefix = `${getDailyNoteName(assumeSameDayBeforeHour, dateFormat, date)}-image`;
 			// count current images under imageDirPath that starts with imageFilePrefix
 			const countImageFiles = (dirPath: string) => {
 				let count = 0;
@@ -305,8 +151,13 @@ export default class BetterDailyNotes extends Plugin {
 			console.log(`Number of images today: ${imageCount}`);
 			var imageFileName = `${imageFilePrefix}${imageCount}.${file.type.split("/")[1]}`;
 			let imagePath = `${imageDirPath}/${imageFileName}`;
-			await this.createImageDirIfNotExists(date);
-			let imageArrayBuffer = this.base64ToArrayBuffer(base64);
+			await createImageDirIfNotExists(
+				this.app,
+				rootDir,
+				assumeSameDayBeforeHour,
+				this.settings.imageSubDir,
+				date);
+			let imageArrayBuffer = base64ToArrayBuffer(base64);
 			await this.app.vault.createBinary(imagePath, imageArrayBuffer);
 			var imageLink = `![[${imagePath}]]`;
 			if (this.settings.resizeWidth !== -1) {
@@ -341,7 +192,7 @@ export default class BetterDailyNotes extends Plugin {
 								reader.onloadend = async () => {
 									const base64 = reader.result?.toString().split(",")[1];
 									if (base64) {
-										const imageArrayBuffer = this.base64ToArrayBuffer(base64);
+										const imageArrayBuffer = base64ToArrayBuffer(base64);
 										const imagePath = `/${file.name}`;
 										await this.app.vault.createBinary(imagePath, imageArrayBuffer);
 										const imageLink = `![[${imagePath}]]`;
@@ -376,7 +227,7 @@ export default class BetterDailyNotes extends Plugin {
 								reader.onloadend = async () => {
 									const base64 = reader.result?.toString().split(",")[1];
 									if (base64) {
-										const imageArrayBuffer = this.base64ToArrayBuffer(base64);
+										const imageArrayBuffer = base64ToArrayBuffer(base64);
 										const imagePath = `/${file.name}`;
 										await this.app.vault.createBinary(imagePath, imageArrayBuffer);
 										const imageLink = `![[${imagePath}]]`;
@@ -393,120 +244,3 @@ export default class BetterDailyNotes extends Plugin {
 	}
 }
 
-
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class BetterDailyNotesSettingTab extends PluginSettingTab {
-	plugin: BetterDailyNotes;
-
-	constructor(app: App, plugin: BetterDailyNotes) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
-
-	display(): void {
-		const {containerEl} = this;
-		function getDescription() {
-			return 'The date format for the daily notes. (Using Dayjs) \n' +
-				'Current format looks like:' +
-				formatDate(this.plugin.settings.dateFormat);
-		}
-		containerEl.empty();
-		new Setting(containerEl)
-			.setName('Date Format')
-			.setDesc(getDescription.bind(this)())
-			.addText(text => text
-				.setPlaceholder(this.plugin.settings.dateFormat)
-				.setValue(this.plugin.settings.dateFormat)
-				.onChange(async (value) => {
-					if (!isValidDateFormat(value)) {
-						return;
-					}
-					this.plugin.settings.dateFormat = value;
-					const previewElement = containerEl.querySelector('.setting-item-description');
-					if (previewElement instanceof HTMLDivElement) {
-						previewElement.innerText = getDescription.bind(this)();
-					}
-					await this.plugin.saveSettings();
-				}));
-		new Setting(containerEl)
-			.setName('Root Directory')
-			.setDesc('The root directory for the daily notes.')
-			.addText(text => text
-				.setPlaceholder(this.plugin.settings.rootDir)
-				.setValue(this.plugin.settings.rootDir)
-				.onChange(async (value) => {
-					this.plugin.settings.rootDir = value;
-					await this.plugin.saveSettings();
-				}));
-		new Setting(containerEl)
-			.setName('Image Subdirectory')
-			.setDesc('The subdirectory for images.')
-			.addText(text => text
-				.setPlaceholder(this.plugin.settings.imageSubDir)
-				.setValue(this.plugin.settings.imageSubDir)
-				.onChange(async (value) => {
-					this.plugin.settings.imageSubDir = value;
-					await this.plugin.saveSettings();
-				}));
-		new Setting(containerEl)
-			.setName('Max Image Size (KB)')
-			.setDesc('Compress images added to the daily note to this size. -1 means no compression.')
-			.addText(text => text
-				.setPlaceholder(this.plugin.settings.maxImageSizeKB.toString())
-				.setValue(this.plugin.settings.maxImageSizeKB.toString())
-				.onChange(async (value) => {
-					this.plugin.settings.maxImageSizeKB = parseInt(value);
-					await this.plugin.saveSettings();
-				}));
-		new Setting(containerEl)
-			.setName('Preserve EXIF Data')
-			.setDesc('Preserve EXIF data when compressing images.')
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.preserveExifData)
-				.onChange(async (value) => {
-					this.plugin.settings.preserveExifData = value;
-					await this.plugin.saveSettings();
-				}));
-		new Setting(containerEl)
-			.setName('Resize Width')
-			.setDesc('The width to resize images. -1 means no resizing.' +
-				'This only add a suffix to the image\s markdown link. ' +
-				'No compression is done.')
-			.addText(text => text
-				.setPlaceholder(this.plugin.settings.resizeWidth.toString())
-				.setValue(this.plugin.settings.resizeWidth.toString())
-				.onChange(async (value) => {
-					this.plugin.settings.resizeWidth = parseInt(value);
-					await this.plugin.saveSettings();
-				}));
-		new Setting(containerEl)
-			.setName('Assume Same Day Before Hour')
-			.setDesc('If the current time is before this hour, assume it is the previous day. (Range: 0-23)')
-			.addText(text => text
-				.setPlaceholder(this.plugin.settings.assumeSameDayBeforeHour.toString())
-				.setValue(this.plugin.settings.assumeSameDayBeforeHour.toString())
-				.onChange(async (value) => {
-					if (parseInt(value) < 0) { value = "0"; }
-					if (parseInt(value) > 23) { value = "23"; }
-					value = parseInt(value).toString();
-					this.plugin.settings.assumeSameDayBeforeHour = parseInt(value);
-					await this.plugin.saveSettings();
-				}));
-	}
-}
