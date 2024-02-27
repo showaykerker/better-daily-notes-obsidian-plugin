@@ -1,7 +1,7 @@
 import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
 import dayjs from 'dayjs';
 import { checkValidDailyNotePath } from './utils';
-import { base64ToArrayBuffer, createAndInsertImageFromFileReader, handleSingleImage } from './imageHandler';
+import { createAndInsertImageFromFileReader, handleSingleImage, shouldHandleAccordingToConfig } from './imageHandler';
 import { openDailyNote } from './commands';
 import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
 import { BetterDailyNotesSettingTab } from './settings/settingTab';
@@ -107,27 +107,30 @@ export default class BetterDailyNotes extends Plugin {
 				"editor-drop",
 				async (evt: DragEvent, editor: Editor, markdownView: MarkdownView) => {
 					console.log("editor-drop", evt, editor, markdownView);
-					const date = new Date();
-					if (evt.dataTransfer &&
-						evt.dataTransfer.files.length !== 0 &&
-						evt.dataTransfer.files[0].type.startsWith("image")) {
-						// only handle images
-						evt.preventDefault();
-						let files = evt.dataTransfer.files;
-						for (let i = 0; i < files.length; i++) {
-							let result = await handleSingleImage(
-								this.app, this.settings, files[i], editor, markdownView);
-							if (!result) {
-								console.log("Failed to handle image.");
-								const file = evt.dataTransfer.files[0];
-								const imagePath = file.name;
-								const reader = new FileReader();
-								reader.onloadend = async () => {
-									await createAndInsertImageFromFileReader(
-										this.app, editor, reader, imagePath, true, this.settings.resizeWidth);
-								};
-								reader.readAsDataURL(file);
-							}
+					if (!evt.dataTransfer || !evt.dataTransfer.files) { return; }
+					if (!shouldHandleAccordingToConfig(this.settings, evt.dataTransfer?.files[0], markdownView)) {
+						return false;
+					}
+					if (!evt.dataTransfer.files[0].type.startsWith("image")) {
+						return false;
+					}
+					// only handle images
+					// TODO: Should handle files one by one here
+					evt.preventDefault();
+					let files = evt.dataTransfer.files;
+					for (let i = 0; i < files.length; i++) {
+						let result = await handleSingleImage(
+							this.app, this.settings, files[i], editor, markdownView);
+						if (!result) {
+							console.log("Failed to handle image.");
+							const file = evt.dataTransfer.files[0];
+							const imagePath = file.name;
+							const reader = new FileReader();
+							reader.onloadend = async () => {
+								await createAndInsertImageFromFileReader(
+									this.app, editor, reader, imagePath, true, -1);
+							};
+							reader.readAsDataURL(file);
 						}
 					}
 				}
@@ -138,26 +141,30 @@ export default class BetterDailyNotes extends Plugin {
 				"editor-paste",
 				async (evt: ClipboardEvent, editor: Editor, markdownView: MarkdownView) => {
 					console.log("editor-paste", editor, markdownView, evt);
-					if (evt.clipboardData &&
-						evt.clipboardData.files.length !== 0 &&
-						evt.clipboardData.files[0].type.startsWith("image")) {
-						// only handle images
-						evt.preventDefault();
-						let files = evt.clipboardData.files;
-						for (let i = 0; i < files.length; i++) {
-							let result = await handleSingleImage(
-								this.app, this.settings, files[i], editor, markdownView);
-							if (!result) {
-								console.log("Failed to handle image.");
-								const file = evt.clipboardData.files[0];
-								const imagePath = file.name;
-								const reader = new FileReader();
-								reader.onloadend = async () => {
-									await createAndInsertImageFromFileReader(
-										this.app, editor, reader, imagePath, true, this.settings.resizeWidth);
-								};
-								reader.readAsDataURL(file);
-							}
+					if (!evt.clipboardData || !evt.clipboardData.files) { return; }
+					if (!shouldHandleAccordingToConfig(this.settings, evt.clipboardData?.files[0], markdownView)) {
+						return false;
+					}
+					if (!evt.clipboardData.files[0].type.startsWith("image")) {
+						return false;
+					}
+					// only handle images
+					// TODO: Should handle files one by one here
+					evt.preventDefault();
+					let files = evt.clipboardData.files;
+					for (let i = 0; i < files.length; i++) {
+						let result = await handleSingleImage(
+							this.app, this.settings, files[i], editor, markdownView);
+						if (!result) {
+							console.log("Failed to handle image.");
+							const file = evt.clipboardData.files[0];
+							const imagePath = file.name;
+							const reader = new FileReader();
+							reader.onloadend = async () => {
+								await createAndInsertImageFromFileReader(
+									this.app, editor, reader, imagePath, true, -1);
+							};
+							reader.readAsDataURL(file);
 						}
 					}
 				}

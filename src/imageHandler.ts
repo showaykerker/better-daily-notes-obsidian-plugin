@@ -71,6 +71,20 @@ export async function createAndInsertImageFromFileReader(
     return true;
 }
 
+export function shouldHandleAccordingToConfig(
+        settings: any,
+        file: File,
+        markdownView: MarkdownView,
+        ): boolean {
+    if (!file.type.startsWith("image")) { return false; }
+    if (!markdownView || !markdownView.file) { return false; }
+    if (settings.imageHandlingScenario === "disabled") { return false; }
+
+    const date = checkValidDailyNotePath(markdownView.file.path, settings.dateFormat);
+    if (settings.imageHandlingScenario === "daily notes only" && !date) { return false; }
+    return true;
+}
+
 export async function handleSingleImage(
     app: App,
     settings: any,
@@ -80,12 +94,10 @@ export async function handleSingleImage(
     reader: FileReader = new FileReader(),
     ): Promise<boolean>{
 
-    if (!file.type.startsWith("image")) { return false; }
+    if (!shouldHandleAccordingToConfig(settings, file, markdownView)) {
+        return false;
+    }
     if (!markdownView || !markdownView.file) { return false; }
-    if (settings.imageHandlingScenario === "disabled") { return false; }
-
-    const date = checkValidDailyNotePath(markdownView.file.path, settings.dateFormat);
-    if (settings.imageHandlingScenario === "daily notes only" && !date) { return false; }
 
     var viewParentPath = markdownView.file.parent?.path ?? "";
     viewParentPath = viewParentPath === "/" ? "" : viewParentPath;

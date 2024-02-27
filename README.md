@@ -44,7 +44,7 @@ This plugin is built with TypeScript. Here's how to contribute:
 ## Known Bugs
 - [x] ~~Assume same day before hour logic error.~~
   > ~~Will need to set actual value + 1 for now.~~
-- [x] Images will still be resized with markdown syntax in notes that's not wishes to handle images.
+- [x] ~~Images will still be resized with markdown syntax in notes that's not wishes to handle images.~~
 
 ## Features to be Added
 - [ ] Support of other file types. e.g. `.dill`.
