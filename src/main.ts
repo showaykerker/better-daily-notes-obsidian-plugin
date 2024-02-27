@@ -1,8 +1,7 @@
 import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
 import dayjs from 'dayjs';
-import { checkValidDailyNotePath, base64ToArrayBuffer } from './utils';
-import { limitImageFileSize } from './imageHandler';
-import { createDirsIfNotExists } from './fileSystem';
+import { checkValidDailyNotePath } from './utils';
+import { base64ToArrayBuffer, createAndInsertImageFromFileReader, handleSingleImage } from './imageHandler';
 import { openDailyNote } from './commands';
 import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
 import { BetterDailyNotesSettingTab } from './settings/settingTab';
@@ -79,12 +78,12 @@ export default class BetterDailyNotes extends Plugin {
 
 		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
 		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
+		// this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
+		// 	console.log('click', evt);
+		// });
 
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		// this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 
 		this.setupImageHandler();
 	}
@@ -102,73 +101,6 @@ export default class BetterDailyNotes extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	async handleSingleImage(
-		file: File,
-		editor: Editor,
-		markdownView: MarkdownView,
-		reader: FileReader = new FileReader(),
-	 	): Promise<boolean>{
-		// rename and move a image to the image directory under current parent
-		// and replace the markdown link with the new path
-		if (!file.type.startsWith("image")) { return false; }
-		if (!markdownView || !markdownView.file) { return false; }
-		if (this.settings.imageHandlingScenario === "disabled") { return false; }
-
-		const date = checkValidDailyNotePath(markdownView.file.path, this.settings.dateFormat);
-		if (this.settings.imageHandlingScenario === "daily notes only" && !date) { return false; }
-
-		let viewParentPath = markdownView.file.parent?.path ?? "";
-		let viewFileName = markdownView.file.basename;
-
-		file = await limitImageFileSize(
-			file,
-			this.settings.maxImageSizeKB,
-			this.settings.preserveExifData);
-
-		var handleSuccess = true;
-
-		reader.onloadend = async (e) => {
-			let result = reader.result;
-			if (typeof result !== "string") {
-				handleSuccess = false;
-				return false;
-			}
-			let base64 = result.split(",")[1];
-			var imageDirPath = `${this.settings.imageSubDir}`;
-			if (viewParentPath !== "/") {
-				imageDirPath = `${viewParentPath}/${imageDirPath}`;
-			}
-			let imageFilePrefix = `${viewFileName}-image`;
-			// count current images under imageDirPath that starts with imageFilePrefix
-			const countImageFiles = (dirPath: string, prefix: string) => {
-				let files = this.app.vault.getFiles();
-				let count = 0;
-				for (let file of files.filter(file => file.path.startsWith(dirPath))) {
-					if (file.path.startsWith(dirPath) &&
-						file.path.contains(prefix) &&
-						!file.path.endsWith(".md")) {count += 1;}
-				}
-				return count;
-			};
-			const imageCount = countImageFiles(imageDirPath, imageFilePrefix);
-			console.log(`Number of images with same prefix "${imageFilePrefix}" under "${imageDirPath}": ${imageCount}`);
-			var imageFileName = `${imageFilePrefix}${imageCount}.${file.type.split("/")[1]}`;
-			let imagePath = `${imageDirPath}/${imageFileName}`;
-			await createDirsIfNotExists(this.app, imageDirPath);
-			console.log("Save to:", imagePath);
-			new Notice(`Creating file "${imagePath}"`);
-			let imageArrayBuffer = base64ToArrayBuffer(base64);
-			await this.app.vault.createBinary(imagePath, imageArrayBuffer);
-			var imageLink = `![[${imagePath}]]`;
-			if (this.settings.resizeWidth !== -1) {
-				imageLink = `![[${imagePath}|${this.settings.resizeWidth}]]`;
-			}
-			editor.replaceSelection(imageLink);
-		};
-		reader.readAsDataURL(file);
-		return handleSuccess;
-	}
-
 	setupImageHandler() {
 		this.registerEvent(
 			this.app.workspace.on(
@@ -183,26 +115,16 @@ export default class BetterDailyNotes extends Plugin {
 						evt.preventDefault();
 						let files = evt.dataTransfer.files;
 						for (let i = 0; i < files.length; i++) {
-							let result = await this.handleSingleImage(files[i], editor, markdownView);
+							let result = await handleSingleImage(
+								this.app, this.settings, files[i], editor, markdownView);
 							if (!result) {
+								console.log("Failed to handle image.");
 								const file = evt.dataTransfer.files[0];
+								const imagePath = file.name;
 								const reader = new FileReader();
 								reader.onloadend = async () => {
-									const base64 = reader.result?.toString().split(",")[1];
-									if (base64) {
-										const imageArrayBuffer = base64ToArrayBuffer(base64);
-										const imagePath = `${file.name}`;
-										// check if the file already exists
-										if (this.app.vault.getAbstractFileByPath(imagePath)) {
-											new Notice(`File "${imagePath}" already exists.`);
-										}
-										else {
-											new Notice(`Creating file "${imagePath}"`);
-											await this.app.vault.createBinary(imagePath, imageArrayBuffer);
-										}
-										const imageLink = `![[${imagePath}]]`;
-										editor.replaceSelection(imageLink);
-									}
+									await createAndInsertImageFromFileReader(
+										this.app, editor, reader, imagePath, true, this.settings.resizeWidth);
 								};
 								reader.readAsDataURL(file);
 							}
@@ -223,26 +145,16 @@ export default class BetterDailyNotes extends Plugin {
 						evt.preventDefault();
 						let files = evt.clipboardData.files;
 						for (let i = 0; i < files.length; i++) {
-							let result = await this.handleSingleImage(files[i], editor, markdownView);
+							let result = await handleSingleImage(
+								this.app, this.settings, files[i], editor, markdownView);
 							if (!result) {
+								console.log("Failed to handle image.");
 								const file = evt.clipboardData.files[0];
+								const imagePath = file.name;
 								const reader = new FileReader();
 								reader.onloadend = async () => {
-									const base64 = reader.result?.toString().split(",")[1];
-									if (base64) {
-										const imageArrayBuffer = base64ToArrayBuffer(base64);
-										const imagePath = `${file.name}`;
-										// check if the file already exists
-										if (this.app.vault.getAbstractFileByPath(imagePath)) {
-											new Notice(`File "${imagePath}" already exists.`);
-										}
-										else {
-											new Notice(`Creating file "${imagePath}"`);
-											await this.app.vault.createBinary(imagePath, imageArrayBuffer);
-										}
-										const imageLink = `![[${imagePath}]]`;
-										editor.replaceSelection(imageLink);
-									}
+									await createAndInsertImageFromFileReader(
+										this.app, editor, reader, imagePath, true, this.settings.resizeWidth);
 								};
 								reader.readAsDataURL(file);
 							}
