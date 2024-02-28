@@ -45,9 +45,11 @@ This plugin is built with TypeScript. Here's how to contribute:
 - [x] ~~Assume same day before hour logic error.~~
   > ~~Will need to set actual value + 1 for now.~~
 - [x] ~~Images will still be resized with markdown syntax in notes that's not wishes to handle images.~~
+- [ ] Images are not compress to exact wished size.
 
 ## Features to be Added
 - [ ] Support of other file types. e.g. `.dill`.
+- [ ] Support of installing through [BRAT](https://github.com/TfTHacker/obsidian42-brat).
 - [ ] Support of customizing drag and paste behavior.
 - [ ] Create daily note with template.
 - [ ] Open daily note on startup.
