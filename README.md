@@ -24,6 +24,8 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
   - ~~***[Removed in 0.2.1]*** Only images added to a daily note will be modified.~~
 - **Assume Same Day Before Hour:**
   - Considers it the same day before a specified hour after midnight.
+- **Create Daily Note From Template:**
+  - ***[New in 0.2.2]*** Manually assign full path of template to use when creating a daily note.
 - **Convenient Navigation:**
   - Adds a ribbon icon to quickly open today's daily note.
   - Provides commands to open today's, yesterday's, and tomorrow's daily notes.
@@ -52,7 +54,6 @@ This plugin is built with TypeScript. Here's how to contribute:
 - [ ] Support of other file types. e.g. `.dill`.
 - [ ] Support of installing through [BRAT](https://github.com/TfTHacker/obsidian42-brat).
 - [ ] Support of customizing drag and paste behavior.
-- [ ] Create daily note with template.
 - [ ] Open daily note on startup.
 - [ ] A modal to ask if image compression is required.
 - [ ] Commands to toggle image compression.
@@ -62,4 +63,5 @@ This plugin is built with TypeScript. Here's how to contribute:
 - [ ] Daily note one line summary by LLM.
 - [ ] Generate tags by LLM.
 - [ ] Image one line summary by LLM.
+- [x] ~~Create daily note with template.~~ (Added v0.2.2)
 - [x] ~~Support of other file types. e.g. `.pdf`, `.zip`.~~ (Added v0.2.1)
