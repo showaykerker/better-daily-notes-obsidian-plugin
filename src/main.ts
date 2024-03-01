@@ -1,7 +1,7 @@
 import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
 import dayjs from 'dayjs';
 import { checkValidDailyNotePath } from './utils';
-import { createAndInsertWithFileReader, handleSingleImageOrPdf, shouldHandleAccordingToConfig } from './imageHandler';
+import { createAndInsertWithFileReader, handleSingleFile, shouldHandleAccordingToConfig } from './fileHandler';
 import { openDailyNote } from './commands';
 import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
 import { BetterDailyNotesSettingTab } from './settings/settingTab';
@@ -85,7 +85,7 @@ export default class BetterDailyNotes extends Plugin {
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		// this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 
-		this.setupImageHandler();
+		this.setupFileHandler();
 	}
 
 
@@ -101,7 +101,7 @@ export default class BetterDailyNotes extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	setupImageHandler() {
+	setupFileHandler() {
 		this.registerEvent(
 			this.app.workspace.on(
 				"editor-drop",
@@ -116,7 +116,7 @@ export default class BetterDailyNotes extends Plugin {
 						return false;
 					}
 
-					// only handle images
+					// only handle image, zip, and pdf files
 					const files = evt.dataTransfer.files;
 					for (let i = 0; i < files.length; i++) {
 						if (!files[i].type.startsWith("image") &&
@@ -137,11 +137,9 @@ export default class BetterDailyNotes extends Plugin {
 							new Notice(`No file ${i} found.`);
 							continue;
 						}
-						console.log("image file");
-						let result = await handleSingleImageOrPdf(
+						let result = await handleSingleFile(
 							this.app, this.settings, files[i], editor, markdownView);
 						if (!result) {
-							console.log("Failed to handle image.");
 							const reader = new FileReader();
 							reader.onloadend = async () => {
 								await createAndInsertWithFileReader(
@@ -163,7 +161,7 @@ export default class BetterDailyNotes extends Plugin {
 						return false;
 					}
 
-					// only handle images
+					// only handle images, zip, and pdf files
 					const files = evt.clipboardData.files;
 					for (let i = 0; i < files.length; i++) {
 						if (!files[i].type.startsWith("image") &&
@@ -177,16 +175,15 @@ export default class BetterDailyNotes extends Plugin {
 					}
 					evt.preventDefault();
 					for (let i = 0; i < files.length; i++) {
-						let result = await handleSingleImageOrPdf(
+						let result = await handleSingleFile(
 							this.app, this.settings, files[i], editor, markdownView);
 						if (!result) {
-							console.log("Failed to handle image.");
 							const file = evt.clipboardData.files[0];
-							const imagePath = file.name;
+							const filePath = file.name;
 							const reader = new FileReader();
 							reader.onloadend = async () => {
 								await createAndInsertWithFileReader(
-									this.app, editor, reader, imagePath, true, -1);
+									this.app, editor, reader, filePath, true, -1);
 							};
 							reader.readAsDataURL(file);
 						}

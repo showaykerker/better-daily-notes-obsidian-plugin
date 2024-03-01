@@ -53,21 +53,21 @@ export async function createAndInsertWithFileReader(
         return false;
     }
 
-    const imageLinkResizeString = resizeWidth !== -1 ? `|${resizeWidth}` : "";
-    const imageLink = `![[${filePath}${imageLinkResizeString}]]`;
+    const fileLinkResizeString = resizeWidth !== -1 ? `|${resizeWidth}` : "";
+    const fileLink = `![[${filePath}${fileLinkResizeString}]]`;
 
     filePath = filePath[0] === '/' ? filePath.substring(1) : filePath;
     if (app.vault.getAbstractFileByPath(filePath) && returnTrueIfExists) {
         new Notice(`File "${filePath}" already exists. Inserting link to the existed one.`);
-        editor.replaceSelection(imageLink);
+        editor.replaceSelection(fileLink);
         return true;
     }
 
     new Notice(`Creating file "${filePath}"`);
-    const imageArrayBuffer = base64ToArrayBuffer(base64);
+    const fileArrayBuffer = base64ToArrayBuffer(base64);
     console.log("Save to:", filePath);
-    await app.vault.createBinary(filePath, imageArrayBuffer);
-    editor.replaceSelection(imageLink);
+    await app.vault.createBinary(filePath, fileArrayBuffer);
+    editor.replaceSelection(fileLink);
     return true;
 }
 
@@ -76,7 +76,6 @@ export function shouldHandleAccordingToConfig(
         file: File,
         markdownView: MarkdownView,
         ): boolean {
-    // if (!file.type.startsWith("image")) { return false; }
     if (!markdownView || !markdownView.file) { return false; }
     if (settings.imageHandlingScenario === "disabled") { return false; }
 
@@ -85,7 +84,7 @@ export function shouldHandleAccordingToConfig(
     return true;
 }
 
-export async function handleSingleImageOrPdf(
+export async function handleSingleFile(
     app: App,
     settings: any,
     file: File,
