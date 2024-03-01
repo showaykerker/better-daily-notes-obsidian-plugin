@@ -30,11 +30,26 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
   - Adds a ribbon icon to quickly open today's daily note.
   - Provides commands to open today's, yesterday's, and tomorrow's daily notes.
 
-## Installation
-For manual installation,
-1. navigate to your vault's plugin folder (`<vault>/.obsidian/plugins`)
-2. Download `better-daily-notes-obsidian-plugin-version.zip` from the release page and extract them in the `plugins` folder.
-3. Reload Obsidian and enable the plugin in `Settings` -> `Community Plugins`.
+## Installation Guide
+[中文版](installation-zh_tw.md)
+
+As this plugin is currently in beta, the installation process requires an additional plugin called [BRAT](obsidian://show-plugin?id=obsidian42-brat). You can find the GitHub repository for BRAT [here](https://github.com/TfTHacker/obsidian42-brat).
+
+### Steps
+
+1. Install BRAT by following one of these methods:
+   - Click [this link](obsidian://show-plugin?id=obsidian42-brat).
+   - Navigate to the Community Plugins tab in Obsidian, search for BRAT, and install it. Then, enable it.
+   ![BRAT Installation](imgs/how-to-install-0.png)
+   ![BRAT Installation](imgs/how-to-install-1.png)
+   ![BRAT Installation](imgs/how-to-install-2.png)
+   ![BRAT Installation](imgs/how-to-install-3.png)
+2. Access the BRAT settings page and locate the `Beta Plugin List` section. Click on the `Add Beta Plugin` button.
+  ![BRAT Settings](imgs/how-to-install-4.png)
+3. Enter the following repository link: `https://github.com/showaykerker/better-daily-notes-obsidian-plugin`, then click `Add Plugin`.
+  ![Plugin Configuration](imgs/how-to-install-5.png)
+4. You should now find the configuration page for the `Better Daily Notes Plugin` in your Options menu.
+
 
 ## Development
 This plugin is built with TypeScript. Here's how to contribute:
