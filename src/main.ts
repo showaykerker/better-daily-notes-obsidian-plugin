@@ -13,7 +13,7 @@ export default class BetterDailyNotes extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		var customParseFormat = require('dayjs/plugin/customParseFormat');
+		const customParseFormat = require('dayjs/plugin/customParseFormat');
 		dayjs.extend(customParseFormat);
 
 

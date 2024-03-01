@@ -7,9 +7,9 @@ export function openDailyNote(
         settings: BetterDailyNotesSettings,
         dateOffset: number = 0,
         date: Date = new Date()) {
-    let rootDir = settings.rootDir;
-    let assumeSameDayBeforeHour = settings.assumeSameDayBeforeHour;
-    let dateFormat = settings.dateFormat;
+    const rootDir = settings.rootDir;
+    const assumeSameDayBeforeHour = settings.assumeSameDayBeforeHour;
+    const dateFormat = settings.dateFormat;
     date.setDate(date.getDate() + dateOffset);
     const targetNotePath = getDailyNotePath(
         rootDir, assumeSameDayBeforeHour, dateFormat, date);

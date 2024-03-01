@@ -99,25 +99,25 @@ export async function handleSingleImage(
     }
     if (!markdownView || !markdownView.file) { return false; }
 
-    var viewParentPath = markdownView.file.parent?.path ?? "";
+    let viewParentPath = markdownView.file.parent?.path ?? "";
     viewParentPath = viewParentPath === "/" ? "" : viewParentPath;
-    let imageDirPath = `${viewParentPath}${settings.imageSubDir}`;
-    let viewFileName = markdownView.file.basename;
-    let imageFilePrefix = `${viewFileName}-image`;
+    const imageDirPath = `${viewParentPath}${settings.imageSubDir}`;
+    const viewFileName = markdownView.file.basename;
+    const imageFilePrefix = `${viewFileName}-image`;
 
     file = await limitImageFileSize(
         file,
         settings.maxImageSizeKB,
         settings.preserveExifData);
 
-    var handleSuccess = true;
+    let handleSuccess = true;
 
     reader.onloadend = async (e) => {
         // count current images under imageDirPath that starts with imageFilePrefix
         const imageCount = countImageFiles(app, imageDirPath, imageFilePrefix);
         console.log(`Number of images with same prefix "${imageFilePrefix}" under "${imageDirPath}": ${imageCount}`);
-        var imageFileName = `${imageFilePrefix}${imageCount}.${file.type.split("/")[1]}`;
-        let imagePath = `${imageDirPath}/${imageFileName}`;
+        const imageFileName = `${imageFilePrefix}${imageCount}.${file.type.split("/")[1]}`;
+        const imagePath = `${imageDirPath}/${imageFileName}`;
         await createDirsIfNotExists(app, imageDirPath);
         handleSuccess = await createAndInsertImageFromFileReader(
             app,
