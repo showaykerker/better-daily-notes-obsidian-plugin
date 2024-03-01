@@ -1,8 +1,9 @@
-import { App } from 'obsidian';
+import { App, Notice, TFile} from 'obsidian';
 import { getDailyNotePath } from './utils';
 import { BetterDailyNotesSettings } from './settings/settings';
+import { createDirIfNotExists } from './fileSystem';
 
-export function openDailyNote(
+export async function openDailyNote(
         app: App,
         settings: BetterDailyNotesSettings,
         dateOffset: number = 0,
@@ -13,19 +14,20 @@ export function openDailyNote(
     date.setDate(date.getDate() + dateOffset);
     const targetNotePath = getDailyNotePath(
         rootDir, assumeSameDayBeforeHour, dateFormat, date);
-    app.workspace.openLinkText(targetNotePath, '', true);
 
-    // const dailyNotePath = getDailyNotePath(rootDir, assumeSameDayBeforeHour, dateFormat);
-    // await createDirIfNotExists(this.app, rootDir, assumeSameDayBeforeHour);
-    // const dailyNote = this.app.vault.getAbstractFileByPath(dailyNotePath);
-    // if (!dailyNote) {
-    //     await this.app.vault.create(dailyNotePath, '');
-    //     new Notice(`Daily note ${dailyNotePath} created.`);
-    // }
-    // if (dailyNote) {
-    //     await this.app.workspace.openLinkText(dailyNotePath, '', true);
-    // }
-    // else {
-    //     await this.app.workspace.openLinkText(dailyNotePath, '', true);
-    // }
+    if (!app.vault.getAbstractFileByPath(targetNotePath)) {
+        console.log("templateFile", settings.templateFile);
+        const templateFile = app.vault.getAbstractFileByPath(settings.templateFile);
+        console.log(templateFile, templateFile instanceof TFile);
+        if (templateFile instanceof TFile) {
+            let template = await app.vault.read(templateFile);
+            await createDirIfNotExists(app, rootDir, assumeSameDayBeforeHour, date);
+            await app.vault.create(targetNotePath, template);
+            new Notice("Daily Note \"" + targetNotePath + "\"" +
+                " with template \"" + settings.templateFile + "\" created!");
+        } else {
+            new Notice("Template File " + settings.templateFile + " not found!");
+        }
+    }
+    app.workspace.openLinkText(targetNotePath, '', true);
 }
