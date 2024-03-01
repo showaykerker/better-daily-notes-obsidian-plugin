@@ -1,4 +1,4 @@
-import {App, Notice, PluginSettingTab, Setting} from 'obsidian';
+import {App, normalizePath, Notice, PluginSettingTab, Setting} from 'obsidian';
 import { formatDate, isValidDateFormat } from '../utils';
 
 export class BetterDailyNotesSettingTab extends PluginSettingTab {
@@ -7,12 +7,14 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 	constructor(app: App, plugin: any) {
 		super(app, plugin);
 		this.plugin = plugin;
+		console.log("BetterDailyNotesSettingTab constructed");
 	}
 
-
-	fileExists(filePath: string): boolean {
-		const file = this.app.vault.getAbstractFileByPath(filePath);
-		return !!file;
+	templateExists = (): Boolean => {
+		if (this.plugin.settings.templateFile == '') { return true; }
+		const templateFile = normalizePath(this.plugin.settings.templateFile);
+		const abstract = this.app.vault.getAbstractFileByPath(templateFile);
+		return this.plugin.settings.templateFile != '' && abstract != null;
 	}
 
 	display(): void {
@@ -22,6 +24,13 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 				'Current format looks like:' +
 				formatDate(this.plugin.settings.dateFormat);
 		}
+
+		if (!this.templateExists()) {
+			new Notice(`Template file ${this.plugin.settings.templateFile} not found. `+
+				'Please modify path to the template file.');
+			this.plugin.settings.templateFile = '';
+		}
+
 		containerEl.empty();
 		containerEl.createEl('h2', {text: 'General Configuration', cls: 'section-header'});
 		new Setting(containerEl)
@@ -61,8 +70,10 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					.setPlaceholder(this.plugin.settings.templateFile)
 					.setValue(this.plugin.settings.templateFile)
 					.onChange(async (value) => {
-						value = value[0] == "/" ? value.substring(1) : value;
-						value = value.endsWith('.md') ? value : value + '.md';
+						if (value != '' && !value.endsWith('.md')) {
+							value = value + '.md';
+						}
+						value = normalizePath(value);
 						if (await this.app.vault.adapter.exists(value) && value.endsWith('.md')) {
 							templateSetting.settingEl.classList.remove('invalid-path');
 							console.log('Setting Daily Folder template to: ', value)
