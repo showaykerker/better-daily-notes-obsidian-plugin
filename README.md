@@ -1,5 +1,7 @@
 # Better Daily Notes Plugin
 
+[正體中文版](README-zh_tw.md)
+
 Transform your daily note-taking experience with the **Better Daily Notes** Plugin.
 
 Seamlessly integrated, this plugin empowers you to organize and manage your daily notes effortlessly.
@@ -31,7 +33,6 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
   - Provides commands to open today's, yesterday's, and tomorrow's daily notes.
 
 ## Installation Guide
-[中文版](installation-zh_tw.md)
 
 As this plugin is currently in beta, the installation process requires an additional plugin called [BRAT](obsidian://show-plugin?id=obsidian42-brat). You can find the GitHub repository for BRAT [here](https://github.com/TfTHacker/obsidian42-brat).
 
@@ -67,7 +68,6 @@ This plugin is built with TypeScript. Here's how to contribute:
 
 ## Features to be Added
 - [ ] Support of other file types. e.g. `.dill`.
-- [ ] Support of installing through [BRAT](https://github.com/TfTHacker/obsidian42-brat).
 - [ ] Support of customizing drag and paste behavior.
 - [ ] Open daily note on startup.
 - [ ] A modal to ask if image compression is required.
@@ -79,4 +79,5 @@ This plugin is built with TypeScript. Here's how to contribute:
 - [ ] Generate tags by LLM.
 - [ ] Image one line summary by LLM.
 - [x] ~~Create daily note with template.~~ (Added v0.2.2)
+- [x] ~~Support of installing through [BRAT](https://github.com/TfTHacker/obsidian42-brat).~~
 - [x] ~~Support of other file types. e.g. `.pdf`, `.zip`.~~ (Added v0.2.1)
