@@ -9,6 +9,12 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
+
+	fileExists(filePath: string): boolean {
+		const file = this.app.vault.getAbstractFileByPath(filePath);
+		return !!file;
+	}
+
 	display(): void {
 		const {containerEl} = this;
 		function getDescription() {
@@ -35,6 +41,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					}
 					await this.plugin.saveSettings();
 				}));
+
 		new Setting(containerEl)
 			.setName('Root Directory')
 			.setDesc('The root directory for the daily notes.')
@@ -45,6 +52,26 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					this.plugin.settings.rootDir = value;
 					await this.plugin.saveSettings();
 				}));
+
+		let templateSetting = new Setting(containerEl)
+				.setName('Template File Location')
+				.setDesc('The location of the template file for the daily notes. ' +
+					'Leave it blank to disable this feature.')
+				.addText(text => text
+					.setPlaceholder(this.plugin.settings.templateFile)
+					.setValue(this.plugin.settings.templateFile)
+					.onChange(async (value) => {
+						if (await this.app.vault.adapter.exists(value) && value.endsWith('.md')) {
+							templateSetting.settingEl.classList.remove('invalid-path');
+							console.log('Setting Daily Folder template to: ', value)
+							value = value[0] == "/" ? value.substring(1) : value;
+							this.plugin.settings.templateFile = value;
+							await this.plugin.saveSettings();
+						} else {
+							templateSetting.setClass('invalid-path');
+						}
+					}));
+
 		new Setting(containerEl)
 			.setName('Assume Same Day Before Hour')
 			.setDesc('If the current time is before this hour, assume it is the previous day. (Range: 0-23)')

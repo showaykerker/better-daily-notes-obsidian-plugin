@@ -1,24 +1,26 @@
 
 export interface BetterDailyNotesSettings {
+	dateFormat: string;
 	rootDir: string;
+	templateFile: string;
+	assumeSameDayBeforeHour: number;
 	fileHandlingScenario: string;
 	imageSubDir: string;
 	otherFilesSubDir: string;
 	maxImageSizeKB: number;
 	preserveExifData: boolean;
-	dateFormat: string;
 	resizeWidth: number;
-	assumeSameDayBeforeHour: number;
 }
 
 export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
+	dateFormat: 'YYYY-MM-DD',
 	rootDir: 'daily-notes',
+	templateFile: '',
+	assumeSameDayBeforeHour: 2,
 	fileHandlingScenario: 'daily notes only',
 	imageSubDir: 'images',
 	otherFilesSubDir: 'other',
 	maxImageSizeKB: -1,
 	preserveExifData: true,
-	dateFormat: 'YYYY-MM-DD',
 	resizeWidth: -1,
-	assumeSameDayBeforeHour: 2,
 }

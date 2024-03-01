@@ -21,8 +21,8 @@ export default class BetterDailyNotes extends Plugin {
 		const ribbonIconEl = this.addRibbonIcon(
 			'book-open-check',
 			'Open today\'s daily note',
-			(evt: MouseEvent) => {
-				openDailyNote(this.app, this.settings, 0);
+			async (evt: MouseEvent) => {
+				await openDailyNote(this.app, this.settings, 0);
 			}
 		);
 		// Perform additional things with the ribbon
@@ -31,24 +31,24 @@ export default class BetterDailyNotes extends Plugin {
 		this.addCommand({
 			id: 'open-todays-daily-note',
 			name: 'Open today\'s daily note',
-			callback: () => {
-				openDailyNote(this.app, this.settings, 0);
+			callback: async () => {
+				await openDailyNote(this.app, this.settings, 0);
 			}
 		})
 
 		this.addCommand({
 			id: 'open-yesterdays-daily-note',
 			name: 'Open yesterday\'s daily note',
-			callback: () => {
-				openDailyNote(this.app, this.settings, -1);
+			callback: async () => {
+				await openDailyNote(this.app, this.settings, -1);
 			}
 		})
 
 		this.addCommand({
 			id: 'open-tomorrows-daily-note',
 			name: 'Open tomorrow\'s daily note',
-			callback: () => {
-				openDailyNote(this.app, this.settings, +1);
+			callback: async () => {
+				await openDailyNote(this.app, this.settings, +1);
 			}
 		})
 
