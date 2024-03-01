@@ -5,6 +5,7 @@ export async function createDirsIfNotExists(app: App, dir: string): Promise<void
     let dirPath = "";
     for (let dirName of dir.split("/")) {
         dirPath = `${dirPath}${dirName}`;
+        if (dirPath === "") { continue; }
         const hasDirPath = app.vault.getAbstractFileByPath(dirPath);
         if (!hasDirPath) {
             await app.vault.createFolder(dirPath);
