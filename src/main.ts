@@ -120,8 +120,11 @@ export default class BetterDailyNotes extends Plugin {
 					const files = evt.dataTransfer.files;
 					for (let i = 0; i < files.length; i++) {
 						if (!files[i].type.startsWith("image") &&
+								files[i].type != "application/zip" &&
 								files[i].type != "application/pdf") {
-							new Notice(`Only image and pdf files are supported.`);
+							new Notice(
+								`Only image, pdf, and zip files are supported. ` +
+								`Get ${files[i].type} instead.`);
 							return false;
 						}
 					}
@@ -129,7 +132,11 @@ export default class BetterDailyNotes extends Plugin {
 					for (let i = 0; i < files.length; i++) {
 						console.log("file ", i, ":", files[i]);
 						const file = evt.dataTransfer.files[i];
-						const filePath = file.name;
+						const filePath = file ? file.name : '';
+						if (!file) {
+							new Notice(`No file ${i} found.`);
+							continue;
+						}
 						console.log("image file");
 						let result = await handleSingleImageOrPdf(
 							this.app, this.settings, files[i], editor, markdownView);
@@ -160,8 +167,11 @@ export default class BetterDailyNotes extends Plugin {
 					const files = evt.clipboardData.files;
 					for (let i = 0; i < files.length; i++) {
 						if (!files[i].type.startsWith("image") &&
+								files[i].type != "application/zip" &&
 								files[i].type != "application/pdf") {
-							new Notice(`Only image and pdf files are supported.`);
+							new Notice(
+								`Only image, pdf, and zip files are supported. ` +
+								`Get ${files[i].type} instead.`);
 							return false;
 						}
 					}

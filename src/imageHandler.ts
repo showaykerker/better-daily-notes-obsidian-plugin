@@ -102,23 +102,24 @@ export async function handleSingleImageOrPdf(
     viewParentPath = viewParentPath === "/" ? "" : viewParentPath;
     let fileSaveSubDir = `${viewParentPath}/${settings.imageSubDir}`;
     const viewFileName = markdownView.file.basename;
-    let filePrefix = `${viewFileName}-image`;
-
-    // count current images under imageDirPath that starts with filePrefix
-    const countPrefix = countFilesWithSamePrefix(app, fileSaveSubDir, filePrefix);
-    console.log(`Number of images with same prefix "${filePrefix}" under "${fileSaveSubDir}": ${countPrefix}`);
-    let fileSuffix = countPrefix === 0 ? "" : `-${countPrefix}`;
+    let filePrefix = `${viewFileName}`;
+    let fileSuffix = "";
 
     if (file.type.startsWith("image")) {
         file = await limitImageFileSize(
             file,
             settings.maxImageSizeKB,
             settings.preserveExifData);
+        // count current images under imageDirPath that starts with filePrefix
+        const countPrefix = countFilesWithSamePrefix(app, fileSaveSubDir, filePrefix);
+        console.log(`Number of file with same prefix "${filePrefix}" under "${fileSaveSubDir}": ${countPrefix}`);
+        filePrefix = `${filePrefix}-image`;
+        fileSuffix = countPrefix === 0 ? "" : `-${countPrefix}`;
     }
     else {
         const fileType = file.type.split("/")[1];
         fileSaveSubDir = `${viewParentPath}/${fileType}s`;
-        filePrefix = `${viewFileName}-${file.name.split(".")[0]}`;
+        filePrefix = `${filePrefix}-${file.name.split(".")[0]}`;
     }
 
     const fileName = `${filePrefix}${fileSuffix}.${file.type.split("/")[1]}`;
