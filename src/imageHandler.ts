@@ -14,7 +14,7 @@ export function base64ToArrayBuffer(base64: string): ArrayBuffer {
 }
 
 export function countImageFiles(app: App, dirPath: string, prefix: string): number {
-    let files = app.vault.getFiles();
+    const files = app.vault.getFiles();
     let count = 0;
     for (let file of files.filter(file => file.path.startsWith(dirPath))) {
         if (file.path.startsWith(dirPath) &&
@@ -31,7 +31,6 @@ export async function limitImageFileSize(file: File, size: number, preserveExifD
     const options = {
         maxSizeMB: size / 1024.0,
         useWebWorker: true,
-        maxIteration: 10,
         preserveExifData: preserveExifData,
     };
     new Notice(`Compressing image "${file.name}" to ${size}KB`);
@@ -54,8 +53,8 @@ export async function createAndInsertImageFromFileReader(
         return false;
     }
 
-    let imageLinkResizeString = resizeWidth !== -1 ? `|${resizeWidth}` : "";
-    let imageLink = `![[${imagePath}${imageLinkResizeString}]]`;
+    const imageLinkResizeString = resizeWidth !== -1 ? `|${resizeWidth}` : "";
+    const imageLink = `![[${imagePath}${imageLinkResizeString}]]`;
 
     if (app.vault.getAbstractFileByPath(imagePath) && returnTrueIfExists) {
         new Notice(`File "${imagePath}" already exists. Inserting link to the existed one.`);
@@ -64,7 +63,7 @@ export async function createAndInsertImageFromFileReader(
     }
 
     new Notice(`Creating file "${imagePath}"`);
-    let imageArrayBuffer = base64ToArrayBuffer(base64);
+    const imageArrayBuffer = base64ToArrayBuffer(base64);
     console.log("Save to:", imagePath);
     await app.vault.createBinary(imagePath, imageArrayBuffer);
     editor.replaceSelection(imageLink);
@@ -101,7 +100,7 @@ export async function handleSingleImage(
 
     let viewParentPath = markdownView.file.parent?.path ?? "";
     viewParentPath = viewParentPath === "/" ? "" : viewParentPath;
-    const imageDirPath = `${viewParentPath}${settings.imageSubDir}`;
+    const imageDirPath = `${viewParentPath}/${settings.imageSubDir}`;
     const viewFileName = markdownView.file.basename;
     const imageFilePrefix = `${viewFileName}-image`;
 
