@@ -1,8 +1,9 @@
 
 export interface BetterDailyNotesSettings {
 	rootDir: string;
-	imageHandlingScenario: string;
+	fileHandlingScenario: string;
 	imageSubDir: string;
+	otherFilesSubDir: string;
 	maxImageSizeKB: number;
 	preserveExifData: boolean;
 	dateFormat: string;
@@ -12,8 +13,9 @@ export interface BetterDailyNotesSettings {
 
 export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	rootDir: 'daily-notes',
-	imageHandlingScenario: 'daily notes only',
+	fileHandlingScenario: 'daily notes only',
 	imageSubDir: 'images',
+	otherFilesSubDir: 'other',
 	maxImageSizeKB: -1,
 	preserveExifData: true,
 	dateFormat: 'YYYY-MM-DD',

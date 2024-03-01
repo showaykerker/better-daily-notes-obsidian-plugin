@@ -60,10 +60,14 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 				}));
 
 		containerEl.createEl('hr');
-		containerEl.createEl('h2', {text: 'Image Handling Configuration', cls: 'section-header'});
+		containerEl.createEl('h2', {text: 'File Handling Configuration', cls: 'section-header'});
+		containerEl.createEl('p', {text: 'The plugin handles drop and paste events, ' +
+			"if you already have other plugins that handle these events, " +
+			"such as automatic image upload, you may want to disable file handling from this plugin."});
+		containerEl.createEl('p', {text: 'Currently, the plugin only supports handling of images, pdfs, and zips.'})
 		new Setting(containerEl)
-			.setName('Image Handling')
-			.setDesc('Select how images should be handled.' +
+			.setName('File Handling')
+			.setDesc('Select how files should be handled.' +
 				'This will disable all the settings below' +
 				' if set to "Disable All Image Handling".')
 			.addDropdown(dropdown => dropdown
@@ -91,6 +95,16 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}));
 			new Setting(containerEl)
+				.setName('Other Files Subdirectory')
+				.setDesc('The subdirectory for other files.')
+				.setClass('other-files-subdir')
+				.addText(text => text
+					.setValue(this.plugin.settings.otherFilesSubDir)
+					.onChange(async (value) => {
+						this.plugin.settings.otherFilesSubDir = value;
+						await this.plugin.saveSettings();
+					}));
+			new Setting(containerEl)
 				.setName('Max Image Size (KB)')
 				.setDesc('Compress images added to the daily note to this size. -1 means no compression.')
 				.addText(text => text
@@ -111,8 +125,8 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					}));
 			new Setting(containerEl)
 				.setName('Resize Width')
-				.setDesc('The width to resize images. -1 means no resizing.' +
-					'This only add a suffix to the image\s markdown link. ' +
+				.setDesc('The width to resize images and pdfs. -1 means no resizing.' +
+					'This only add a suffix to the images\' and pdfs\' markdown link. ' +
 					'No compression is done.')
 				.addText(text => text
 					.setPlaceholder(this.plugin.settings.resizeWidth.toString())

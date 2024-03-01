@@ -100,7 +100,7 @@ export async function handleSingleFile(
 
     let viewParentPath = markdownView.file.parent?.path ?? "";
     viewParentPath = viewParentPath === "/" ? "" : viewParentPath;
-    let fileSaveSubDir = `${viewParentPath}/${settings.imageSubDir}`;
+    let fileSaveSubDir = "";
     const viewFileName = markdownView.file.basename;
     let filePrefix = `${viewFileName}`;
     let fileSuffix = "";
@@ -113,12 +113,13 @@ export async function handleSingleFile(
         // count current images under imageDirPath that starts with filePrefix
         const countPrefix = countFilesWithSamePrefix(app, fileSaveSubDir, filePrefix);
         console.log(`Number of file with same prefix "${filePrefix}" under "${fileSaveSubDir}": ${countPrefix}`);
+        fileSaveSubDir = `${viewParentPath}/${settings.imageSubDir}`;
         filePrefix = `${filePrefix}-image`;
         fileSuffix = countPrefix === 0 ? "" : `-${countPrefix}`;
     }
     else {
         const fileType = file.type.split("/")[1];
-        fileSaveSubDir = `${viewParentPath}/${fileType}s`;
+        fileSaveSubDir = `${viewParentPath}/${settings.otherFilesSubDir}`;
         filePrefix = `${filePrefix}-${file.name.split(".")[0]}`;
     }
 
