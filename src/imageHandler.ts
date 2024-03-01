@@ -38,34 +38,35 @@ export async function limitImageFileSize(file: File, size: number, preserveExifD
     return compressedFile;
 }
 
-export async function createAndInsertImageFromFileReader(
+export async function createAndInsertWithFileReader(
         app: App,
         editor: Editor,
         reader: FileReader,
-        imagePath: string,
+        filePath: string,
         returnTrueIfExists: boolean,
         resizeWidth: number,
     ): Promise<boolean> {
     const base64 = reader.result?.toString().split(",")[1];
 
     if (!base64) {
-        new Notice(`Failed to create file "${imagePath}", base64 is empty.`);
+        new Notice(`Failed to create file "${filePath}", base64 is empty.`);
         return false;
     }
 
     const imageLinkResizeString = resizeWidth !== -1 ? `|${resizeWidth}` : "";
-    const imageLink = `![[${imagePath}${imageLinkResizeString}]]`;
+    const imageLink = `![[${filePath}${imageLinkResizeString}]]`;
 
-    if (app.vault.getAbstractFileByPath(imagePath) && returnTrueIfExists) {
-        new Notice(`File "${imagePath}" already exists. Inserting link to the existed one.`);
+    filePath = filePath[0] === '/' ? filePath.substring(1) : filePath;
+    if (app.vault.getAbstractFileByPath(filePath) && returnTrueIfExists) {
+        new Notice(`File "${filePath}" already exists. Inserting link to the existed one.`);
         editor.replaceSelection(imageLink);
         return true;
     }
 
-    new Notice(`Creating file "${imagePath}"`);
+    new Notice(`Creating file "${filePath}"`);
     const imageArrayBuffer = base64ToArrayBuffer(base64);
-    console.log("Save to:", imagePath);
-    await app.vault.createBinary(imagePath, imageArrayBuffer);
+    console.log("Save to:", filePath);
+    await app.vault.createBinary(filePath, imageArrayBuffer);
     editor.replaceSelection(imageLink);
     return true;
 }
@@ -129,7 +130,7 @@ export async function handleSingleImageOrPdf(
 
     reader.onloadend = async (e) => {
         await createDirsIfNotExists(app, fileSaveSubDir);
-        handleSuccess = await createAndInsertImageFromFileReader(
+        handleSuccess = await createAndInsertWithFileReader(
             app,
             editor,
             reader,

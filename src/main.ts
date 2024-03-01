@@ -1,7 +1,7 @@
 import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
 import dayjs from 'dayjs';
 import { checkValidDailyNotePath } from './utils';
-import { createAndInsertImageFromFileReader, handleSingleImageOrPdf, shouldHandleAccordingToConfig } from './imageHandler';
+import { createAndInsertWithFileReader, handleSingleImageOrPdf, shouldHandleAccordingToConfig } from './imageHandler';
 import { openDailyNote } from './commands';
 import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
 import { BetterDailyNotesSettingTab } from './settings/settingTab';
@@ -144,7 +144,7 @@ export default class BetterDailyNotes extends Plugin {
 							console.log("Failed to handle image.");
 							const reader = new FileReader();
 							reader.onloadend = async () => {
-								await createAndInsertImageFromFileReader(
+								await createAndInsertWithFileReader(
 									this.app, editor, reader, filePath, true, -1);
 							};
 							reader.readAsDataURL(file);
@@ -185,7 +185,7 @@ export default class BetterDailyNotes extends Plugin {
 							const imagePath = file.name;
 							const reader = new FileReader();
 							reader.onloadend = async () => {
-								await createAndInsertImageFromFileReader(
+								await createAndInsertWithFileReader(
 									this.app, editor, reader, imagePath, true, -1);
 							};
 							reader.readAsDataURL(file);
