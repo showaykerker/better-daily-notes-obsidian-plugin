@@ -1,7 +1,7 @@
 import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
 import dayjs from 'dayjs';
 import { checkValidDailyNotePath } from './utils';
-import { createAndInsertImageFromFileReader, handleSingleImage, shouldHandleAccordingToConfig } from './imageHandler';
+import { createAndInsertImageFromFileReader, handleSingleImageOrPdf, shouldHandleAccordingToConfig } from './imageHandler';
 import { openDailyNote } from './commands';
 import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
 import { BetterDailyNotesSettingTab } from './settings/settingTab';
@@ -107,28 +107,38 @@ export default class BetterDailyNotes extends Plugin {
 				"editor-drop",
 				async (evt: DragEvent, editor: Editor, markdownView: MarkdownView) => {
 					console.log("editor-drop", evt, editor, markdownView);
-					if (!evt.dataTransfer || !evt.dataTransfer.files) { return; }
+					if (!evt.dataTransfer || !evt.dataTransfer.files) {
+						console.log("No files in the event.");
+						return;
+					}
 					if (!shouldHandleAccordingToConfig(this.settings, evt.dataTransfer?.files[0], markdownView)) {
+						console.log("Should not handle according to config.");
 						return false;
 					}
-					if (!evt.dataTransfer.files[0].type.startsWith("image")) {
-						return false;
-					}
+
 					// only handle images
-					// TODO: Should handle files one by one here
-					evt.preventDefault();
-					let files = evt.dataTransfer.files;
+					const files = evt.dataTransfer.files;
 					for (let i = 0; i < files.length; i++) {
-						let result = await handleSingleImage(
+						if (!files[i].type.startsWith("image") &&
+								files[i].type != "application/pdf") {
+							new Notice(`Only image and pdf files are supported.`);
+							return false;
+						}
+					}
+					evt.preventDefault();
+					for (let i = 0; i < files.length; i++) {
+						console.log("file ", i, ":", files[i]);
+						const file = evt.dataTransfer.files[i];
+						const filePath = file.name;
+						console.log("image file");
+						let result = await handleSingleImageOrPdf(
 							this.app, this.settings, files[i], editor, markdownView);
 						if (!result) {
 							console.log("Failed to handle image.");
-							const file = evt.dataTransfer.files[0];
-							const imagePath = file.name;
 							const reader = new FileReader();
 							reader.onloadend = async () => {
 								await createAndInsertImageFromFileReader(
-									this.app, editor, reader, imagePath, true, -1);
+									this.app, editor, reader, filePath, true, -1);
 							};
 							reader.readAsDataURL(file);
 						}
@@ -145,15 +155,19 @@ export default class BetterDailyNotes extends Plugin {
 					if (!shouldHandleAccordingToConfig(this.settings, evt.clipboardData?.files[0], markdownView)) {
 						return false;
 					}
-					if (!evt.clipboardData.files[0].type.startsWith("image")) {
-						return false;
-					}
+
 					// only handle images
-					// TODO: Should handle files one by one here
-					evt.preventDefault();
-					let files = evt.clipboardData.files;
+					const files = evt.clipboardData.files;
 					for (let i = 0; i < files.length; i++) {
-						let result = await handleSingleImage(
+						if (!files[i].type.startsWith("image") &&
+								files[i].type != "application/pdf") {
+							new Notice(`Only image and pdf files are supported.`);
+							return false;
+						}
+					}
+					evt.preventDefault();
+					for (let i = 0; i < files.length; i++) {
+						let result = await handleSingleImageOrPdf(
 							this.app, this.settings, files[i], editor, markdownView);
 						if (!result) {
 							console.log("Failed to handle image.");

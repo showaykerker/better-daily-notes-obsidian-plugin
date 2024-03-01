@@ -13,7 +13,7 @@ export function base64ToArrayBuffer(base64: string): ArrayBuffer {
     return bytes.buffer;
 }
 
-export function countImageFiles(app: App, dirPath: string, prefix: string): number {
+export function countFilesWithSamePrefix(app: App, dirPath: string, prefix: string): number {
     const files = app.vault.getFiles();
     let count = 0;
     for (let file of files.filter(file => file.path.startsWith(dirPath))) {
@@ -75,7 +75,7 @@ export function shouldHandleAccordingToConfig(
         file: File,
         markdownView: MarkdownView,
         ): boolean {
-    if (!file.type.startsWith("image")) { return false; }
+    // if (!file.type.startsWith("image")) { return false; }
     if (!markdownView || !markdownView.file) { return false; }
     if (settings.imageHandlingScenario === "disabled") { return false; }
 
@@ -84,7 +84,7 @@ export function shouldHandleAccordingToConfig(
     return true;
 }
 
-export async function handleSingleImage(
+export async function handleSingleImageOrPdf(
     app: App,
     settings: any,
     file: File,
@@ -100,29 +100,39 @@ export async function handleSingleImage(
 
     let viewParentPath = markdownView.file.parent?.path ?? "";
     viewParentPath = viewParentPath === "/" ? "" : viewParentPath;
-    const imageDirPath = `${viewParentPath}/${settings.imageSubDir}`;
+    let fileSaveSubDir = `${viewParentPath}/${settings.imageSubDir}`;
     const viewFileName = markdownView.file.basename;
-    const imageFilePrefix = `${viewFileName}-image`;
+    let filePrefix = `${viewFileName}-image`;
 
-    file = await limitImageFileSize(
-        file,
-        settings.maxImageSizeKB,
-        settings.preserveExifData);
+    // count current images under imageDirPath that starts with filePrefix
+    const countPrefix = countFilesWithSamePrefix(app, fileSaveSubDir, filePrefix);
+    console.log(`Number of images with same prefix "${filePrefix}" under "${fileSaveSubDir}": ${countPrefix}`);
+    let fileSuffix = countPrefix === 0 ? "" : `-${countPrefix}`;
+
+    if (file.type.startsWith("image")) {
+        file = await limitImageFileSize(
+            file,
+            settings.maxImageSizeKB,
+            settings.preserveExifData);
+    }
+    else {
+        const fileType = file.type.split("/")[1];
+        fileSaveSubDir = `${viewParentPath}/${fileType}s`;
+        filePrefix = `${viewFileName}-${file.name.split(".")[0]}`;
+    }
+
+    const fileName = `${filePrefix}${fileSuffix}.${file.type.split("/")[1]}`;
+    const filePath = `${fileSaveSubDir}/${fileName}`;
 
     let handleSuccess = true;
 
     reader.onloadend = async (e) => {
-        // count current images under imageDirPath that starts with imageFilePrefix
-        const imageCount = countImageFiles(app, imageDirPath, imageFilePrefix);
-        console.log(`Number of images with same prefix "${imageFilePrefix}" under "${imageDirPath}": ${imageCount}`);
-        const imageFileName = `${imageFilePrefix}${imageCount}.${file.type.split("/")[1]}`;
-        const imagePath = `${imageDirPath}/${imageFileName}`;
-        await createDirsIfNotExists(app, imageDirPath);
+        await createDirsIfNotExists(app, fileSaveSubDir);
         handleSuccess = await createAndInsertImageFromFileReader(
             app,
             editor,
             reader,
-            imagePath,
+            filePath,
             true,
             settings.resizeWidth);
     };
