@@ -1,4 +1,4 @@
-import {App, Plugin, PluginSettingTab, Setting} from 'obsidian';
+import {App, Notice, PluginSettingTab, Setting} from 'obsidian';
 import { formatDate, isValidDateFormat } from '../utils';
 
 export class BetterDailyNotesSettingTab extends PluginSettingTab {
@@ -61,12 +61,14 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					.setPlaceholder(this.plugin.settings.templateFile)
 					.setValue(this.plugin.settings.templateFile)
 					.onChange(async (value) => {
+						value = value[0] == "/" ? value.substring(1) : value;
+						value = value.endsWith('.md') ? value : value + '.md';
 						if (await this.app.vault.adapter.exists(value) && value.endsWith('.md')) {
 							templateSetting.settingEl.classList.remove('invalid-path');
 							console.log('Setting Daily Folder template to: ', value)
-							value = value[0] == "/" ? value.substring(1) : value;
 							this.plugin.settings.templateFile = value;
 							await this.plugin.saveSettings();
+							new Notice('Template file set to: ' + value);
 						} else {
 							templateSetting.setClass('invalid-path');
 						}
