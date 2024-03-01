@@ -118,6 +118,8 @@ export default class BetterDailyNotes extends Plugin {
 
 					// only handle image, zip, and pdf files
 					const files = evt.dataTransfer.files;
+					console.log("files", files);
+					if (files.length === 0) { return; }  // dropped text
 					for (let i = 0; i < files.length; i++) {
 						if (!files[i].type.startsWith("image") &&
 								files[i].type != "application/zip" &&
@@ -163,6 +165,8 @@ export default class BetterDailyNotes extends Plugin {
 
 					// only handle images, zip, and pdf files
 					const files = evt.clipboardData.files;
+					console.log("files", files);
+					if (files.length === 0) { return; }  // pasted text
 					for (let i = 0; i < files.length; i++) {
 						if (!files[i].type.startsWith("image") &&
 								files[i].type != "application/zip" &&
