@@ -1,7 +1,7 @@
 {
 	"id": "better-daily-notes",
 	"name": "Better Daily Notes Plugin",
-	"version": "0.1.1beta",
+	"version": "0.1.2",
 	"minAppVersion": "0.15.0",
 	"description": "A plugin for Obsidian that enhances the management of daily notes and images in a more structured manner.",
 	"author": "showay",
