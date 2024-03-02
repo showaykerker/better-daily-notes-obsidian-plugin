@@ -53,39 +53,7 @@ export default class BetterDailyNotes extends Plugin {
 			}
 		})
 
-		this.addCommand({
-			id: 'check-valid-daily-note-path',
-			name: 'Check if the current note is a valid daily note',
-			callback: () => {
-				const activeView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (!activeView || !activeView.file) {
-					new Notice(`No active view.`);
-					return;
-				}
-				if (activeView instanceof MarkdownView) {
-					const date = checkValidDailyNotePath(activeView.file.path, this.settings.dateFormat);
-					if (date) {
-						new Notice(`${activeView.file.path} is a valid daily note on ${date}`);
-					}
-					else {
-						new Notice(`This is not a valid daily note.`);
-					}
-				}
-			}
-		})
-
-		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new BetterDailyNotesSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		// this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-		// 	console.log('click', evt);
-		// });
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		// this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
-
 		this.setupFileHandler();
 	}
 
