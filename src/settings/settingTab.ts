@@ -176,5 +176,38 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}));
 		}
+
+		new Setting(containerEl)
+			.setName('Enable Summary Page Creation Through Command')
+			.setDesc('Enable the command to create / update summary page.')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.enableSummaryPage)
+				.onChange(async (value) => {
+					this.plugin.settings.enableSummaryPage = value;
+					await this.plugin.saveSettings();
+					this.display();
+				}));
+
+		if (this.plugin.settings.enableSummaryPage) {
+			new Setting(containerEl)
+				.setName('Summary Page File')
+				.setDesc('The file name for the summary page.')
+				.addText(text => text
+					.setValue(this.plugin.settings.summaryPageFile)
+					.onChange(async (value) => {
+						this.plugin.settings.summaryPageFile = value;
+						await this.plugin.saveSettings();
+					}));
+			new Setting(containerEl)
+				.setName('Number of Days to Summarize')
+				.setDesc('The number of days to summarize.')
+				.addText(text => text
+					.setPlaceholder(this.plugin.settings.summaryOfDaysCount.toString())
+					.setValue(this.plugin.settings.summaryOfDaysCount.toString())
+					.onChange(async (value) => {
+						this.plugin.settings.summaryOfDaysCount = parseInt(value);
+						await this.plugin.saveSettings();
+					}));
+		}
 	}
 }

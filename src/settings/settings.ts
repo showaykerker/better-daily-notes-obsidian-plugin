@@ -4,6 +4,7 @@ export interface BetterDailyNotesSettings {
 	rootDir: string;
 	templateFile: string;
 	assumeSameDayBeforeHour: number;
+
 	fileHandlingScenario: string;
 	imageSubDir: string;
 	otherFilesSubDir: string;
@@ -11,6 +12,10 @@ export interface BetterDailyNotesSettings {
 	maxImageSizeKBCache: number
 	preserveExifData: boolean;
 	resizeWidth: number;
+
+	enableSummaryPage: boolean;
+	summaryPageFile: string;
+	summaryOfDaysCount: number;
 }
 
 export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
@@ -18,6 +23,7 @@ export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	rootDir: 'daily-notes',
 	templateFile: '',
 	assumeSameDayBeforeHour: 2,
+
 	fileHandlingScenario: 'daily notes only',
 	imageSubDir: 'images',
 	otherFilesSubDir: 'other',
@@ -25,4 +31,8 @@ export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	maxImageSizeKBCache: -1,
 	preserveExifData: true,
 	resizeWidth: -1,
+
+	enableSummaryPage: true,
+	summaryPageFile: 'summary',
+	summaryOfDaysCount: 7
 }
