@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Notice } from "obsidian";
+import { App, Editor, MarkdownView, Notice, normalizePath } from "obsidian";
 import { BetterDailyNotesSettings } from "./settings/settings";
 import { checkValidDailyNotePath } from "./utils";
 import { createDirsIfNotExists } from "./fileSystem";
@@ -129,6 +129,7 @@ export async function handleSingleFile(
 
     const fileName = `${filePrefix}${fileSuffix}.${file.type.split("/")[1]}`;
     const filePath = `${fileSaveSubDir}/${fileName}`;
+    const filePath = normalizePath(`${fileSaveSubDir}/${fileName}`);
 
     let handleSuccess = true;
 
