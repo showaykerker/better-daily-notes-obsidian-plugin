@@ -1,8 +1,6 @@
 import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
 import dayjs from 'dayjs';
-import { checkValidDailyNotePath } from './utils';
-import { createAndInsertWithFileReader, shouldHandleAccordingToConfig } from './fileHandler';
-import { handleFiles, handleSingleFile } from './fileHandler';
+import { handleFiles } from './fileHandler';
 import { openDailyNote } from './commands';
 import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
 import { BetterDailyNotesSettingTab } from './settings/settingTab';

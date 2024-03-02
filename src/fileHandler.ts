@@ -39,43 +39,9 @@ export async function limitImageFileSize(file: File, size: number, preserveExifD
     return compressedFile;
 }
 
-export async function createAndInsertWithFileReader(
-        app: App,
-        editor: Editor,
-        reader: FileReader,
-        filePath: string,
-        returnTrueIfExists: boolean,
-        resizeWidth: number,
-    ): Promise<boolean> {
-    const base64 = reader.result?.toString().split(",")[1];
-
-    if (!base64) {
-        new Notice(`Failed to create file "${filePath}", base64 is empty.`);
-        return false;
-    }
-
-    const fileLinkResizeString = resizeWidth !== -1 ? `|${resizeWidth}` : "";
-    const fileLink = `![[${filePath}${fileLinkResizeString}]]`;
-
-    filePath = filePath[0] === '/' ? filePath.substring(1) : filePath;
-    if (app.vault.getAbstractFileByPath(filePath) && returnTrueIfExists) {
-        new Notice(`File "${filePath}" already exists. Inserting link to the existed one.`);
-        editor.replaceSelection(fileLink);
-        return true;
-    }
-
-    new Notice(`Creating file "${filePath}"`);
-    const fileArrayBuffer = base64ToArrayBuffer(base64);
-    console.log("Save to:", filePath);
-    await app.vault.createBinary(filePath, fileArrayBuffer);
-    editor.replaceSelection(fileLink);
-    return true;
-}
-
 export function shouldHandleAccordingToConfig(
         settings: BetterDailyNotesSettings,
-        markdownView: MarkdownView,
-        ): boolean {
+        markdownView: MarkdownView): boolean {
     console.log(settings);
     if (!markdownView || !markdownView.file) { return false; }
     if (settings.fileHandlingScenario === "disabled") { return false; }
@@ -121,17 +87,8 @@ export async function handleFiles(
     evt.preventDefault();
     for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        let result = await handleSingleFile(
+        await handleSingleFile(
             app, settings, file, editor, markdownView);
-        if (!result) {
-            const filePath = file.name;
-            const reader = new FileReader();
-            reader.onloadend = async () => {
-                await createAndInsertWithFileReader(
-                    app, editor, reader, filePath, true, -1);
-            };
-            reader.readAsDataURL(file);
-        }
     }
 }
 
@@ -141,8 +98,7 @@ export async function handleSingleFile(
     file: File,
     editor: Editor,
     markdownView: MarkdownView,
-    reader: FileReader = new FileReader(),
-    ): Promise<boolean>{
+    reader: FileReader = new FileReader()): Promise<boolean>{
 
     if (!markdownView || !markdownView.file) { return false; }
 
@@ -189,4 +145,35 @@ export async function handleSingleFile(
     reader.readAsDataURL(file);
     return handleSuccess;
 }
-// Note: You'll need to adjust the parameters and return types based on how you plan to use these functions outside the class.
+
+export async function createAndInsertWithFileReader(
+        app: App,
+        editor: Editor,
+        reader: FileReader,
+        filePath: string,
+        returnTrueIfExists: boolean,
+        resizeWidth: number): Promise<boolean> {
+    const base64 = reader.result?.toString().split(",")[1];
+
+    if (!base64) {
+        new Notice(`Failed to create file "${filePath}", base64 is empty.`);
+        return false;
+    }
+
+    const fileLinkResizeString = resizeWidth !== -1 ? `|${resizeWidth}` : "";
+    const fileLink = `![[${filePath}${fileLinkResizeString}]]`;
+
+    filePath = filePath[0] === '/' ? filePath.substring(1) : filePath;
+    if (app.vault.getAbstractFileByPath(filePath) && returnTrueIfExists) {
+        new Notice(`File "${filePath}" already exists. Inserting link to the existed one.`);
+        editor.replaceSelection(fileLink);
+        return true;
+    }
+
+    new Notice(`Creating file "${filePath}"`);
+    const fileArrayBuffer = base64ToArrayBuffer(base64);
+    console.log("Save to:", filePath);
+    await app.vault.createBinary(filePath, fileArrayBuffer);
+    editor.replaceSelection(fileLink);
+    return true;
+}
