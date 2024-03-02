@@ -122,24 +122,24 @@ export async function handleSingleFile(
         fileSuffix = countPrefix === 0 ? "" : `-${countPrefix}`;
     }
     else {
-        const fileType = file.type.split("/")[1];
         fileSaveSubDir = `${viewParentPath}/${settings.otherFilesSubDir}`;
         filePrefix = `${filePrefix}-${file.name.split(".")[0]}`;
     }
-
-    const fileName = `${filePrefix}${fileSuffix}.${file.type.split("/")[1]}`;
-    const filePath = `${fileSaveSubDir}/${fileName}`;
+    fileSaveSubDir = normalizePath(fileSaveSubDir);
+    const ext = file.name.split(".").slice(-1)[0];
+    const fileName = `${filePrefix}${fileSuffix}.${ext}`;
     const filePath = normalizePath(`${fileSaveSubDir}/${fileName}`);
 
     let handleSuccess = true;
+    await createDirsIfNotExists(app, fileSaveSubDir);
 
     reader.onloadend = async (e) => {
-        await createDirsIfNotExists(app, fileSaveSubDir);
         handleSuccess = await createAndInsertWithFileReader(
             app,
             editor,
             reader,
             filePath,
+            file.name,
             true,
             settings.resizeWidth);
     };
@@ -152,6 +152,7 @@ export async function createAndInsertWithFileReader(
         editor: Editor,
         reader: FileReader,
         filePath: string,
+        fileName: string, // only for logging
         returnTrueIfExists: boolean,
         resizeWidth: number): Promise<boolean> {
     const base64 = reader.result?.toString().split(",")[1];
@@ -171,10 +172,16 @@ export async function createAndInsertWithFileReader(
         return true;
     }
 
-    new Notice(`Creating file "${filePath}"`);
     const fileArrayBuffer = base64ToArrayBuffer(base64);
-    console.log("Save to:", filePath);
-    await app.vault.createBinary(filePath, fileArrayBuffer);
-    editor.replaceSelection(fileLink);
-    return true;
+    try {
+        await app.vault.createBinary(filePath, fileArrayBuffer);
+        editor.replaceSelection(fileLink);
+        return true;
+    }
+    catch (e) {
+        new Notice(`Failed to create file "${fileName}".`, 0);
+        console.error(e);
+        editor.replaceSelection(fileLink);
+        return false;
+    }
 }
