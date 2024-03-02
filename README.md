@@ -22,6 +22,7 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
   - PDF and ZIP files dropped or pasted are saved to *"other files subdirectory"* under the same parent of current note, and renamed to `[CurrentNoteBasename]-[OriginFileBaseName].[OriginalExt]`. If there exists a file with same name, this plugin simply add a link pointing to that file, no file will be added.
   - Customize image and other files' folder name in the settings.
   - Images are compressed using [browser-image-compression](https://github.com/Donaldcwl/browser-image-compression#readme). Adjust compression settings like max image size and EXIF data removal.
+    - ***[New in 0.2.5]*** A command `Toggle image compression` to toggle image compression.
   - Images and pdfs can be resized with markdown syntax to a specified width. Customize resizing width in the settings.
   - ~~***[Removed in 0.2.1]*** Only images added to a daily note will be modified.~~
 - **Assume Same Day Before Hour:**
@@ -64,20 +65,20 @@ This plugin is built with TypeScript. Here's how to contribute:
 - [x] ~~Assume same day before hour logic error.~~
   > ~~Will need to set actual value + 1 for now.~~
 - [x] ~~Images will still be resized with markdown syntax in notes that's not wishes to handle images.~~
-- [x] Images are not compress to exact wished size.
+- [x] ~~Images are not compress to exact wished size.~~
 
 ## Features to be Added
 - [ ] Support of other file types. e.g. `.dill`.
 - [ ] Support of customizing drag and paste behavior.
 - [ ] Open daily note on startup.
 - [ ] A modal to ask if image compression is required.
-- [ ] Commands to toggle image compression.
 - [ ] Create daily note for arbitrary date.
 - [ ] Support of month directory custom naming.
 - [ ] Compress images and rename file for existing notes.
 - [ ] Daily note one line summary by LLM.
 - [ ] Generate tags by LLM.
 - [ ] Image one line summary by LLM.
+- [x] ~~Commands to toggle image compression.~~ (Added v0.2.5)
 - [x] ~~Create daily note with template.~~ (Added v0.2.2)
 - [x] ~~Support of installing through [BRAT](https://github.com/TfTHacker/obsidian42-brat).~~
 - [x] ~~Support of other file types. e.g. `.pdf`, `.zip`.~~ (Added v0.2.1)
