@@ -13,15 +13,17 @@
 - **結構化的每日筆記：** 以結構化的資料夾格式 `[DailyNoteRootDirectory]/[Mon.]/[DateFormat].md` 歸檔每日筆記。
   - 在設定中自定日期格式（`Date Format`）和根目錄（`Root Directory`）。
   - 月份以簡寫表示（如，Jan、Feb、Mar）。
-- **檔案管理：** 處理拖曳或貼上到你的筆記中的圖片、PDF、ZIP 檔案。
+- **檔案管理：** 處理拖曳或貼上到你的筆記中的檔案。
+  - ***[0.2.6 中的更新]*** 支援的檔案類型為 `images`, `json`, `pdf`, `zip`, `.dill`, `.dmg`, `.kml`, `.pickle`.
   - ***[0.2.1 中的新增]*** 處理檔案的時機選項
     - `停用所有處理 Disable All Handling：` 不處理任何檔案。如果你有其他Plugin 如自動圖片上傳等，建議選用此項。
     - `僅在每日筆記中 Only in Daily Notes：` 只處理被拖曳或是貼上到有效每日筆記名稱中的檔案。
     - `在所有檔案中處理 Handle in All Files：` 在包含每日筆記在內的任何筆記上都處理被拖曳或是貼上。
   - 拖曳或貼上的圖片會被存在目前筆記所在文件夾下的`「影像資料夾 Image Subdirectory」`，並且重新命名為 `[筆記檔名]-image#`。
-  - 拖曳或貼上的 PDF 和 ZIP 檔案會被存在目前筆記所在文件夾下的`「其他檔案資料夾 Other File Subdirectory」`，並重新命名為 `[筆記檔名]-[原始檔名]`。如果有同名的檔案在同樣的資料夾，則只在筆記中插入該檔案的連結，不新增檔案到Vault裡。
+  - 圖片以外被拖曳或貼上的檔案會被存在目前筆記所在文件夾下的`「其他檔案資料夾 Other File Subdirectory」`，並重新命名為 `[筆記檔名]-[原始檔名]`。如果有同名的檔案在同樣的資料夾，則只在筆記中插入該檔案的連結，不新增檔案到Vault裡。
   - 在設置中可以自定圖片和其他檔案的文件夾名稱。
   - 使用 [browser-image-compression](https://github.com/Donaldcwl/browser-image-compression#readme) 壓縮圖片。調整壓縮設定，如最大圖片大小和是否刪除照片的 EXIF。
+    - ***[0.2.5 中的新增]*** 使用 `Toggle image compression` 指令 取消/恢復 自動的圖片壓縮。
   - 可以使用 markdown 語法將圖片和 PDF 調整為指定寬度。
   - ~~***[0.2.1 後移除]*** 只有新增到每日筆記的圖片將被修改。~~
 - **在某個指定時間之前認定為同一天 Assume Same Day Before Hour：**
