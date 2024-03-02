@@ -1,6 +1,6 @@
 {
 	"name": "better-daily-notes",
-	"version": "0.2.7",
+	"version": "0.3.0",
 	"description": "Enhances the management of daily notes and files in a more structured manner.",
 	"main": "main.js",
 	"scripts": {
