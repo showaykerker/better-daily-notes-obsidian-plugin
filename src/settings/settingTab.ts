@@ -116,14 +116,14 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					'daily notes only': 'Only in Daily Notes',
 					'all': 'Handle in All Files'
 				})
-				.setValue(this.plugin.settings.imageHandlingScenario)
+				.setValue(this.plugin.settings.fileHandlingScenario)
 				.onChange(async (value) => {
-					this.plugin.settings.imageHandlingScenario = value;
+					this.plugin.settings.fileHandlingScenario = value;
 					await this.plugin.saveSettings();
 					this.display();
 				}));
 
-		if (this.plugin.settings.imageHandlingScenario != 'disabled') {
+		if (this.plugin.settings.fileHandlingScenario != 'disabled') {
 			new Setting(containerEl)
 				.setName('Image Subdirectory')
 				.setDesc('The subdirectory for images.')

@@ -1,4 +1,5 @@
 import { App, Editor, MarkdownView, Notice } from "obsidian";
+import { BetterDailyNotesSettings } from "./settings/settings";
 import { checkValidDailyNotePath } from "./utils";
 import { createDirsIfNotExists } from "./fileSystem";
 import imageCompression from 'browser-image-compression';
@@ -72,16 +73,66 @@ export async function createAndInsertWithFileReader(
 }
 
 export function shouldHandleAccordingToConfig(
-        settings: any,
-        file: File,
+        settings: BetterDailyNotesSettings,
         markdownView: MarkdownView,
         ): boolean {
+    console.log(settings);
     if (!markdownView || !markdownView.file) { return false; }
-    if (settings.imageHandlingScenario === "disabled") { return false; }
+    if (settings.fileHandlingScenario === "disabled") { return false; }
 
     const date = checkValidDailyNotePath(markdownView.file.path, settings.dateFormat);
-    if (settings.imageHandlingScenario === "daily notes only" && !date) { return false; }
+    if (settings.fileHandlingScenario === "daily notes only" && !date) { return false; }
     return true;
+}
+
+export async function handleFiles(
+    dataTransfer: DataTransfer | null,
+    evt: DragEvent | ClipboardEvent,
+    app: App,
+    settings: BetterDailyNotesSettings,
+    editor: Editor,
+    markdownView: MarkdownView): Promise<void> {
+
+    if (!dataTransfer || !dataTransfer.files) {
+        console.log("No files in the event.");
+        return;
+    }
+    if (!shouldHandleAccordingToConfig(settings, markdownView)) {
+        console.log("Should not handle according to config.");
+        return;
+    }
+
+    // only handle image, zip, and pdf files
+    const files = dataTransfer.files;
+
+    if (files.length === 0) { return; }  // pasted text
+
+    // Check if all file types are supported
+    for (let i = 0; i < files.length; i++) {
+        if (!files[i].type.startsWith("image") &&
+                files[i].type != "application/zip" &&
+                files[i].type != "application/pdf") {
+            new Notice(
+                `Only image, pdf, and zip files are supported. ` +
+                `Get ${files[i].type} instead.`);
+            return;
+        }
+    }
+    evt.preventDefault();
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        let result = await handleSingleFile(
+            app, settings, file, editor, markdownView);
+        if (!result) {
+            const filePath = file.name;
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+                await createAndInsertWithFileReader(
+                    app, editor, reader, filePath, true, -1);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
 }
 
 export async function handleSingleFile(
@@ -93,9 +144,6 @@ export async function handleSingleFile(
     reader: FileReader = new FileReader(),
     ): Promise<boolean>{
 
-    if (!shouldHandleAccordingToConfig(settings, file, markdownView)) {
-        return false;
-    }
     if (!markdownView || !markdownView.file) { return false; }
 
     let viewParentPath = markdownView.file.parent?.path ?? "";

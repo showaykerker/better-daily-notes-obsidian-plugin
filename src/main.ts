@@ -1,7 +1,8 @@
 import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
 import dayjs from 'dayjs';
 import { checkValidDailyNotePath } from './utils';
-import { createAndInsertWithFileReader, handleSingleFile, shouldHandleAccordingToConfig } from './fileHandler';
+import { createAndInsertWithFileReader, shouldHandleAccordingToConfig } from './fileHandler';
+import { handleFiles, handleSingleFile } from './fileHandler';
 import { openDailyNote } from './commands';
 import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
 import { BetterDailyNotesSettingTab } from './settings/settingTab';
@@ -107,49 +108,7 @@ export default class BetterDailyNotes extends Plugin {
 				"editor-drop",
 				async (evt: DragEvent, editor: Editor, markdownView: MarkdownView) => {
 					console.log("editor-drop", evt, editor, markdownView);
-					if (!evt.dataTransfer || !evt.dataTransfer.files) {
-						console.log("No files in the event.");
-						return;
-					}
-					if (!shouldHandleAccordingToConfig(this.settings, evt.dataTransfer?.files[0], markdownView)) {
-						console.log("Should not handle according to config.");
-						return false;
-					}
-
-					// only handle image, zip, and pdf files
-					const files = evt.dataTransfer.files;
-					console.log("files", files);
-					if (files.length === 0) { return; }  // dropped text
-					for (let i = 0; i < files.length; i++) {
-						if (!files[i].type.startsWith("image") &&
-								files[i].type != "application/zip" &&
-								files[i].type != "application/pdf") {
-							new Notice(
-								`Only image, pdf, and zip files are supported. ` +
-								`Get ${files[i].type} instead.`);
-							return false;
-						}
-					}
-					evt.preventDefault();
-					for (let i = 0; i < files.length; i++) {
-						console.log("file ", i, ":", files[i]);
-						const file = evt.dataTransfer.files[i];
-						const filePath = file ? file.name : '';
-						if (!file) {
-							new Notice(`No file ${i} found.`);
-							continue;
-						}
-						let result = await handleSingleFile(
-							this.app, this.settings, files[i], editor, markdownView);
-						if (!result) {
-							const reader = new FileReader();
-							reader.onloadend = async () => {
-								await createAndInsertWithFileReader(
-									this.app, editor, reader, filePath, true, -1);
-							};
-							reader.readAsDataURL(file);
-						}
-					}
+					handleFiles(evt.dataTransfer, evt, this.app, this.settings, editor, markdownView);
 				}
 			)
 		);
@@ -157,41 +116,8 @@ export default class BetterDailyNotes extends Plugin {
 			this.app.workspace.on(
 				"editor-paste",
 				async (evt: ClipboardEvent, editor: Editor, markdownView: MarkdownView) => {
-					console.log("editor-paste", editor, markdownView, evt);
-					if (!evt.clipboardData || !evt.clipboardData.files) { return; }
-					if (!shouldHandleAccordingToConfig(this.settings, evt.clipboardData?.files[0], markdownView)) {
-						return false;
-					}
-
-					// only handle images, zip, and pdf files
-					const files = evt.clipboardData.files;
-					console.log("files", files);
-					if (files.length === 0) { return; }  // pasted text
-					for (let i = 0; i < files.length; i++) {
-						if (!files[i].type.startsWith("image") &&
-								files[i].type != "application/zip" &&
-								files[i].type != "application/pdf") {
-							new Notice(
-								`Only image, pdf, and zip files are supported. ` +
-								`Get ${files[i].type} instead.`);
-							return false;
-						}
-					}
-					evt.preventDefault();
-					for (let i = 0; i < files.length; i++) {
-						let result = await handleSingleFile(
-							this.app, this.settings, files[i], editor, markdownView);
-						if (!result) {
-							const file = evt.clipboardData.files[0];
-							const filePath = file.name;
-							const reader = new FileReader();
-							reader.onloadend = async () => {
-								await createAndInsertWithFileReader(
-									this.app, editor, reader, filePath, true, -1);
-							};
-							reader.readAsDataURL(file);
-						}
-					}
+					console.log("editor-paste", evt, editor, markdownView);
+					handleFiles(evt.clipboardData, evt, this.app, this.settings, editor, markdownView);
 				}
 			)
 		);
