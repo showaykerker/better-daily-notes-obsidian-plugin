@@ -179,7 +179,10 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Enable Summary Page Creation Through Command')
-			.setDesc('Enable the command to create / update summary page.')
+			.setDesc('Enable the command to create / update summary page. ' +
+				"Summary page is a page that summarizes the daily notes for the last few days. " +
+				"If enabled, the command will be available in the command palette. " +
+				"Requires restart of th app to take effect.")
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.enableSummaryPage)
 				.onChange(async (value) => {
