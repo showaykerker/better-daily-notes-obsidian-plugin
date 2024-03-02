@@ -43,7 +43,7 @@ export default class BetterDailyNotes extends Plugin {
 			callback: async () => {
 				await openDailyNote(this.app, this.settings, -1);
 			}
-		})
+		});
 
 		this.addCommand({
 			id: 'open-tomorrows-daily-note',
@@ -51,7 +51,42 @@ export default class BetterDailyNotes extends Plugin {
 			callback: async () => {
 				await openDailyNote(this.app, this.settings, +1);
 			}
-		})
+		});
+
+		this.addCommand({
+			id: 'toggle-image-compression',
+			name: 'Toggle image compression',
+			callback: async () => {
+				// If Cache is -1 and maxImageSizeKB is not -1,
+				// it means that it is currently toggled to not upload.
+				// will be toggled back after restart
+				const curr = this.settings.maxImageSizeKB;
+				const cache = this.settings.maxImageSizeKBCache;
+				if (curr == -1 && cache == -1) {
+					new Notice("Nothing happens because image compression is already disabled.");
+					return;
+				}
+				else if (curr == -1 && cache != -1) {
+					new Notice(
+						"Image compression is now ENABLED.\n" +
+						"Set back to maximum size: " + cache + "KB.", 7500);
+				}
+				else if (curr != -1 && cache == -1) {
+					new Notice("Image compression is now DISABLED.\n" +
+						"Execute the command again to set it back to maximum size: " + curr + "KB.\n" +
+						"Will be set back automatically when restart.", 7500);
+				}
+				this.settings.maxImageSizeKB = cache;
+				this.settings.maxImageSizeKBCache = curr;
+				await this.saveSettings();
+			}
+		});
+
+		if (this.settings.maxImageSizeKBCache != -1) {
+			this.settings.maxImageSizeKB = this.settings.maxImageSizeKBCache;
+			this.settings.maxImageSizeKBCache = -1;
+			await this.saveSettings();
+		}
 
 		this.addSettingTab(new BetterDailyNotesSettingTab(this.app, this));
 		this.setupFileHandler();

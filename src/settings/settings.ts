@@ -8,6 +8,7 @@ export interface BetterDailyNotesSettings {
 	imageSubDir: string;
 	otherFilesSubDir: string;
 	maxImageSizeKB: number;
+	maxImageSizeKBCache: number
 	preserveExifData: boolean;
 	resizeWidth: number;
 }
@@ -21,6 +22,7 @@ export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	imageSubDir: 'images',
 	otherFilesSubDir: 'other',
 	maxImageSizeKB: -1,
+	maxImageSizeKBCache: -1,
 	preserveExifData: true,
 	resizeWidth: -1,
 }
