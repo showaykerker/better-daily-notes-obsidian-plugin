@@ -43,7 +43,6 @@ export async function openDailyNote(
         }
     }
     openOrSwitchToNote(app, targetNotePath);
-    updateSummaryPage(app, settings, false, false);
 }
 
 function getPreviousDailyNotePaths(app: App, settings: BetterDailyNotesSettings, days: number): string[] {

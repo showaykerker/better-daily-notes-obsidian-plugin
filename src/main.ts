@@ -1,9 +1,10 @@
-import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
+import { Editor, MarkdownView, Notice, Plugin, TAbstractFile, TFile } from 'obsidian';
 import dayjs from 'dayjs';
 import { handleFiles } from './fileHandler';
 import { openDailyNote, updateSummaryPage } from './commands';
 import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
 import { BetterDailyNotesSettingTab } from './settings/settingTab';
+import { checkValidDailyNotePath } from './utils';
 
 
 export default class BetterDailyNotes extends Plugin {
@@ -136,6 +137,40 @@ export default class BetterDailyNotes extends Plugin {
 				"editor-paste",
 				async (evt: ClipboardEvent, editor: Editor, markdownView: MarkdownView) => {
 					handleFiles(evt.clipboardData, evt, this.app, this.settings, editor, markdownView);
+				}
+			)
+		);
+		this.registerEvent(
+			this.app.vault.on(
+				"delete",
+				async (file: TAbstractFile) => {
+					if (!this.settings.enableSummaryPage) return;
+					if (!(file instanceof TFile)) return;
+					if (!checkValidDailyNotePath(file.path, this.settings.dateFormat)) return;
+					await updateSummaryPage(this.app, this.settings, false, false);
+				}
+			)
+		);
+		this.registerEvent(
+			this.app.vault.on(
+				"rename",
+				async (file: TAbstractFile, oldPath: string) => {
+					if (!this.settings.enableSummaryPage) return;
+					if (!(file instanceof TFile)) return;
+					if (!checkValidDailyNotePath(oldPath, this.settings.dateFormat) &&
+						!checkValidDailyNotePath(file.path, this.settings.dateFormat)) return;
+					await updateSummaryPage(this.app, this.settings, false, false);
+				}
+			)
+		);
+		this.registerEvent(
+			this.app.vault.on(
+				"create",
+				async (file: TAbstractFile) => {
+					if (!this.settings.enableSummaryPage) return;
+					if (!(file instanceof TFile)) return;
+					if (!checkValidDailyNotePath(file.path, this.settings.dateFormat)) return;
+					await updateSummaryPage(this.app, this.settings, false, false);
 				}
 			)
 		);
