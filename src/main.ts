@@ -108,7 +108,6 @@ export default class BetterDailyNotes extends Plugin {
 			this.app.workspace.on(
 				"editor-drop",
 				async (evt: DragEvent, editor: Editor, markdownView: MarkdownView) => {
-					console.log("editor-drop", evt, editor, markdownView);
 					handleFiles(evt.dataTransfer, evt, this.app, this.settings, editor, markdownView);
 				}
 			)
@@ -117,7 +116,6 @@ export default class BetterDailyNotes extends Plugin {
 			this.app.workspace.on(
 				"editor-paste",
 				async (evt: ClipboardEvent, editor: Editor, markdownView: MarkdownView) => {
-					console.log("editor-paste", evt, editor, markdownView);
 					handleFiles(evt.clipboardData, evt, this.app, this.settings, editor, markdownView);
 				}
 			)

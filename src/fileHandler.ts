@@ -60,11 +60,9 @@ export async function handleFiles(
     markdownView: MarkdownView): Promise<void> {
 
     if (!dataTransfer || !dataTransfer.files) {
-        console.log("No files in the event.");
         return;
     }
     if (!shouldHandleAccordingToConfig(settings, markdownView)) {
-        console.log("Should not handle according to config.");
         return;
     }
 
