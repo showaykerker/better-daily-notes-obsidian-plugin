@@ -13,13 +13,14 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
 - **Structured Daily Notes:** Organizes daily notes in a structured folder format `[DailyNoteRootDirectory]/[Mon.]/[DateFormat].md`.
   - Customize the root directory and date format in the settings.
   - Month represented in short form (e.g., Jan, Feb, Mar).
-- **Files Management:** Handle image, pdf, zip files dropped or pasted to your notes.
+- **Files Management:** Handle files dropped or pasted to your notes.
+  - ***[Updated in 0.2.6]*** Supported file format: `images`, `json`, `pdf`, `zip`, `.dill`, `.dmg`, `.kml`, `.pickle`
   - ***[New in 0.2.1]*** Configuration of files handling scenario.
     - `Disable All Handling`: No file handling. If you have another plugin such as automatic image upload, you should disable the handling from this plugin.
     - `Only in Daily Notes`: Only files added to a valid daily-note name will be handled.
     - `Handle in All Files`: Handle all files added to your notes.
   - Images dropped or pasted are saved to a *"image subdirectory"* under the same parent of current note, and renamed to `[CurrentNoteBasename]-image#.[OriginalExt]`
-  - PDF and ZIP files dropped or pasted are saved to *"other files subdirectory"* under the same parent of current note, and renamed to `[CurrentNoteBasename]-[OriginFileBaseName].[OriginalExt]`. If there exists a file with same name, this plugin simply add a link pointing to that file, no file will be added.
+  - Files other than images dropped or pasted are saved to *"other files subdirectory"* under the same parent of current note, and renamed to `[CurrentNoteBasename]-[OriginFileBaseName].[OriginalExt]`. If there exists a file with same name, this plugin simply add a link pointing to that file, no file will be added.
   - Customize image and other files' folder name in the settings.
   - Images are compressed using [browser-image-compression](https://github.com/Donaldcwl/browser-image-compression#readme). Adjust compression settings like max image size and EXIF data removal.
     - ***[New in 0.2.5]*** A command `Toggle image compression` to toggle image compression.
@@ -68,7 +69,6 @@ This plugin is built with TypeScript. Here's how to contribute:
 - [x] ~~Images are not compress to exact wished size.~~
 
 ## Features to be Added
-- [ ] Support of other file types. e.g. `.dill`.
 - [ ] Support of customizing drag and paste behavior.
 - [ ] Open daily note on startup.
 - [ ] A modal to ask if image compression is required.
@@ -78,6 +78,7 @@ This plugin is built with TypeScript. Here's how to contribute:
 - [ ] Daily note one line summary by LLM.
 - [ ] Generate tags by LLM.
 - [ ] Image one line summary by LLM.
+- [x] ~~Support of other file types. e.g. `.dill`.~~ (Supported from v0.2.6)
 - [x] ~~Commands to toggle image compression.~~ (Added v0.2.5)
 - [x] ~~Create daily note with template.~~ (Added v0.2.2)
 - [x] ~~Support of installing through [BRAT](https://github.com/TfTHacker/obsidian42-brat).~~
