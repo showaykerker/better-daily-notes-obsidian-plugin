@@ -33,6 +33,10 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
 - **Convenient Navigation:**
   - Adds a ribbon icon to quickly open today's daily note.
   - Provides commands to open today's, yesterday's, and tomorrow's daily notes.
+- **Summary Page** (Optional)
+  - ***[New in 0.2.7]*** Adds a ribbon icon and command to create summary page for previous daily notes. The summary page will be modified automatically when
+    1. Calling `Open and update summary page` command or ribbon icon.
+    2. Creating daily notes with commands or ribbon icon.
 
 ## Installation Guide
 
