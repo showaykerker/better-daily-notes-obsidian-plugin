@@ -177,11 +177,15 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					}));
 		}
 
+		containerEl.createEl('hr');
+		containerEl.createEl('h2', {text: 'Summary Page Configuration', cls: 'section-header'});
+		containerEl.createEl('p', {text: "Summary page is a page that summarizes the daily notes from the past few days. " +
+			"If enabled, the feature will be available in the command palette and as ribbon icon. "});
+		containerEl.createEl('p', {text: "If you owns a huge vault, it is possible that this feature slows down the app when launched. "});
+
 		new Setting(containerEl)
-			.setName('Enable Summary Page Creation Through Command')
+			.setName('Enable Summary Page Creation')
 			.setDesc('Enable the command to create / update summary page. ' +
-				"Summary page is a page that summarizes the daily notes for the last few days. " +
-				"If enabled, the command will be available in the command palette. " +
 				"Requires restart of th app to take effect.")
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.enableSummaryPage)
