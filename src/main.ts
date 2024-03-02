@@ -1,7 +1,7 @@
 import { Editor, MarkdownView, Notice, Plugin } from 'obsidian';
 import dayjs from 'dayjs';
 import { handleFiles } from './fileHandler';
-import { openDailyNote } from './commands';
+import { openDailyNote, updateSummaryPage } from './commands';
 import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
 import { BetterDailyNotesSettingTab } from './settings/settingTab';
 
@@ -16,16 +16,25 @@ export default class BetterDailyNotes extends Plugin {
 		dayjs.extend(customParseFormat);
 
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon(
+		const openDailyNoteRibbonIconEl = this.addRibbonIcon(
 			'book-open-check',
 			'Open today\'s daily note',
 			async (evt: MouseEvent) => {
 				await openDailyNote(this.app, this.settings, 0);
 			}
 		);
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('better-daily-notes-ribbon-class');
+		openDailyNoteRibbonIconEl.addClass('better-daily-notes-ribbon-class');
+
+		if (this.settings.enableSummaryPage) {
+			const openSummaryPageRibbonIconEl = this.addRibbonIcon(
+				'list',
+				'Open and update summary page',
+				async (evt: MouseEvent) => {
+					updateSummaryPage(this.app, this.settings, true, true);
+				}
+			);
+			openSummaryPageRibbonIconEl.addClass('better-daily-notes-ribbon-class');
+		}
 
 		this.addCommand({
 			id: 'open-todays-daily-note',
@@ -50,6 +59,16 @@ export default class BetterDailyNotes extends Plugin {
 				await openDailyNote(this.app, this.settings, +1);
 			}
 		});
+
+		if (this.settings.enableSummaryPage) {
+			this.addCommand({
+				id: 'open-summary-page',
+				name: 'Open and update summary page',
+				callback: async () => {
+					updateSummaryPage(this.app, this.settings, true, true);
+				}
+			});
+		}
 
 		this.addCommand({
 			id: 'toggle-image-compression',
