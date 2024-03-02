@@ -51,6 +51,19 @@ export function shouldHandleAccordingToConfig(
     return true;
 }
 
+function isFileSupported(file: File): boolean {
+
+    const acceptableFileTypes = [
+        "application/zip", "application/pdf", "application/json",
+        "application/vnd.google-earth.kml+xml"];
+    const acceptableFileExtensionsWithEmptyFileType = [ "dill", "dmg", "pkl" ];
+    const fileExtension = file.name.split(".").slice(-1)[0];
+
+    return file.type.startsWith("image") ||
+        acceptableFileTypes.includes(file.type) ||
+        (acceptableFileExtensionsWithEmptyFileType.includes(fileExtension) && file.type === "");
+}
+
 export async function handleFiles(
     dataTransfer: DataTransfer | null,
     evt: DragEvent | ClipboardEvent,
@@ -73,12 +86,11 @@ export async function handleFiles(
 
     // Check if all file types are supported
     for (let i = 0; i < files.length; i++) {
-        if (!files[i].type.startsWith("image") &&
-                files[i].type != "application/zip" &&
-                files[i].type != "application/pdf") {
+        if (!isFileSupported(files[i])) {
             new Notice(
                 `Only image, pdf, and zip files are supported. ` +
-                `Get ${files[i].type} instead.`);
+                `Get file "${files[i]?.name}" with type "${files[i].type}" instead.`,
+                7500);
             return;
         }
     }
