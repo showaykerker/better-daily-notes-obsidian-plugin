@@ -1,10 +1,11 @@
 import { Editor, MarkdownView, Notice, Plugin, TAbstractFile, TFile } from 'obsidian';
 import dayjs from 'dayjs';
 import { handleFiles } from './fileHandler';
-import { openDailyNote, updateSummaryPage } from './commands';
+import { openDailyNote } from './commands';
 import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
 import { BetterDailyNotesSettingTab } from './settings/settingTab';
-import { checkValidDailyNotePath } from './utils';
+import { CreateSummaryPageEventListener } from './summaryPage/eventListener';
+import { CreateSummaryPageCommands, CreateSummaryPageRibbonIcons } from './summaryPage/commands';
 
 
 export default class BetterDailyNotes extends Plugin {
@@ -27,14 +28,8 @@ export default class BetterDailyNotes extends Plugin {
 		openDailyNoteRibbonIconEl.addClass('better-daily-notes-ribbon-class');
 
 		if (this.settings.enableSummaryPage) {
-			const openSummaryPageRibbonIconEl = this.addRibbonIcon(
-				'list',
-				'Open and update summary page',
-				async (evt: MouseEvent) => {
-					updateSummaryPage(this.app, this.settings, true, true);
-				}
-			);
-			openSummaryPageRibbonIconEl.addClass('better-daily-notes-ribbon-class');
+			CreateSummaryPageRibbonIcons(this);
+			CreateSummaryPageCommands(this);
 		}
 
 		this.addCommand({
@@ -60,16 +55,6 @@ export default class BetterDailyNotes extends Plugin {
 				await openDailyNote(this.app, this.settings, +1);
 			}
 		});
-
-		if (this.settings.enableSummaryPage) {
-			this.addCommand({
-				id: 'open-summary-page',
-				name: 'Open and update summary page',
-				callback: async () => {
-					updateSummaryPage(this.app, this.settings, true, true);
-				}
-			});
-		}
 
 		this.addCommand({
 			id: 'toggle-image-compression',
@@ -108,6 +93,7 @@ export default class BetterDailyNotes extends Plugin {
 
 		this.addSettingTab(new BetterDailyNotesSettingTab(this.app, this));
 		this.setupFileHandler();
+		CreateSummaryPageEventListener(this);
 	}
 
 
@@ -137,40 +123,6 @@ export default class BetterDailyNotes extends Plugin {
 				"editor-paste",
 				async (evt: ClipboardEvent, editor: Editor, markdownView: MarkdownView) => {
 					handleFiles(evt.clipboardData, evt, this.app, this.settings, editor, markdownView);
-				}
-			)
-		);
-		this.registerEvent(
-			this.app.vault.on(
-				"delete",
-				async (file: TAbstractFile) => {
-					if (!this.settings.enableSummaryPage) return;
-					if (!(file instanceof TFile)) return;
-					if (!checkValidDailyNotePath(file.path, this.settings.dateFormat)) return;
-					await updateSummaryPage(this.app, this.settings, false, false);
-				}
-			)
-		);
-		this.registerEvent(
-			this.app.vault.on(
-				"rename",
-				async (file: TAbstractFile, oldPath: string) => {
-					if (!this.settings.enableSummaryPage) return;
-					if (!(file instanceof TFile)) return;
-					if (!checkValidDailyNotePath(oldPath, this.settings.dateFormat) &&
-						!checkValidDailyNotePath(file.path, this.settings.dateFormat)) return;
-					await updateSummaryPage(this.app, this.settings, false, false);
-				}
-			)
-		);
-		this.registerEvent(
-			this.app.vault.on(
-				"create",
-				async (file: TAbstractFile) => {
-					if (!this.settings.enableSummaryPage) return;
-					if (!(file instanceof TFile)) return;
-					if (!checkValidDailyNotePath(file.path, this.settings.dateFormat)) return;
-					await updateSummaryPage(this.app, this.settings, false, false);
 				}
 			)
 		);
