@@ -1,8 +1,8 @@
-import { App, Editor, MarkdownView, Notice, normalizePath } from "obsidian";
-import { BetterDailyNotesSettings } from "./settings/settings";
-import { checkValidDailyNotePath } from "./utils";
-import { createDirsIfNotExists } from "./fileSystem";
 import imageCompression from 'browser-image-compression';
+import { App, Editor, MarkdownView, normalizePath, Notice } from "obsidian";
+import { createDirsIfNotExists } from "./fileSystem";
+import { checkValidDailyNotePath } from "../utils";
+import { BetterDailyNotesSettings } from "../settings/settings";
 
 export function base64ToArrayBuffer(base64: string): ArrayBuffer {
     const binaryString = window.atob(base64);
@@ -42,7 +42,6 @@ export async function limitImageFileSize(file: File, size: number, preserveExifD
 export function shouldHandleAccordingToConfig(
         settings: BetterDailyNotesSettings,
         markdownView: MarkdownView): boolean {
-    console.log(settings);
     if (!markdownView || !markdownView.file) { return false; }
     if (settings.fileHandlingScenario === "disabled") { return false; }
 

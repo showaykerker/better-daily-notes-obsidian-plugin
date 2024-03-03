@@ -1,5 +1,5 @@
 import { App, normalizePath } from 'obsidian';
-import { getMonthDirPath } from './utils';
+import { getMonthDirPath } from '../utils';
 
 export async function createDirsIfNotExists(app: App, dir: string): Promise<void> {
     let dirPath = "";

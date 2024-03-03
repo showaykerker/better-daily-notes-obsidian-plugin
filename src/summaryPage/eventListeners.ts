@@ -1,7 +1,7 @@
-import BetterDailyNotePlugin from '../main';
-import { checkValidDailyNotePath } from '../utils';
 import { TAbstractFile, TFile } from 'obsidian';
 import { updateSummaryPage } from './commands';
+import BetterDailyNotePlugin from '../main';
+import { checkValidDailyNotePath } from '../utils';
 
 export function CreateSummaryPageEventListener(plugin: BetterDailyNotePlugin) {
     plugin.registerEvent(

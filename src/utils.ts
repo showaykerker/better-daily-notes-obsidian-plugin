@@ -1,4 +1,18 @@
+import { App, MarkdownView } from 'obsidian';
 import dayjs from 'dayjs';
+
+export function openOrSwitchToNote(app: App, dailyNotePath: string) {
+    const leaves = app.workspace.getLeavesOfType("markdown");
+    for (let leaf of leaves) {
+        if (!(leaf.view instanceof MarkdownView)) { continue; }
+        const file = leaf.view.file;
+        if (file?.path === dailyNotePath) {
+            leaf.openFile(file);
+            return;
+        }
+    }
+    app.workspace.openLinkText(dailyNotePath, '', true);
+}
 
 export function getDailyNoteName(
         assumeSameDayBeforeHour: number,

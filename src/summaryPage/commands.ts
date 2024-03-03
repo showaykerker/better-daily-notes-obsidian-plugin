@@ -1,19 +1,19 @@
 import { App, Notice, TFile } from 'obsidian';
-import { getDailyNotePath } from '../utils';
+import BetterDailyNotePlugin from '../main';
+import { getDailyNotePath, openOrSwitchToNote } from '../utils';
 import { BetterDailyNotesSettings } from '../settings/settings';
-import { openOrSwitchToNote } from '../commands';
 
-export async function CreateSummaryPageCommands(plugin: any) {
+export async function CreateSummaryPageCommands(plugin: BetterDailyNotePlugin) {
     plugin.addCommand({
         id: 'open-summary-page',
         name: 'Open and update summary page',
         callback: async () => {
             await updateSummaryPage(plugin.app, plugin.settings, true, true);
         }
-    })
+    });
 }
 
-export async function CreateSummaryPageRibbonIcons(plugin: any) {
+export async function CreateSummaryPageRibbonIcons(plugin: BetterDailyNotePlugin) {
     plugin.addRibbonIcon(
         'list',
         'Open and update summary page',

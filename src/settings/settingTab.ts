@@ -7,7 +7,6 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 	constructor(app: App, plugin: any) {
 		super(app, plugin);
 		this.plugin = plugin;
-		console.log("BetterDailyNotesSettingTab constructed");
 	}
 
 	templateExists = (): Boolean => {
@@ -76,7 +75,6 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						value = normalizePath(value);
 						if (await this.app.vault.adapter.exists(value) && value.endsWith('.md')) {
 							templateSetting.settingEl.classList.remove('invalid-path');
-							console.log('Setting Daily Folder template to: ', value)
 							this.plugin.settings.templateFile = value;
 							await this.plugin.saveSettings();
 							new Notice('Template file set to: ' + value);

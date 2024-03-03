@@ -1,11 +1,11 @@
-import { Editor, MarkdownView, Notice, Plugin, TAbstractFile, TFile } from 'obsidian';
+import { Plugin } from 'obsidian';
 import dayjs from 'dayjs';
-import { handleFiles } from './fileHandler';
-import { openDailyNote } from './commands';
 import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
 import { BetterDailyNotesSettingTab } from './settings/settingTab';
-import { CreateSummaryPageEventListener } from './summaryPage/eventListener';
+import { CreateSummaryPageEventListener } from './summaryPage/eventListeners';
 import { CreateSummaryPageCommands, CreateSummaryPageRibbonIcons } from './summaryPage/commands';
+import { CreateDailyNotesEventListener } from './dailyNotes/eventListeners';
+import { CreateDailyNotesCommands, CreateDailyNotesRibbonIcons } from './dailyNotes/commands';
 
 
 export default class BetterDailyNotes extends Plugin {
@@ -17,82 +17,16 @@ export default class BetterDailyNotes extends Plugin {
 		const customParseFormat = require('dayjs/plugin/customParseFormat');
 		dayjs.extend(customParseFormat);
 
-
-		const openDailyNoteRibbonIconEl = this.addRibbonIcon(
-			'book-open-check',
-			'Open today\'s daily note',
-			async (evt: MouseEvent) => {
-				await openDailyNote(this.app, this.settings, 0);
-			}
-		);
-		openDailyNoteRibbonIconEl.addClass('better-daily-notes-ribbon-class');
+		CreateDailyNotesCommands(this);
+		CreateDailyNotesRibbonIcons(this);
 
 		if (this.settings.enableSummaryPage) {
 			CreateSummaryPageRibbonIcons(this);
 			CreateSummaryPageCommands(this);
 		}
 
-		this.addCommand({
-			id: 'open-todays-daily-note',
-			name: 'Open today\'s daily note',
-			callback: async () => {
-				await openDailyNote(this.app, this.settings, 0);
-			}
-		})
-
-		this.addCommand({
-			id: 'open-yesterdays-daily-note',
-			name: 'Open yesterday\'s daily note',
-			callback: async () => {
-				await openDailyNote(this.app, this.settings, -1);
-			}
-		});
-
-		this.addCommand({
-			id: 'open-tomorrows-daily-note',
-			name: 'Open tomorrow\'s daily note',
-			callback: async () => {
-				await openDailyNote(this.app, this.settings, +1);
-			}
-		});
-
-		this.addCommand({
-			id: 'toggle-image-compression',
-			name: 'Toggle image compression',
-			callback: async () => {
-				// If Cache is -1 and maxImageSizeKB is not -1,
-				// it means that it is currently toggled to not upload.
-				// will be toggled back after restart
-				const curr = this.settings.maxImageSizeKB;
-				const cache = this.settings.maxImageSizeKBCache;
-				if (curr == -1 && cache == -1) {
-					new Notice("Nothing happens because image compression is already disabled.");
-					return;
-				}
-				else if (curr == -1 && cache != -1) {
-					new Notice(
-						"Image compression is now ENABLED.\n" +
-						"Set back to maximum size: " + cache + "KB.", 7500);
-				}
-				else if (curr != -1 && cache == -1) {
-					new Notice("Image compression is now DISABLED.\n" +
-						"Execute the command again to set it back to maximum size: " + curr + "KB.\n" +
-						"Will be set back automatically when restart.", 7500);
-				}
-				this.settings.maxImageSizeKB = cache;
-				this.settings.maxImageSizeKBCache = curr;
-				await this.saveSettings();
-			}
-		});
-
-		if (this.settings.maxImageSizeKBCache != -1) {
-			this.settings.maxImageSizeKB = this.settings.maxImageSizeKBCache;
-			this.settings.maxImageSizeKBCache = -1;
-			await this.saveSettings();
-		}
-
 		this.addSettingTab(new BetterDailyNotesSettingTab(this.app, this));
-		this.setupFileHandler();
+		CreateDailyNotesEventListener(this);
 		CreateSummaryPageEventListener(this);
 	}
 
@@ -109,23 +43,5 @@ export default class BetterDailyNotes extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	setupFileHandler() {
-		this.registerEvent(
-			this.app.workspace.on(
-				"editor-drop",
-				async (evt: DragEvent, editor: Editor, markdownView: MarkdownView) => {
-					handleFiles(evt.dataTransfer, evt, this.app, this.settings, editor, markdownView);
-				}
-			)
-		);
-		this.registerEvent(
-			this.app.workspace.on(
-				"editor-paste",
-				async (evt: ClipboardEvent, editor: Editor, markdownView: MarkdownView) => {
-					handleFiles(evt.clipboardData, evt, this.app, this.settings, editor, markdownView);
-				}
-			)
-		);
-	}
 }
 
