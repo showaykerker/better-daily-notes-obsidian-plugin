@@ -76,13 +76,11 @@ This plugin is built with TypeScript. Here's how to contribute:
 4. Compile changes with `$ npm run dev`.
 5. Reload Obsidian to load the updated plugin.
 
-## Known Bugs
-- [x] ~~Assume same day before hour logic error.~~
-  > ~~Will need to set actual value + 1 for now.~~
-- [x] ~~Images will still be resized with markdown syntax in notes that's not wishes to handle images.~~
-- [x] ~~Images are not compress to exact wished size.~~
+## Roadmap of Features
+- [ ] Handle create event and editor-drop event for file management.
+- [ ] Use svelte in configuration interface.
 
-## Features to be Added
+## Feature Ideas
 - [ ] Support of customizing drag and paste behavior.
 - [ ] Open daily note on startup.
 - [ ] A modal to ask if image compression is required.
@@ -97,3 +95,13 @@ This plugin is built with TypeScript. Here's how to contribute:
 - [x] ~~Create daily note with template.~~ (Added v0.2.2)
 - [x] ~~Support of installing through [BRAT](https://github.com/TfTHacker/obsidian42-brat).~~
 - [x] ~~Support of other file types. e.g. `.pdf`, `.zip`.~~ (Added v0.2.1)
+
+## Known Bugs
+- [ ] Compressing very large images may occasionally cause the application to restart.
+  > Likely to be resolved with the implementation of the roadmap feature - `Handle create event`.
+- [ ] Adding a significant quantity of images at once may result in some not being processed successfully.
+  > Likely to be resolved with the implementation of the roadmap feature - `Handle create event`.
+- [x] ~~Assume same day before hour logic error.~~
+  > ~~Will need to set actual value + 1 for now.~~
+- [x] ~~Images will still be resized with markdown syntax in notes that's not wishes to handle images.~~
+- [x] ~~Images are not compress to exact wished size.~~
