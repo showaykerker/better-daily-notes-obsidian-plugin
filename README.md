@@ -10,35 +10,44 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
 <img src='imgs/2024-02-20-image2.png' width='140'/>
 
 ## Features
+
+### Features
 - **Structured Daily Notes:** Organizes daily notes in a structured folder format `[DailyNoteRootDirectory]/[Mon.]/[DateFormat].md`.
   - Customize the root directory and date format in the settings.
   - Month represented in short form (e.g., Jan, Feb, Mar).
 - **Files Management:** Handle files dropped or pasted to your notes.
-  - ***[Updated in 0.2.6]*** Supported file format: `images`, `json`, `pdf`, `zip`, `.dill`, `.dmg`, `.kml`, `.pickle`
-  - ***[New in 0.2.1]*** Configuration of files handling scenario.
+  - Supported file format: `images`, `json`, `pdf`, `zip`, `.dill`, `.dmg`, `.kml`, `.pickle`
+  - Configuration of files handling scenario.
     - `Disable All Handling`: No file handling. If you have another plugin such as automatic image upload, you should disable the handling from this plugin.
     - `Only in Daily Notes`: Only files added to a valid daily-note name will be handled.
     - `Handle in All Files`: Handle all files added to your notes.
   - Images dropped or pasted are saved to a *"image subdirectory"* under the same parent of current note, and renamed to `[CurrentNoteBasename]-image#.[OriginalExt]`
-  - Files other than images dropped or pasted are saved to *"other files subdirectory"* under the same parent of current note, and renamed to `[CurrentNoteBasename]-[OriginFileBaseName].[OriginalExt]`. If there exists a file with same name, this plugin simply add a link pointing to that file, no file will be added.
+  - Files other than images dropped or pasted are saved to *"other files subdirectory"* under the same parent of current note, and renamed to `[CurrentNoteBasename]-[OriginFileBaseName].[OriginalExt]`. If there exists a file with the same name, this plugin simply adds a link pointing to that file, no file will be added.
   - Customize image and other files' folder name in the settings.
   - Images are compressed using [browser-image-compression](https://github.com/Donaldcwl/browser-image-compression#readme). Adjust compression settings like max image size and EXIF data removal.
-    - ***[New in 0.2.5]*** A command `Toggle image compression` to toggle image compression.
+    - A command `Toggle image compression` to toggle image compression.
   - Images and pdfs can be resized with markdown syntax to a specified width. Customize resizing width in the settings.
-  - ~~***[Removed in 0.2.1]*** Only images added to a daily note will be modified.~~
 - **Assume Same Day Before Hour:**
   - Considers it the same day before a specified hour after midnight.
 - **Create Daily Note From Template:**
-  - ***[New in 0.2.2]*** Manually assign full path of template to use when creating a daily note.
+  - Manually assign the full path of the template to use when creating a daily note.
 - **Convenient Navigation:**
   - Adds a ribbon icon to quickly open today's daily note.
   - Provides commands to open today's, yesterday's, and tomorrow's daily notes.
 - **Summary Page** (Optional)
-  - ***[Added in 0.2.7]*** Added a ribbon icon and command to create/update the summary page of daily notes. This page will automatically update under the following conditions:
+  - Added a ribbon icon and command to create/update the summary page of daily notes. This page will automatically update under the following conditions:
     1. When calling the `Open and update summary page` command or ribbon icon.
     2. When creating a daily note.
     3. When removing a daily note.
-    4. When renaming a daily note or renaming it as a daily note. (Note: Moving files also counts as renaming)
+    4. When renaming a daily note or renaming it as a daily note. (Note: Moving files also count as renaming)
+  - Note that if you have a very large vault, this feature may slow down the initialization of the app.
+
+### Commands
+- **Open yesterday's daily note:** Opens yesterday's daily note.
+- **Open tomorrow's daily note:** Opens tomorrow's daily note.
+- **Toggle image compression:** Toggles image compression settings.
+- **Open and update summary page:** Opens a summary page and updates it.
+
 
 ## Installation Guide
 
