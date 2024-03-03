@@ -27,16 +27,18 @@ export function CreateSummaryPageEventListener(plugin: BetterDailyNotePlugin) {
             }
         )
     );
-    plugin.registerEvent(
-        plugin.app.vault.on(
-            "create",
-            async (file: TAbstractFile) => {
-                if (!plugin.settings.enableSummaryPage) return;
-                if (!(file instanceof TFile)) return;
-                if (!checkValidDailyNotePath(file.path, plugin.settings.dateFormat)) return;
-                await updateSummaryPage(plugin.app, plugin.settings, false, false);
-            }
-        )
-    );
+    plugin.app.workspace.onLayoutReady(() => {
+        plugin.registerEvent(
+            plugin.app.vault.on(
+                "create",
+                async (file: TAbstractFile) => {
+                    if (!plugin.settings.enableSummaryPage) return;
+                    if (!(file instanceof TFile)) return;
+                    if (!checkValidDailyNotePath(file.path, plugin.settings.dateFormat)) return;
+                    await updateSummaryPage(plugin.app, plugin.settings, false, false);
+                }
+            )
+        );
+    });
 }
 
