@@ -4,7 +4,7 @@ import BetterDailyNotePlugin from '../main';
 import { getDailyNotePath, openOrSwitchToNote } from '../utils';
 import { BetterDailyNotesSettings } from '../settings/settings';
 
-export async function CreateDailyNotesCommands(plugin: BetterDailyNotePlugin) {
+export async function createDailyNotesCommands(plugin: BetterDailyNotePlugin) {
     plugin.addCommand({
         id: 'open-todays-daily-note',
         name: 'Open today\'s daily note',
@@ -65,7 +65,7 @@ export async function CreateDailyNotesCommands(plugin: BetterDailyNotePlugin) {
     }
 }
 
-export async function CreateDailyNotesRibbonIcons(plugin: BetterDailyNotePlugin) {
+export async function createDailyNotesRibbonIcons(plugin: BetterDailyNotePlugin) {
     const openDailyNoteRibbonIconEl = plugin.addRibbonIcon(
         'book-open-check',
         'Open today\'s daily note',

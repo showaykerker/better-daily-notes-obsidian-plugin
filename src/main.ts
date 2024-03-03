@@ -2,10 +2,10 @@ import { Plugin } from 'obsidian';
 import dayjs from 'dayjs';
 import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
 import { BetterDailyNotesSettingTab } from './settings/settingTab';
-import { CreateSummaryPageEventListener } from './summaryPage/eventListeners';
-import { CreateSummaryPageCommands, CreateSummaryPageRibbonIcons } from './summaryPage/commands';
-import { CreateDailyNotesEventListener } from './dailyNotes/eventListeners';
-import { CreateDailyNotesCommands, CreateDailyNotesRibbonIcons } from './dailyNotes/commands';
+import { createSummaryPageEventListener } from './summaryPage/eventListeners';
+import { createSummaryPageCommands, createSummaryPageRibbonIcons } from './summaryPage/commands';
+import { createDailyNotesEventListener } from './dailyNotes/eventListeners';
+import { createDailyNotesCommands, createDailyNotesRibbonIcons } from './dailyNotes/commands';
 
 
 export default class BetterDailyNotes extends Plugin {
@@ -17,17 +17,17 @@ export default class BetterDailyNotes extends Plugin {
 		const customParseFormat = require('dayjs/plugin/customParseFormat');
 		dayjs.extend(customParseFormat);
 
-		CreateDailyNotesCommands(this);
-		CreateDailyNotesRibbonIcons(this);
+		createDailyNotesCommands(this);
+		createDailyNotesRibbonIcons(this);
 
 		if (this.settings.enableSummaryPage) {
-			CreateSummaryPageRibbonIcons(this);
-			CreateSummaryPageCommands(this);
+			createSummaryPageRibbonIcons(this);
+			createSummaryPageCommands(this);
 		}
 
 		this.addSettingTab(new BetterDailyNotesSettingTab(this.app, this));
-		CreateDailyNotesEventListener(this);
-		CreateSummaryPageEventListener(this);
+		createDailyNotesEventListener(this);
+		createSummaryPageEventListener(this);
 	}
 
 

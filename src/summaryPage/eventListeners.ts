@@ -3,7 +3,7 @@ import { updateSummaryPage } from './commands';
 import BetterDailyNotePlugin from '../main';
 import { checkValidDailyNotePath } from '../utils';
 
-export function CreateSummaryPageEventListener(plugin: BetterDailyNotePlugin) {
+export function createSummaryPageEventListener(plugin: BetterDailyNotePlugin) {
     plugin.registerEvent(
         plugin.app.vault.on(
             "delete",
