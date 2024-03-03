@@ -2,7 +2,10 @@
 
 ## 0.3.0
 
-### Refactors
-- Isolate by commands, `main.ts` adds commands and eventListeners from functions.
-  - Add a `summaryPage/` folder with `commands.ts` and `eventListeners.ts`.
-  - Add a `dailyNotes/` folder with `commands.ts` and `eventListeners.ts`, also move `fileHandler.ts` and `fileSystem.ts` into it.
+### Refactoring
+- Commands and event listeners have been modularized in `main.ts`.
+  - A new `summaryPage/` directory has been created, containing `commands.ts` and `eventListeners.ts`.
+  - A new `dailyNotes/` directory has been created, containing `commands.ts` and `eventListeners.ts`, `fileHandler.ts` and `fileSystem.ts` have been relocated here.
+
+### Fixes
+- Move on create callback registration within workspace.onLayoutReady() to avoid premature invocation during application initialization.

@@ -40,7 +40,6 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
     2. When creating a daily note.
     3. When removing a daily note.
     4. When renaming a daily note or renaming it as a daily note. (Note: Moving files also count as renaming)
-  - Note that if you have a very large vault, this feature may slow down the initialization of the app.
 
 ### Commands
 - **Open yesterday's daily note:** Opens yesterday's daily note.
