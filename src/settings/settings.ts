@@ -8,6 +8,8 @@ export interface BetterDailyNotesSettings {
 	fileHandlingScenario: string;
 	imageSubDir: string;
 	otherFilesSubDir: string;
+	keepImageOriginalName: boolean,
+	imageFileDefaultName: string;
 	maxImageSizeKB: number;
 	maxImageSizeKBCache: number
 	preserveExifData: boolean;
@@ -26,7 +28,9 @@ export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 
 	fileHandlingScenario: 'daily notes only',
 	imageSubDir: 'images',
-	otherFilesSubDir: 'other',
+	otherFilesSubDir: 'attachments',
+	keepImageOriginalName: true,
+	imageFileDefaultName: 'image',
 	maxImageSizeKB: -1,
 	maxImageSizeKBCache: -1,
 	preserveExifData: true,

@@ -143,6 +143,30 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}));
 			new Setting(containerEl)
+				.setName('Keep Image Original Name')
+				.setDesc('Whether to uniformly rename the image files. ' +
+					'If set to true, the image will be renamed to "noteName-imageFileDefaultName-1.png", ' +
+					'"noteName-imageFileDefaultName-2.png", ...')
+				.addToggle(toggle => toggle
+					.setValue(this.plugin.settings.keepImageOriginalName)
+					.onChange(async (value) => {
+						this.plugin.settings.keepImageOriginalName = value;
+						await this.plugin.saveSettings();
+						this.display();
+					}));
+			if (!this.plugin.settings.keepImageOriginalName) {
+				new Setting(containerEl)
+					.setName('Image File Name')
+					.setDesc('The name of the image file. ' +
+						'It will appear as "noteName-imageOriginalName.png')
+					.addText(text => text
+						.setValue(this.plugin.settings.imageFileDefaultName)
+						.onChange(async (value) => {
+							this.plugin.settings.imageFileDefaultName = value;
+							await this.plugin.saveSettings();
+						}));
+			}
+			new Setting(containerEl)
 				.setName('Max Image Size (KB)')
 				.setDesc('Compress images added to the daily note to this size. -1 means no compression.')
 				.addText(text => text
