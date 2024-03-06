@@ -77,6 +77,7 @@ This plugin is built with TypeScript. Here's how to contribute:
 5. Reload Obsidian to load the updated plugin.
 
 ## Roadmap of Features
+- [ ] Compatibility with other plugins. (Calendar, Day Planner, etc.)
 - [ ] Handle create event and editor-drop event for file management.
 - [ ] Use svelte in configuration interface.
 
