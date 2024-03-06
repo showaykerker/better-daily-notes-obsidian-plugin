@@ -61,8 +61,7 @@ function getPreviousDailyNotePaths(app: App, settings: BetterDailyNotesSettings,
     let date = new Date();
     const paths: string[] = [];
     for (let i = 1; i <= days; i++) {
-        const targetNotePath = getDailyNotePath(
-            rootDir, 0, dateFormat, date);
+        const targetNotePath = getDailyNotePath(settings, date);
         if (app.vault.getAbstractFileByPath(targetNotePath)) {
             paths.push(targetNotePath);
         }

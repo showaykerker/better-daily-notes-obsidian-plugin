@@ -1,5 +1,6 @@
 import { App, MarkdownView } from 'obsidian';
 import dayjs from 'dayjs';
+import { BetterDailyNotesSettings } from './settings/settings';
 
 export function openOrSwitchToNote(app: App, dailyNotePath: string) {
     const leaves = app.workspace.getLeavesOfType("markdown");
@@ -27,9 +28,9 @@ export function getDailyNoteName(
     return formatDate(dateFormat, date);
 }
 
-export function getDailyNotePath(rootDir:string, assumeSameDayBeforeHour: number, dateFormat: string, date: Date = new Date()){
-    const noteName = getDailyNoteName(assumeSameDayBeforeHour, dateFormat, date, true);
-    const dirPath = getMonthDirPath(rootDir, assumeSameDayBeforeHour, date);
+export function getDailyNotePath(settings: BetterDailyNotesSettings, date: Date = new Date()) {
+    const noteName = getDailyNoteName(settings.assumeSameDayBeforeHour, settings.dateFormat, date, true);
+    const dirPath = getMonthDirPath(settings.rootDir, settings.assumeSameDayBeforeHour, date);
     return `${dirPath}/${noteName}.md`;
 }
 
