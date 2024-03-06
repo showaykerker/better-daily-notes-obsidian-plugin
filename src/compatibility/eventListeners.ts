@@ -11,9 +11,12 @@ export function createCompatibilityEventListener(plugin: BetterDailyNotePlugin) 
                 "create",
                 async (file: TFile) => {
                     console.log("Create event: ", file);
+                    if (plugin.settings.debugMode) new Notice("Create event: " + file.path, 0);
                     if (!(file.extension === "md")) return;
                     const createdByThisPlugin = checkValidDailyNotePath(file.path, plugin.settings.dateFormat);
                     const fileBasenameDate = dayjs(file.basename);
+                    if (plugin.settings.debugMode)
+                        new Notice(`createByThisPlugin: ${createdByThisPlugin}, ${fileBasenameDate} valid: ${fileBasenameDate.isValid()}`, 0);
                     if (createdByThisPlugin) return;
                     if (fileBasenameDate.isValid()) {
                         const dailyNotePath = getDailyNotePath(plugin.settings, fileBasenameDate.toDate());

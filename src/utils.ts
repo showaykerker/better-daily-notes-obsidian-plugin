@@ -71,19 +71,16 @@ export function checkValidDailyNotePath(notePath: string, dateFormat: string): D
     // return None if the notePath is not a daily note
     const noteName = notePath.split("/").slice(-1)[0].split(".")[0];
     if (!noteName) {
-        console.log("No note name.");
         return null;
     }
     // first check if the file name matches the settings.dateFormat
     const date = dayjs(noteName, dateFormat, true);
     if (!date.isValid()) {
-        console.log("Invalid date.");
         return null;
     }
     // then check if the file is monthly note directory
     const monthDir = notePath.split("/").slice(-2, -1);
     if (!monthDir) {
-        console.log("No month directory.");
         return null;
     }
     return date.toDate();

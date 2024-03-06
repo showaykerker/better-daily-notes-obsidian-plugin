@@ -16,6 +16,8 @@ export interface BetterDailyNotesSettings {
 	enableSummaryPage: boolean;
 	summaryPageFile: string;
 	summaryOfDaysCount: number;
+
+	debugMode: boolean;
 }
 
 export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
@@ -34,5 +36,7 @@ export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 
 	enableSummaryPage: true,
 	summaryPageFile: 'summary',
-	summaryOfDaysCount: 7
+	summaryOfDaysCount: 7,
+
+	debugMode: false
 }
