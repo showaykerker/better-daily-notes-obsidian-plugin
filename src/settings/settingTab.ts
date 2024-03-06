@@ -221,7 +221,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 			.setName('Disable Compatibility Mode')
 			.setDesc('Disable compatibility mode. ' +
 				'If you don\'t wish to be compatible with other plugins such as "Calendar", ' +
-				'you\'ll need disable this feature. ' +
+				'you\'ll need to disable this feature. ' +
 				'Modify this setting will require restart of the app.')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.disableCompatibilityMode)
