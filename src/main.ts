@@ -2,6 +2,7 @@ import { Plugin } from 'obsidian';
 import dayjs from 'dayjs';
 import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
 import { BetterDailyNotesSettingTab } from './settings/settingTab';
+import { createCompatibilityEventListener } from './compatibility/eventListeners';
 import { createSummaryPageEventListener } from './summaryPage/eventListeners';
 import { createSummaryPageCommands, createSummaryPageRibbonIcons } from './summaryPage/commands';
 import { createDailyNotesEventListener } from './dailyNotes/eventListeners';
@@ -26,6 +27,7 @@ export default class BetterDailyNotes extends Plugin {
 		}
 
 		this.addSettingTab(new BetterDailyNotesSettingTab(this.app, this));
+		createCompatibilityEventListener(this);
 		createDailyNotesEventListener(this);
 		createSummaryPageEventListener(this);
 	}

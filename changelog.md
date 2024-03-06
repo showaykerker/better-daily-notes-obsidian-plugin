@@ -2,6 +2,9 @@
 
 ## 0.3.0
 
+### Features
+- Add compatibility to [Calendar](https://github.com/liamcain/obsidian-calendar-plugin) plugin.  Now you can easily create a daily note by clicking a date on the calendar view! The plugin will wait for 1 second (for th)
+
 ### Refactoring
 - Commands and event listeners have been modularized in `main.ts`.
   - A new `summaryPage/` directory has been created, containing `commands.ts` and `eventListeners.ts`.
