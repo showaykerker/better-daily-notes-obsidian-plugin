@@ -39,6 +39,25 @@
     3. 移除每日筆記時。
     4. 將每日筆記從某處重命名或重命名到某處時。
 
+
+### 相容性
+#### [Calendar](https://github.com/liamcain/obsidian-calendar-plugin) :white_check_mark:
+|項目|相容性|備註|
+|:--:|:--:|:--|
+|從日曆建立筆記|:white_check_mark:|會等待1秒，然後重新命名並移動已建立的檔案。|
+|點日期打開每日筆記|:bangbang:|原本每日筆記外掛程式的`date format`需要與此外掛程式中的完全相同。|
+
+#### [Day Planner](https://github.com/ivan-lednev/obsidian-day-planner) :x:
+|功能|相容性|備註|
+|:--:|:--:|:--|
+|從日程規劃建立筆記|:x:|實驗後可行，但目前不支援此功能。|
+|從日程規劃建立項目|:x:|實驗後可行，但目前不支援此功能。|
+|在日程規劃上顯示項目|:x:|此功能需要進一步實驗，可能需要向Day Planner的repository提交pull request。|
+
+#### 其他
+上述列表僅包含我測試和實驗過的外掛程式。如果您對某個外掛程式的相容性感到猶豫，因此不確定是否要使用此外掛程式，請隨時提交issue或在Discord上找到我。
+
+
 ## 安裝指南
 
 由於這個Plugin目前處於測試版階段，安裝過程需要另外安裝一個名為 [BRAT](obsidian://show-plugin?id=obsidian42-brat) 的Plugin。
@@ -49,7 +68,7 @@
 
 1. 通過以下任一種方式安裝 BRAT：
    - 點擊[此連結](obsidian://show-plugin?id=obsidian42-brat)。
-   - 在 Obsidian 中的「社群插件」選項中搜尋「BRAT」，然後安裝並啟用它。
+   - 在 Obsidian 中的「社群外掛」選項中搜尋「BRAT」，然後安裝並啟用它。
    ![BRAT 安裝](imgs/how-to-install-0.png)
    ![BRAT 安裝](imgs/how-to-install-1.png)
    ![BRAT 安裝](imgs/how-to-install-2.png)
@@ -59,6 +78,10 @@
    ![BRAT 設置](imgs/how-to-install-4.png)
 
 3. 輸入這個repository的連結：`https://github.com/showaykerker/better-daily-notes-obsidian-plugin`，然後點擊「Add Plugin」。
-   ![插件配置](imgs/how-to-install-5.png)
+   ![外掛程式配置](imgs/how-to-install-5.png)
 
 4. 現在你應該能在設置選單中找到「Better Daily Notes Plugin」的設定頁面了！
+
+
+### 更新到最新版本
+如果有成功的以 BRAT 安裝了這個外掛程式，那只需使用 BRAT 命令進行更新即可。

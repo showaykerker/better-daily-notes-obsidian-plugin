@@ -47,6 +47,23 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
 - **Toggle image compression:** Toggles image compression settings.
 - **Open and update summary page:** Opens a summary page and updates it.
 
+### Compatibility
+#### [Calendar](https://github.com/liamcain/obsidian-calendar-plugin) :white_check_mark:
+|Item|Compatible|Note|
+|:--:|:--:|:--|
+| Create note from calendar | :white_check_mark: | Wait for 1 second, then rename and move the created file. |
+| Open daily note by clicking a date | :bangbang: | The date format of the original daily note plugin needs to be identical to the date format in this plugin. |
+
+#### [Day Planner](https://github.com/ivan-lednev/obsidian-day-planner) :x:
+|Feature|Compatible|Note|
+|:--:|:--:|:--|
+| Create note from day planner | :x: | This feature is not currently supported. |
+| Create items from day planner | :x: | This feature is not currently supported. |
+| Show items on day planner | :x: | This feature requires further investigation and may require filing a pull request to the day planner repository. I'll see what I can do |
+
+#### Others
+The above list includes plugins that have been tested and experimented with by me. If you are hesitant about the compatibility of a certain plugin and unsure about jumping into this plugin, please feel free to file an issue or find me on Discord.
+
 
 ## Installation Guide
 
@@ -67,6 +84,8 @@ As this plugin is currently in beta, the installation process requires an additi
   ![Plugin Configuration](imgs/how-to-install-5.png)
 4. You should now find the configuration page for the `Better Daily Notes Plugin` in your Options menu.
 
+### Updating to latest version
+It should be easy to update the version of this plugin if I correctly installed it through BRAT. Simply use the BRAT command to update.
 
 ## Development
 This plugin is built with TypeScript. Here's how to contribute:

@@ -2,13 +2,16 @@
 
 ## 0.3.1
 
+### Features
+- Add a setting option to enable debug info through `Notice`.
+
 ### Refactoring
-- Refactor logic to tell whether a string is a daily note.
-- Add dayjs extend custom format in utils
+- Refactored logic to determine whether a string is a daily note.
+- Added dayjs custom format extension in utils.
 
 ### Fixes
-- Some configuration makes compatibility of Calendar broken issue.
-- Falsely assume same day when creating with calendar.
+- Fixed compatibility issue with Calendar caused by certain configurations.
+- Corrected false assumption of same day when creating with calendar.
 
 ## 0.3.0
 
