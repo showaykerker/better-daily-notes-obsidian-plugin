@@ -1,9 +1,12 @@
 # Changelog
 
-## 0.3.2 - prerelease
+## 0.3.2
 
 ### Features
 - Add a setting option to disable compatible mode.
+
+### Adjustment
+- logging
 
 ## 0.3.1
 
