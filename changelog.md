@@ -9,3 +9,4 @@
 
 ### Fixes
 - Move on create callback registration within workspace.onLayoutReady() to avoid premature invocation during application initialization.
+- Fixed a bug where image naming would be incorrect after deleting an image between the minimum and maximum numbers.

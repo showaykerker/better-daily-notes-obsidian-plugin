@@ -14,15 +14,20 @@ export function base64ToArrayBuffer(base64: string): ArrayBuffer {
     return bytes.buffer;
 }
 
-export function countFilesWithSamePrefix(app: App, dirPath: string, prefix: string): number {
+export function getNextNumberedImageIndex(app: App, dirPath: string, prefix: string): number {
     const files = app.vault.getFiles();
-    let count = 0;
-    for (let file of files.filter(file => file.path.startsWith(dirPath))) {
-        if (file.path.startsWith(dirPath) &&
-            file.path.contains(prefix) &&
-            !file.path.endsWith(".md")) {count += 1;}
-    }
-    return count;
+    let nextIndex = 0;
+    const filteredFiles = files.filter(file =>
+        file.path.startsWith(dirPath) &&
+        file.path.match(/.*-image(-\d+)?\..*/) &&
+        !file.path.endsWith(".md") &&
+        file.path.includes(prefix)
+    )
+    filteredFiles.forEach(file => {
+        const index = (parseInt(file.path.match(/.*-image(-(\d+))?\..*/)![2]) || 0) + 1;
+        nextIndex = index > nextIndex ? index : nextIndex;
+    });
+    return nextIndex;
 }
 
 export async function limitImageFileSize(file: File, size: number, preserveExifData: boolean): Promise<File> {
@@ -123,12 +128,10 @@ export async function handleSingleFile(
             file,
             settings.maxImageSizeKB,
             settings.preserveExifData);
-        // count current images under imageDirPath that starts with filePrefix
-        const countPrefix = countFilesWithSamePrefix(app, fileSaveSubDir, filePrefix);
-        console.log(`Number of file with same prefix "${filePrefix}" under "${fileSaveSubDir}": ${countPrefix}`);
+        const getImageNumber = getNextNumberedImageIndex(app, fileSaveSubDir, filePrefix);
         fileSaveSubDir = `${viewParentPath}/${settings.imageSubDir}`;
         filePrefix = `${filePrefix}-image`;
-        fileSuffix = countPrefix === 0 ? "" : `-${countPrefix}`;
+        fileSuffix = getImageNumber === 0 ? "" : `-${getImageNumber}`;
     }
     else {
         fileSaveSubDir = `${viewParentPath}/${settings.otherFilesSubDir}`;
