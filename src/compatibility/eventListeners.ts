@@ -1,7 +1,7 @@
 import { Notice, TFile } from 'obsidian';
 import BetterDailyNotePlugin from '../main';
 import dayjs from 'dayjs';
-import { checkValidDailyNotePath, getDailyNotePath } from '../utils';
+import { checkValidDailyNote, getDailyNotePath } from '../utils';
 import { createDirsIfNotExists } from 'src/dailyNotes/fileSystem';
 
 export function createCompatibilityEventListener(plugin: BetterDailyNotePlugin) {
@@ -13,7 +13,7 @@ export function createCompatibilityEventListener(plugin: BetterDailyNotePlugin) 
                     console.log("Create event: ", file);
                     if (plugin.settings.debugMode) new Notice("Create event: " + file.path, 0);
                     if (!(file.extension === "md")) return;
-                    const createdByThisPlugin = checkValidDailyNotePath(file.path, plugin.settings.dateFormat);
+                    const createdByThisPlugin = checkValidDailyNote(file, plugin.settings);
                     const fileBasenameDate = dayjs(file.basename);
                     if (plugin.settings.debugMode)
                         new Notice(`createByThisPlugin: ${createdByThisPlugin}, ${fileBasenameDate} valid: ${fileBasenameDate.isValid()}`, 0);

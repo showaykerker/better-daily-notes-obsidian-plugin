@@ -1,6 +1,9 @@
-import { App, MarkdownView } from 'obsidian';
+import { App, MarkdownView, normalizePath, Notice, TFile } from 'obsidian';
 import dayjs from 'dayjs';
 import { BetterDailyNotesSettings } from './settings/settings';
+
+const customParseFormat = require('dayjs/plugin/customParseFormat');
+dayjs.extend(customParseFormat);
 
 export function openOrSwitchToNote(app: App, dailyNotePath: string) {
     const leaves = app.workspace.getLeavesOfType("markdown");
@@ -67,21 +70,32 @@ export function isValidDateFormat(format: string): boolean {
     }
 }
 
-export function checkValidDailyNotePath(notePath: string, dateFormat: string): Date | null{
-    // return None if the notePath is not a daily note
-    const noteName = notePath.split("/").slice(-1)[0].split(".")[0];
-    if (!noteName) {
+export function checkValidDailyNotePath(filePath: string, settings: BetterDailyNotesSettings): Date | null {
+    const debugMode = settings.debugMode;
+    if (debugMode) new Notice("Checking valid daily note path: " + filePath, 0);
+    if (!filePath.endsWith(".md")) {
+        if (debugMode) new Notice("Not a markdown file", 0);
         return null;
     }
-    // first check if the file name matches the settings.dateFormat
-    const date = dayjs(noteName, dateFormat, true);
-    if (!date.isValid()) {
+    if (!filePath.startsWith(normalizePath(settings.rootDir))) {
+        if (debugMode) new Notice("Not in root dir", 0);
         return null;
     }
-    // then check if the file is monthly note directory
-    const monthDir = notePath.split("/").slice(-2, -1);
-    if (!monthDir) {
+    const fileBasename = filePath.split("/").slice(-1)[0].split(".")[0];
+    const fileDate = dayjs(fileBasename, settings.dateFormat, true);
+    if (!fileDate.isValid()) {
+        if (debugMode) new Notice("Invalid date format", 0);
         return null;
     }
-    return date.toDate();
+    if (filePath !== getDailyNotePath(settings, fileDate.toDate())) {
+        if (debugMode) new Notice("Not a valid daily note path", 0);
+        return null;
+    }
+    new Notice("Valid daily note path: " + filePath, 0);
+    return fileDate.toDate();
+
+}
+
+export function checkValidDailyNote(file: TFile, settings: BetterDailyNotesSettings): Date | null{
+    return checkValidDailyNotePath(file.path, settings);
 }

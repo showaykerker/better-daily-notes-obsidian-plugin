@@ -1,7 +1,7 @@
 import { TAbstractFile, TFile } from 'obsidian';
 import { updateSummaryPage } from './commands';
 import BetterDailyNotePlugin from '../main';
-import { checkValidDailyNotePath } from '../utils';
+import { checkValidDailyNote, checkValidDailyNotePath } from '../utils';
 
 export function createSummaryPageEventListener(plugin: BetterDailyNotePlugin) {
     plugin.registerEvent(
@@ -10,7 +10,7 @@ export function createSummaryPageEventListener(plugin: BetterDailyNotePlugin) {
             async (file: TAbstractFile) => {
                 if (!plugin.settings.enableSummaryPage) return;
                 if (!(file instanceof TFile)) return;
-                if (!checkValidDailyNotePath(file.path, plugin.settings.dateFormat)) return;
+                if (!checkValidDailyNote(file, plugin.settings)) return;
                 await updateSummaryPage(plugin.app, plugin.settings, false, false);
             }
         )
@@ -21,8 +21,8 @@ export function createSummaryPageEventListener(plugin: BetterDailyNotePlugin) {
             async (file: TAbstractFile, oldPath: string) => {
                 if (!plugin.settings.enableSummaryPage) return;
                 if (!(file instanceof TFile)) return;
-                if (!checkValidDailyNotePath(oldPath, plugin.settings.dateFormat) &&
-                    !checkValidDailyNotePath(file.path, plugin.settings.dateFormat)) return;
+                if (!checkValidDailyNotePath(oldPath, plugin.settings) &&
+                    !checkValidDailyNote(file, plugin.settings)) return;
                 await updateSummaryPage(plugin.app, plugin.settings, false, false);
             }
         )
@@ -34,7 +34,7 @@ export function createSummaryPageEventListener(plugin: BetterDailyNotePlugin) {
                 async (file: TAbstractFile) => {
                     if (!plugin.settings.enableSummaryPage) return;
                     if (!(file instanceof TFile)) return;
-                    if (!checkValidDailyNotePath(file.path, plugin.settings.dateFormat)) return;
+                    if (!checkValidDailyNote(file, plugin.settings)) return;
                     await updateSummaryPage(plugin.app, plugin.settings, false, false);
                 }
             )

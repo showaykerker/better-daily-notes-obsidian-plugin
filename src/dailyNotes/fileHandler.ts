@@ -1,7 +1,7 @@
 import imageCompression from 'browser-image-compression';
 import { App, Editor, MarkdownView, normalizePath, Notice } from "obsidian";
 import { createDirsIfNotExists } from "./fileSystem";
-import { checkValidDailyNotePath } from "../utils";
+import { checkValidDailyNote } from "../utils";
 import { BetterDailyNotesSettings } from "../settings/settings";
 
 export function base64ToArrayBuffer(base64: string): ArrayBuffer {
@@ -50,7 +50,7 @@ export function shouldHandleAccordingToConfig(
     if (!markdownView || !markdownView.file) { return false; }
     if (settings.fileHandlingScenario === "disabled") { return false; }
 
-    const date = checkValidDailyNotePath(markdownView.file.path, settings.dateFormat);
+    const date = checkValidDailyNote(markdownView.file, settings);
     if (settings.fileHandlingScenario === "daily notes only" && !date) { return false; }
     return true;
 }
