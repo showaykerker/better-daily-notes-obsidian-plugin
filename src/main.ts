@@ -27,7 +27,9 @@ export default class BetterDailyNotes extends Plugin {
 		}
 
 		this.addSettingTab(new BetterDailyNotesSettingTab(this.app, this));
-		createCompatibilityEventListener(this);
+		if (!this.settings.disableCompatibilityMode) {
+			createCompatibilityEventListener(this);
+		}
 		createDailyNotesEventListener(this);
 		createSummaryPageEventListener(this);
 	}

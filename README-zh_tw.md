@@ -45,7 +45,7 @@
 |項目|相容性|備註|
 |:--:|:--:|:--|
 |從日曆建立筆記|:white_check_mark:|會等待1秒，然後重新命名並移動已建立的檔案。|
-|點日期打開每日筆記|:bangbang:|原本每日筆記外掛程式的`date format`需要與此外掛程式中的完全相同。|
+|點日期打開每日筆記|:bangbang:|原本`Daily Note`外掛（和`Periodic Note`）的`date format`需要與此外掛程式中的完全相同。|
 
 #### [Day Planner](https://github.com/ivan-lednev/obsidian-day-planner) :x:
 |功能|相容性|備註|

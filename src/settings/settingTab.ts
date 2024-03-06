@@ -216,6 +216,21 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 		}
 
 		containerEl.createEl('hr');
+		containerEl.createEl('h2', {text: 'Compatibility Mode', cls: 'section-header'});
+		new Setting(containerEl)
+			.setName('Disable Compatibility Mode')
+			.setDesc('Disable compatibility mode. ' +
+				'If you don\'t wish to be compatible with other plugins such as "Calendar", ' +
+				'you\'ll need disable this feature. ' +
+				'Modify this setting will require restart of the app.')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.disableCompatibilityMode)
+				.onChange(async (value) => {
+					this.plugin.settings.disableCompatibilityMode = value;
+					await this.plugin.saveSettings();
+				}));
+
+		containerEl.createEl('hr');
 		containerEl.createEl('h2', {text: 'Developer Option', cls: 'section-header'});
 		containerEl.createEl('p', {text: 'This section is for debugging purposes. ' +
 			'Please do not modify these settings unless you know what you are doing.'});
