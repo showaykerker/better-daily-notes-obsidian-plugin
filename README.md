@@ -87,6 +87,12 @@ As this plugin is currently in beta, the installation process requires an additi
 ### Updating to latest version
 It should be easy to update the version of this plugin if I correctly installed it through BRAT. Simply use the BRAT command to update.
 
+### Installing a specific version
+If you want to install a specific version or a pre-release version of this plugin, you can use BRAT's `Add Beta plugin with frozen version` feature.
+
+
+After following these steps, you should be able to install the desired version of the plugin.
+
 ## Development
 This plugin is built with TypeScript. Here's how to contribute:
 1. Clone the repository.
