@@ -91,7 +91,7 @@ export function checkValidDailyNotePath(filePath: string, settings: BetterDailyN
         if (debugMode) new Notice("Not a valid daily note path", 0);
         return null;
     }
-    new Notice("Valid daily note path: " + filePath, 0);
+    if (debugMode) new Notice("Valid daily note path: " + filePath, 0);
     return fileDate.toDate();
 
 }
