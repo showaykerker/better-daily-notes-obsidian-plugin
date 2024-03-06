@@ -31,9 +31,9 @@ export function getDailyNoteName(
     return formatDate(dateFormat, date);
 }
 
-export function getDailyNotePath(settings: BetterDailyNotesSettings, date: Date = new Date()) {
-    const noteName = getDailyNoteName(settings.assumeSameDayBeforeHour, settings.dateFormat, date, true);
-    const dirPath = getMonthDirPath(settings.rootDir, settings.assumeSameDayBeforeHour, date);
+export function getDailyNotePath(settings: BetterDailyNotesSettings, date: Date = new Date(), considerAssumeSameDayBeforeHour: boolean = true) {
+    const noteName = getDailyNoteName(settings.assumeSameDayBeforeHour, settings.dateFormat, date, considerAssumeSameDayBeforeHour);
+    const dirPath = getMonthDirPath(settings.rootDir, settings.assumeSameDayBeforeHour, date, considerAssumeSameDayBeforeHour);
     return `${dirPath}/${noteName}.md`;
 }
 
@@ -87,7 +87,7 @@ export function checkValidDailyNotePath(filePath: string, settings: BetterDailyN
         if (debugMode) new Notice("Invalid date format", 0);
         return null;
     }
-    if (filePath !== getDailyNotePath(settings, fileDate.toDate())) {
+    if (filePath !== getDailyNotePath(settings, fileDate.toDate(), false)) {
         if (debugMode) new Notice("Not a valid daily note path", 0);
         return null;
     }

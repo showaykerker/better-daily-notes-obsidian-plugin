@@ -19,7 +19,7 @@ export function createCompatibilityEventListener(plugin: BetterDailyNotePlugin) 
                         new Notice(`createByThisPlugin: ${createdByThisPlugin}, ${fileBasenameDate} valid: ${fileBasenameDate.isValid()}`, 0);
                     if (createdByThisPlugin) return;
                     if (fileBasenameDate.isValid()) {
-                        const dailyNotePath = getDailyNotePath(plugin.settings, fileBasenameDate.toDate());
+                        const dailyNotePath = getDailyNotePath(plugin.settings, fileBasenameDate.toDate(), false);
                         if (plugin.app.vault.getAbstractFileByPath(dailyNotePath) == null) {
                             new Notice("Daily note created by external plugin, will be renamed to "+
                                 dailyNotePath + " in 1 second.", 5000);

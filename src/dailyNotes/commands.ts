@@ -85,7 +85,7 @@ export async function openDailyNote(
     const assumeSameDayBeforeHour = settings.assumeSameDayBeforeHour;
     const dateFormat = settings.dateFormat;
     date.setDate(date.getDate() + dateOffset);
-    const targetNotePath = getDailyNotePath(settings, date);
+    const targetNotePath = getDailyNotePath(settings, date, true);
 
     if (!app.vault.getAbstractFileByPath(targetNotePath)) {
         const templateFile = app.vault.getAbstractFileByPath(settings.templateFile);

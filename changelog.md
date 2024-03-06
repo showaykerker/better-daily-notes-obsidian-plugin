@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.1
+
+### Refactoring
+- Refactor logic to tell whether a string is a daily note.
+- Add dayjs extend custom format in utils
+
+### Fixes
+- Some configuration makes compatibility of Calendar broken issue.
+- Falsely assume same day when creating with calendar.
+
 ## 0.3.0
 
 ### Features
