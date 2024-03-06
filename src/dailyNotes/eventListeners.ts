@@ -3,7 +3,7 @@ import { handleFiles } from './fileHandler';
 import BetterDailyNotePlugin from '../main';
 
 
-export function CreateDailyNotesEventListener(plugin: BetterDailyNotePlugin) {
+export function createDailyNotesEventListener(plugin: BetterDailyNotePlugin) {
     plugin.registerEvent(
         plugin.app.workspace.on(
             "editor-drop",

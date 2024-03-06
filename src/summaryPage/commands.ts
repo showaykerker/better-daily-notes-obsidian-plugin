@@ -3,7 +3,7 @@ import BetterDailyNotePlugin from '../main';
 import { getDailyNotePath, openOrSwitchToNote } from '../utils';
 import { BetterDailyNotesSettings } from '../settings/settings';
 
-export async function CreateSummaryPageCommands(plugin: BetterDailyNotePlugin) {
+export async function createSummaryPageCommands(plugin: BetterDailyNotePlugin) {
     plugin.addCommand({
         id: 'open-summary-page',
         name: 'Open and update summary page',
@@ -13,7 +13,7 @@ export async function CreateSummaryPageCommands(plugin: BetterDailyNotePlugin) {
     });
 }
 
-export async function CreateSummaryPageRibbonIcons(plugin: BetterDailyNotePlugin) {
+export async function createSummaryPageRibbonIcons(plugin: BetterDailyNotePlugin) {
     plugin.addRibbonIcon(
         'list',
         'Open and update summary page',
