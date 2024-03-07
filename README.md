@@ -54,12 +54,12 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
 | Create note from calendar | :white_check_mark: | Wait for 1 second, then rename and move the created file. |
 | Open daily note by clicking a date | :bangbang: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. |
 
-#### [Day Planner](https://github.com/ivan-lednev/obsidian-day-planner) :x:
+#### [Day Planner](https://github.com/ivan-lednev/obsidian-day-planner) :white_check_mark:
 |Feature|Compatible|Note|
 |:--:|:--:|:--|
-| Create note from day planner | :x: | Possible but not currently supported. |
-| Create items from day planner | :x: | Possible but not currently supported. |
-| Show items on day planner | :x: | This feature requires further investigation and may require filing a pull request to the day planner repository. I'll see what I can do. |
+| Create note from day planner | :white_check_mark: | Wait for 1 second, then rename and move the created file. |
+| Create items from day planner | :bangbang: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. |
+| Show items on day planner | :bangbang: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. |
 
 #### Others
 The above list includes plugins that have been tested and experimented with by me. If you are hesitant about the compatibility of a certain plugin and unsure about jumping into this plugin, please feel free to file an issue or find me on Discord.
