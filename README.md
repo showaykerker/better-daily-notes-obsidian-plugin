@@ -53,7 +53,7 @@ The compatibility feature is **experimental** and default set to **enabled**, bu
 
 #### Known Issues
 - On MacOS, if your use a `oneDrive` to be the root of the vault, you might not be able to delete a daily note since `oneDrive` on MacOS sometimes weirdly move deleted files to the root.  Which means this plugin will still locate it and rename and move to the daily note folder. See [this discussion](https://forum.obsidian.md/t/vault-in-onedrive-deleted-files-are-moved-to-the-onedrive-root/57188) for more information and possible solution.
-- `Dayjs` somehow parse every string and make it's best to guess a date from it, for example, `summary 2` will be parsed as "2001-02-01", this might cause an issue if an automatically created file being parsed as a date. This will be fixed in the next version by adding a format user want to parse.
+- (Fixed in 0.3.3) ~~`Dayjs` somehow parse every string and make it's best to guess a date from it, for example, `summary 2` will be parsed as "2001-02-01", this might cause an issue if an automatically created file being parsed as a date. This will be fixed in the next version by adding a format user want to parse.~~
 
 #### Tested Plugins
 
@@ -101,8 +101,6 @@ It should be easy to update the version of this plugin if I correctly installed 
 If you want to install a specific version or a pre-release version of this plugin, you can use BRAT's `Add Beta plugin with frozen version` feature.
 
 
-After following these steps, you should be able to install the desired version of the plugin.
-
 ## Development
 This plugin is built with TypeScript. Here's how to contribute:
 1. Clone the repository.
@@ -119,12 +117,12 @@ This plugin is built with TypeScript. Here's how to contribute:
 - [ ] Support of customizing drag and paste behavior.
 - [ ] Open daily note on startup.
 - [ ] A modal to ask if image compression is required.
-- [ ] Create daily note for arbitrary date.
 - [ ] Support of month directory custom naming.
 - [ ] Compress images and rename file for existing notes.
 - [ ] Daily note one line summary by LLM.
 - [ ] Generate tags by LLM.
 - [ ] Image one line summary by LLM.
+- [x] ~~Create daily note for arbitrary date.~~ (Supported through external plugins from 0.3.2)
 - [x] ~~Compatibility with other plugins. (Calendar, Day Planner, etc.)~~ (Supported from 0.3.2)
 - [x] ~~Support of other file types. e.g. `.dill`.~~ (Supported from 0.2.6)
 - [x] ~~Commands to toggle image compression.~~ (Added 0.2.5)
@@ -133,11 +131,11 @@ This plugin is built with TypeScript. Here's how to contribute:
 - [x] ~~Support of other file types. e.g. `.pdf`, `.zip`.~~ (Added 0.2.1)
 
 ## Known Bugs
-- [ ] `dayjs` somehow thinks `summary 2` is a date `2001-02-01`
 - [ ] Compressing very large images may occasionally cause the application to restart.
   > Likely to be resolved with the implementation of the roadmap feature - `Handle create event`.
 - [ ] Adding a significant quantity of images at once may result in some not being processed successfully.
   > Likely to be resolved with the implementation of the roadmap feature - `Handle create event`.
+- [x] ~~`dayjs` somehow thinks `summary 2` is a date `2001-02-01`~~ (Fixed in 0.3.3)
 - [x] ~~Assume same day before hour logic error.~~
   > ~~Will need to set actual value + 1 for now.~~
 - [x] ~~Images will still be resized with markdown syntax in notes that's not wishes to handle images.~~
