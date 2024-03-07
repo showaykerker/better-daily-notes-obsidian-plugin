@@ -69,8 +69,8 @@ The compatibility feature is **experimental** and default set to **enabled**, bu
 |Feature|Compatible|Note|
 |:--:|:--:|:--|
 | Create note from day planner | :white_check_mark: | Wait for 1 second, then rename and move the created file. |
-| Create items from day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. Seems to work reliably when creating a daily note using the `better-daily-notes-plugin`, but may not be stable otherwise. |
-| Show items on day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format used in this plugin. Seems to work reliably when creating a daily note using the `better-daily-notes-plugin`, but may not be stable otherwise. |
+| Create items from day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. If the item is created in note but not shown on timeline, try reload the app. |
+| Show items on day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format used in this plugin. If the item is created in note but not shown on timeline, try reload the app. |
 
 ![](imgs/day-planner-test.png)
 
