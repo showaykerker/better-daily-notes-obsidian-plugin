@@ -72,26 +72,26 @@ export function isValidDateFormat(format: string): boolean {
 
 export function checkValidDailyNotePath(filePath: string, settings: BetterDailyNotesSettings): Date | null {
     const debugMode = settings.debugMode;
-    if (debugMode) new Notice("Checking valid daily note path: " + filePath, 0);
+    if (debugMode) new Notice("checkValidDailyNotePath | debug | Checking valid daily note path: " + filePath, 10000);
     if (!filePath.endsWith(".md")) {
-        if (debugMode) new Notice("Not a markdown file", 0);
+        if (debugMode) new Notice("checkValidDailyNotePath | debug | Not a markdown file", 10000);
         return null;
     }
     if (!filePath.startsWith(normalizePath(settings.rootDir))) {
-        if (debugMode) new Notice("Not in root dir", 0);
+        if (debugMode) new Notice("checkValidDailyNotePath | debug | Not in root dir", 10000);
         return null;
     }
     const fileBasename = filePath.split("/").slice(-1)[0].split(".")[0];
     const fileDate = dayjs(fileBasename, settings.dateFormat, true);
     if (!fileDate.isValid()) {
-        if (debugMode) new Notice("Invalid date format", 0);
+        if (debugMode) new Notice("checkValidDailyNotePath | debug | Invalid date format", 10000);
         return null;
     }
     if (filePath !== getDailyNotePath(settings, fileDate.toDate(), false)) {
-        if (debugMode) new Notice("Not a valid daily note path", 0);
+        if (debugMode) new Notice("checkValidDailyNotePath | debug | Not a valid daily note path", 10000);
         return null;
     }
-    if (debugMode) new Notice("Valid daily note path: " + filePath, 0);
+    if (debugMode) new Notice("checkValidDailyNotePath | debug | Valid daily note path: " + filePath, 10000);
     return fileDate.toDate();
 
 }
