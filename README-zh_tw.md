@@ -6,8 +6,10 @@
 
 無縫整合，讓你輕鬆組織和管理你的每日筆記與檔案。
 
-<img src='imgs/better-daily-note-demo.gif' width='560'/>
-<img src='imgs/2024-02-20-image2.png' width='140'/>
+![](imgs/better-daily-note-0.3.3-demo.gif)
+
+[![0.3.3 demo](imgs/screenshot.png)](https://www.youtube.com/watch?v=_jqOHse3Q94)
+
 
 ## 功能
 - **結構化的每日筆記：** 以結構化的資料夾格式 `[DailyNoteRootDirectory]/[Mon.]/[DateFormat].md` 歸檔每日筆記。
@@ -61,8 +63,10 @@
 |功能|相容性|備註|
 |:--:|:--:|:--|
 |從日程計劃建立筆記|:white_check_mark:|等待1秒，然後重新命名並移動已建立的檔案。|
-|從日程計劃建立項目|:grey_exclamation:|官方Daily Note外掛程式（和如果有安裝的其他類似每日筆記外掛程式）的日期格式需要與此外掛程式中的日期格式完全相同。在今天的筆記中能夠成功運作，但在其他日期新增項目時可能失敗。|
-|在日程計劃上顯示項目|:grey_exclamation:|官方Daily Note外掛程式（和如果有安裝的其他類似每日筆記外掛程式）的日期格式需要與此外掛程式中使用的日期格式完全相同。在今天的筆記中能夠成功運作，但在其他日期顯示項目時可能失敗。|
+|從日程計劃建立項目|:grey_exclamation:|官方Daily Note外掛程式（和如果有安裝的其他類似每日筆記外掛程式）的日期格式需要與此外掛程式中的日期格式完全相同。似乎在使用 `better-daily-notes-plugin` 建立的每日筆記中可靠，但在其他情況下可能不穩定。|
+|在日程計劃上顯示項目|:grey_exclamation:|官方Daily Note外掛程式（和如果有安裝的其他類似每日筆記外掛程式）的日期格式需要與此外掛程式中使用的日期格式完全相同。似乎在使用 `better-daily-notes-plugin` 建立的每日筆記中可靠，但在其他情況下可能不穩定。|
+
+![](imgs/day-planner-test.png)
 
 ##### 其他
 上述列表僅包含我測試和實驗過的外掛程式。如果您對某個外掛程式的相容性感到猶豫，因此不確定是否要使用此外掛程式，請隨時提交issue或在Discord上丟訊息給我。

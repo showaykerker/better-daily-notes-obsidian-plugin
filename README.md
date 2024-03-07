@@ -68,8 +68,10 @@ The compatibility feature is **experimental** and default set to **enabled**, bu
 |Feature|Compatible|Note|
 |:--:|:--:|:--|
 | Create note from day planner | :white_check_mark: | Wait for 1 second, then rename and move the created file. |
-| Create items from day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. It works successfully in today's note but may fail when creating items for other dates. |
-| Show items on day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format used in this plugin. It works successfully in today's note but may fail when creating items for other dates. |
+| Create items from day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. Seems to work reliably when creating a daily note using the `better-daily-notes-plugin`, but may not be stable otherwise. |
+| Show items on day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format used in this plugin. Seems to work reliably when creating a daily note using the `better-daily-notes-plugin`, but may not be stable otherwise. |
+
+![](imgs/day-planner-test.png)
 
 ##### Others
 The above list includes plugins that have been tested and experimented with by me. If you are hesitant about the compatibility of a certain plugin and unsure about jumping into this plugin, please feel free to file an issue or find me on Discord.
