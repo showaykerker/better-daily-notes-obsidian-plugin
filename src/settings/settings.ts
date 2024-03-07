@@ -18,6 +18,7 @@ export interface BetterDailyNotesSettings {
 	summaryOfDaysCount: number;
 
 	disableCompatibilityMode: boolean;
+	compatibleDateFormats: string[];
 
 	debugMode: boolean;
 }
@@ -41,6 +42,7 @@ export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	summaryOfDaysCount: 7,
 
 	disableCompatibilityMode: false,
+	compatibleDateFormats: ["AUTO"],
 
 	debugMode: false
 }

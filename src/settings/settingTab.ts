@@ -228,7 +228,28 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.disableCompatibilityMode = value;
 					await this.plugin.saveSettings();
+					this.display();
 				}));
+		if (!this.plugin.settings.disableCompatibilityMode) {
+			containerEl.createEl('h4', {text: 'Compatible Date Formats', cls: 'setting-item-name'})
+			containerEl.createEl('p', {text: 'The date formats that are compatible with this plugin. ', cls: 'setting-item-description'});
+			containerEl.createEl('p', {text: 'Files created with these formats will be recognized as daily notes. ', cls: 'setting-item-description'});
+			containerEl.createEl('p', {text: 'By default, it will fetch all the date formats from other supported plugins. ', cls: 'setting-item-description'});
+			containerEl.createEl('p', {text: 'You can modify this setting to add or remove date formats, ', cls: 'setting-item-description'});
+			containerEl.createEl('p', {text: 'just separate each format with a comma. ', cls: 'setting-item-description'});
+			containerEl.createEl('p', {text: 'Set to "AUTO" to fetch all the date formats from other supported plugins. ', cls: 'setting-item-description'});
+			containerEl.createEl('p', {text: 'Modify this setting will require restart of the app.', cls: 'setting-item-description'});
+			new Setting(containerEl)
+				.addTextArea(text => text
+					.setPlaceholder(this.plugin.settings.compatibleDateFormats.toString().replaceAll(',', '\n'))
+					.setValue(this.plugin.settings.compatibleDateFormats.toString().replaceAll(',', '\n'))
+					.onChange(async (value) => {
+						this.plugin.settings.compatibleDateFormats =
+							value.split('\n').map((format: string) => format.trim()).filter((format: string) => format != '');
+						console.log("compatible formats: ", this.plugin.settings.compatibleDateFormats);
+						await this.plugin.saveSettings();
+					}));
+		}
 
 		containerEl.createEl('hr');
 		containerEl.createEl('h2', {text: 'Developer Option', cls: 'section-header'});
