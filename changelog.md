@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.3
+
+### Features
+- A setting to list data formats that should be considered as a daily note created by external plugin.
+
+### Fixes
+- Compatibility issue with dayjs trying to parse a non Date string
+
 ## 0.3.2
 
 ### Features
