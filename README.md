@@ -61,15 +61,14 @@ The compatibility feature is **experimental** and default set to **enabled**, bu
 |Item|Compatible|Note|
 |:--:|:--:|:--|
 | Create note from calendar | :white_check_mark: | Wait for 1 second, then rename and move the created file. |
-| Open daily note by clicking a date | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. |
+| Open daily note by clicking a date | :grey_exclamation: | Most date formats are compatible. |
 
 ##### [Day Planner](https://github.com/ivan-lednev/obsidian-day-planner) :white_check_mark:
 |Feature|Compatible|Note|
 |:--:|:--:|:--|
 | Create note from day planner | :white_check_mark: | Wait for 1 second, then rename and move the created file. |
-| Create items from day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. |
-| Show items on day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. |
-| Modify items on day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. |
+| Create items from day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. It works successfully in today's note but may fail when creating items for other dates. |
+| Show items on day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format used in this plugin. It works successfully in today's note but may fail when creating items for other dates. |
 
 ##### Others
 The above list includes plugins that have been tested and experimented with by me. If you are hesitant about the compatibility of a certain plugin and unsure about jumping into this plugin, please feel free to file an issue or find me on Discord.
@@ -112,6 +111,7 @@ This plugin is built with TypeScript. Here's how to contribute:
 ## Roadmap of Features
 - [ ] Handle create event and editor-drop event for file management.
 - [ ] Use svelte in configuration interface.
+- [ ] Language support.
 
 ## Feature Ideas
 - [ ] Support of customizing drag and paste behavior.

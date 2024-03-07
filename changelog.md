@@ -4,6 +4,7 @@
 
 ### Features
 - A setting to list data formats that should be considered as a daily note created by external plugin.
+- Now template can be used in externally created daily notes!
 
 ### Refactor
 - Make date format preview in settingsTab isolated.

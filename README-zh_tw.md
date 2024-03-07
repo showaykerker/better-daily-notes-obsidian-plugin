@@ -55,14 +55,14 @@
 |項目|相容性|備註|
 |:--:|:--:|:--|
 |從日曆建立筆記|:white_check_mark:|會等待1秒，然後重新命名並移動已建立的檔案。|
-|點日期打開每日筆記|:grey_exclamation:|原本`Daily Note`外掛（和如果有安裝的`Periodic Note`）的`date format`需要與此外掛程式中的完全相同。|
+|點日期打開每日筆記|:grey_exclamation:|大部分日期格式都相容。|
 
 ##### [Day Planner](https://github.com/ivan-lednev/obsidian-day-planner) :white_check_mark:
 |功能|相容性|備註|
 |:--:|:--:|:--|
-|從日程規劃建立筆記|:white_check_mark:|會等待1秒，然後重新命名並移動已建立的檔案。|
-|從日程規劃建立項目|:grey_exclamation:|原本`Daily Note`外掛（和如果有安裝的`Periodic Note`）的`date format`需要與此外掛程式中的完全相同。|
-|在日程規劃上顯示項目|:grey_exclamation:|原本`Daily Note`外掛（和如果有安裝的`Periodic Note`）的`date format`需要與此外掛程式中的完全相同。|
+|從日程計劃建立筆記|:white_check_mark:|等待1秒，然後重新命名並移動已建立的檔案。|
+|從日程計劃建立項目|:grey_exclamation:|官方Daily Note外掛程式（和如果有安裝的其他類似每日筆記外掛程式）的日期格式需要與此外掛程式中的日期格式完全相同。在今天的筆記中能夠成功運作，但在其他日期新增項目時可能失敗。|
+|在日程計劃上顯示項目|:grey_exclamation:|官方Daily Note外掛程式（和如果有安裝的其他類似每日筆記外掛程式）的日期格式需要與此外掛程式中使用的日期格式完全相同。在今天的筆記中能夠成功運作，但在其他日期顯示項目時可能失敗。|
 
 ##### 其他
 上述列表僅包含我測試和實驗過的外掛程式。如果您對某個外掛程式的相容性感到猶豫，因此不確定是否要使用此外掛程式，請隨時提交issue或在Discord上丟訊息給我。
