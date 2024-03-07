@@ -8,6 +8,7 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
 
 ![](imgs/better-daily-note-0.3.3-demo.gif)
 
+[View On Youtube](https://www.youtube.com/watch?v=_jqOHse3Q94) :arrow_down:
 [![0.3.3 demo](imgs/screenshot.png)](https://www.youtube.com/watch?v=_jqOHse3Q94)
 
 ## Features
