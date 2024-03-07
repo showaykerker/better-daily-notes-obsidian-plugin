@@ -48,20 +48,30 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
 - **Open and update summary page:** Opens a summary page and updates it.
 
 ### Compatibility
-#### [Calendar](https://github.com/liamcain/obsidian-calendar-plugin) :white_check_mark:
+
+The compatibility feature is **experimental** and default set to **enabled**, but if it behaves unexpectedly, please feel free to disable it in the settings (, and it would be even better if you could provide feedback!).
+
+#### Known Issues
+- On MacOS, if your use a `oneDrive` to be the root of the vault, you might not be able to delete a daily note since `oneDrive` on MacOS sometimes weirdly move deleted files to the root.  Which means this plugin will still locate it and rename and move to the daily note folder. See [this discussion](https://forum.obsidian.md/t/vault-in-onedrive-deleted-files-are-moved-to-the-onedrive-root/57188) for more information and possible solution.
+- `Dayjs` somehow parse every string and make it's best to guess a date from it, for example, `summary 2` will be parsed as "2001-02-01", this might cause an issue if an automatically created file being parsed as a date. This will be fixed in the next version by adding a format user want to parse.
+
+#### Tested Plugins
+
+##### [Calendar](https://github.com/liamcain/obsidian-calendar-plugin) :white_check_mark:
 |Item|Compatible|Note|
 |:--:|:--:|:--|
 | Create note from calendar | :white_check_mark: | Wait for 1 second, then rename and move the created file. |
-| Open daily note by clicking a date | :bangbang: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. |
+| Open daily note by clicking a date | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. |
 
-#### [Day Planner](https://github.com/ivan-lednev/obsidian-day-planner) :white_check_mark:
+##### [Day Planner](https://github.com/ivan-lednev/obsidian-day-planner) :white_check_mark:
 |Feature|Compatible|Note|
 |:--:|:--:|:--|
 | Create note from day planner | :white_check_mark: | Wait for 1 second, then rename and move the created file. |
-| Create items from day planner | :bangbang: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. |
-| Show items on day planner | :bangbang: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. |
+| Create items from day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. |
+| Show items on day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. |
+| Modify items on day planner | :grey_exclamation: | The date format of the original daily note plugin (and periodic notes plugin) needs to be identical to the date format in this plugin. |
 
-#### Others
+##### Others
 The above list includes plugins that have been tested and experimented with by me. If you are hesitant about the compatibility of a certain plugin and unsure about jumping into this plugin, please feel free to file an issue or find me on Discord.
 
 
@@ -102,7 +112,6 @@ This plugin is built with TypeScript. Here's how to contribute:
 5. Reload Obsidian to load the updated plugin.
 
 ## Roadmap of Features
-- [ ] Compatibility with other plugins. (Calendar, Day Planner, etc.)
 - [ ] Handle create event and editor-drop event for file management.
 - [ ] Use svelte in configuration interface.
 
@@ -116,13 +125,15 @@ This plugin is built with TypeScript. Here's how to contribute:
 - [ ] Daily note one line summary by LLM.
 - [ ] Generate tags by LLM.
 - [ ] Image one line summary by LLM.
-- [x] ~~Support of other file types. e.g. `.dill`.~~ (Supported from v0.2.6)
-- [x] ~~Commands to toggle image compression.~~ (Added v0.2.5)
-- [x] ~~Create daily note with template.~~ (Added v0.2.2)
+- [x] ~~Compatibility with other plugins. (Calendar, Day Planner, etc.)~~ (Supported from 0.3.2)
+- [x] ~~Support of other file types. e.g. `.dill`.~~ (Supported from 0.2.6)
+- [x] ~~Commands to toggle image compression.~~ (Added 0.2.5)
+- [x] ~~Create daily note with template.~~ (Added 0.2.2)
 - [x] ~~Support of installing through [BRAT](https://github.com/TfTHacker/obsidian42-brat).~~
-- [x] ~~Support of other file types. e.g. `.pdf`, `.zip`.~~ (Added v0.2.1)
+- [x] ~~Support of other file types. e.g. `.pdf`, `.zip`.~~ (Added 0.2.1)
 
 ## Known Bugs
+- [ ] `dayjs` somehow thinks `summary 2` is a date `2001-02-01`
 - [ ] Compressing very large images may occasionally cause the application to restart.
   > Likely to be resolved with the implementation of the roadmap feature - `Handle create event`.
 - [ ] Adding a significant quantity of images at once may result in some not being processed successfully.

@@ -41,20 +41,30 @@
 
 
 ### 相容性
-#### [Calendar](https://github.com/liamcain/obsidian-calendar-plugin) :white_check_mark:
+
+這個功能目前仍在**實驗**階段，預設為**啟用**，但如果它做的事情與你預想的不同，請在設置中關掉它（如果能回報那就更好了！）。
+
+
+#### 已知問題
+- 在 MacOS 上，如果您使用 `oneDrive` 作為 vault 的根目錄，您可能無法刪除每日筆記，因為 MacOS 上的 `oneDrive` 有時會奇怪地將已刪除的檔案移動到根目錄。所以此外掛程式仍然會認為該檔案是由其他外掛新增的，將其重新命名並移動到每日筆記資料夾中。請參閱[此討論](https://forum.obsidian.md/t/vault-in-onedrive-deleted-files-are-moved-to-the-onedrive-root/57188)。
+- `Dayjs` 在解析每個字串時會盡力猜測日期，例如，`summary 2` 將被解析為 "2001-02-01"，如果自動建立的檔案被解析為日期，可能會引起問題。下一個版本將通過增加用戶想要解析的格式來修復此問題。
+
+#### 測試過的其他plugin
+
+##### [Calendar](https://github.com/liamcain/obsidian-calendar-plugin) :white_check_mark:
 |項目|相容性|備註|
 |:--:|:--:|:--|
 |從日曆建立筆記|:white_check_mark:|會等待1秒，然後重新命名並移動已建立的檔案。|
-|點日期打開每日筆記|:bangbang:|原本`Daily Note`外掛（和如果有安裝的`Periodic Note`）的`date format`需要與此外掛程式中的完全相同。|
+|點日期打開每日筆記|:grey_exclamation:|原本`Daily Note`外掛（和如果有安裝的`Periodic Note`）的`date format`需要與此外掛程式中的完全相同。|
 
-#### [Day Planner](https://github.com/ivan-lednev/obsidian-day-planner) :white_check_mark:
+##### [Day Planner](https://github.com/ivan-lednev/obsidian-day-planner) :white_check_mark:
 |功能|相容性|備註|
 |:--:|:--:|:--|
 |從日程規劃建立筆記|:white_check_mark:|會等待1秒，然後重新命名並移動已建立的檔案。|
-|從日程規劃建立項目|:bangbang:|原本`Daily Note`外掛（和如果有安裝的`Periodic Note`）的`date format`需要與此外掛程式中的完全相同。|
-|在日程規劃上顯示項目|:bangbang:|原本`Daily Note`外掛（和如果有安裝的`Periodic Note`）的`date format`需要與此外掛程式中的完全相同。|
+|從日程規劃建立項目|:grey_exclamation:|原本`Daily Note`外掛（和如果有安裝的`Periodic Note`）的`date format`需要與此外掛程式中的完全相同。|
+|在日程規劃上顯示項目|:grey_exclamation:|原本`Daily Note`外掛（和如果有安裝的`Periodic Note`）的`date format`需要與此外掛程式中的完全相同。|
 
-#### 其他
+##### 其他
 上述列表僅包含我測試和實驗過的外掛程式。如果您對某個外掛程式的相容性感到猶豫，因此不確定是否要使用此外掛程式，請隨時提交issue或在Discord上找到我。
 
 
