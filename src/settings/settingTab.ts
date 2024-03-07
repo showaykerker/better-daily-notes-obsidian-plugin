@@ -239,16 +239,29 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 			containerEl.createEl('p', {text: 'just separate each format with a comma. ', cls: 'setting-item-description'});
 			containerEl.createEl('p', {text: 'Set to "AUTO" to fetch all the date formats from other supported plugins. ', cls: 'setting-item-description'});
 			containerEl.createEl('p', {text: 'Modify this setting will require restart of the app.', cls: 'setting-item-description'});
-			new Setting(containerEl)
-				.addTextArea(text => text
-					.setPlaceholder(this.plugin.settings.compatibleDateFormats.toString().replaceAll(',', '\n'))
-					.setValue(this.plugin.settings.compatibleDateFormats.toString().replaceAll(',', '\n'))
-					.onChange(async (value) => {
-						this.plugin.settings.compatibleDateFormats =
-							value.split('\n').map((format: string) => format.trim()).filter((format: string) => format != '');
-						console.log("compatible formats: ", this.plugin.settings.compatibleDateFormats);
-						await this.plugin.saveSettings();
-					}));
+			const input = document.createElement('textarea');
+			input.cols = 15;
+			input.rows = 5;
+			input.placeholder = this.plugin.settings.compatibleDateFormats.toString().replaceAll(',', '\n');
+			input.value = this.plugin.settings.compatibleDateFormats.toString().replaceAll(',', '\n');
+			input.addEventListener('change', async (event) => {
+				this.plugin.settings.compatibleDateFormats =
+					input.value.split('\n').map((format: string) => format.trim()).filter((format: string) => format != '');
+				console.log("compatible formats: ", this.plugin.settings.compatibleDateFormats);
+				await this.plugin.saveSettings();
+			});
+			containerEl.appendChild(input);
+
+			// new Setting(containerEl)
+			// 	.addTextArea(text => text
+			// 		.setPlaceholder(this.plugin.settings.compatibleDateFormats.toString().replaceAll(',', '\n'))
+			// 		.setValue(this.plugin.settings.compatibleDateFormats.toString().replaceAll(',', '\n'))
+			// 		.onChange(async (value) => {
+			// 			this.plugin.settings.compatibleDateFormats =
+			// 				value.split('\n').map((format: string) => format.trim()).filter((format: string) => format != '');
+			// 			console.log("compatible formats: ", this.plugin.settings.compatibleDateFormats);
+			// 			await this.plugin.saveSettings();
+			// 		}));
 		}
 
 		containerEl.createEl('hr');
