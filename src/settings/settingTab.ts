@@ -1,5 +1,6 @@
 import {App, normalizePath, Notice, PluginSettingTab, Setting} from 'obsidian';
 import { formatDate, isValidDateFormat } from '../utils';
+import { create } from 'domain';
 
 export class BetterDailyNotesSettingTab extends PluginSettingTab {
 	plugin: any;
@@ -18,11 +19,6 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 
 	display(): void {
 		const {containerEl} = this;
-		function getDescription() {
-			return 'The date format for the daily notes. (Using Dayjs) \n' +
-				'Current format looks like:' +
-				formatDate(this.plugin.settings.dateFormat);
-		}
 
 		if (!this.templateExists()) {
 			new Notice(`Template file ${this.plugin.settings.templateFile} not found. `+
@@ -31,10 +27,11 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 		}
 
 		containerEl.empty();
-		containerEl.createEl('h2', {text: 'General Configuration', cls: 'section-header'});
+		containerEl.createEl('h2', {text: 'Better Daily Notes', cls: 'section-header'});
+		// containerEl.createEl('h2', {text: 'General Configuration', cls: 'section-header'});
 		new Setting(containerEl)
 			.setName('Date Format')
-			.setDesc(getDescription.bind(this)())
+			.setDesc('The date format for the daily notes. (Using Dayjs)')
 			.addText(text => text
 				.setPlaceholder(this.plugin.settings.dateFormat)
 				.setValue(this.plugin.settings.dateFormat)
@@ -42,13 +39,14 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					if (!isValidDateFormat(value)) {
 						return;
 					}
-					this.plugin.settings.dateFormat = value;
-					const previewElement = containerEl.querySelector('.setting-item-description');
-					if (previewElement instanceof HTMLDivElement) {
-						previewElement.innerText = getDescription.bind(this)();
-					}
+					this.plugin.settings.dateFormat = value.trim();
+					const preview = containerEl.getElementsByClassName('preview-date-format')[0];
+					preview.setText(`Current format looks like: "${formatDate(this.plugin.settings.dateFormat)}"`);
 					await this.plugin.saveSettings();
 				}));
+		containerEl.createEl('p', {
+			text: `Current format looks like: "${formatDate(this.plugin.settings.dateFormat)}"`,
+			cls: 'setting-item-description preview-date-format'});
 
 		new Setting(containerEl)
 			.setName('Root Directory')
@@ -98,11 +96,24 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 				}));
 
 		containerEl.createEl('hr');
-		containerEl.createEl('h2', {text: 'File Handling Configuration', cls: 'section-header'});
-		containerEl.createEl('p', {text: 'The plugin handles drop and paste events, ' +
-			"if you already have other plugins that handle these events, " +
-			"such as automatic image upload, you may want to disable file handling from this plugin."});
-		containerEl.createEl('p', {text: 'Currently, the plugin only supports handling of images, pdfs, and zips.'})
+		containerEl.createEl('h2', {
+			text: 'File Handling Configuration', cls: 'section-header'});
+		containerEl.createEl('p', {
+			text: 'The plugin handles drop and paste events, ',
+			cls: 'setting-item-description' });
+		containerEl.createEl('p', {
+			text: "if you already have other plugins that handle these events, ",
+			cls: 'setting-item-description'});
+		containerEl.createEl('p', {
+			text: "such as automatic image upload, ",
+			cls: 'setting-item-description' });
+		containerEl.createEl('p', {
+			text: "you may want to disable file handling from this plugin.",
+			cls: 'setting-item-description'});
+		containerEl.createEl(
+			'p', {
+			text: 'Currently, the plugin only supports handling of images, pdfs, and zips.',
+			cls: 'setting-item-description' });
 		new Setting(containerEl)
 			.setName('File Handling')
 			.setDesc('Select how files should be handled.' +
@@ -163,7 +174,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					}));
 			new Setting(containerEl)
 				.setName('Resize Width')
-				.setDesc('The width to resize images and pdfs. -1 means no resizing.' +
+				.setDesc('The width to resize images and pdfs. -1 means no resizing. ' +
 					'This only add a suffix to the images\' and pdfs\' markdown link. ' +
 					'No compression is done.')
 				.addText(text => text
@@ -178,8 +189,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 		containerEl.createEl('hr');
 		containerEl.createEl('h2', {text: 'Summary Page Configuration', cls: 'section-header'});
 		containerEl.createEl('p', {text: "Summary page is a page that summarizes the daily notes from the past few days. " +
-			"If enabled, the feature will be available in the command palette and as ribbon icon. "});
-		containerEl.createEl('p', {text: "If you owns a huge vault, it is possible that this feature slows down the app when launched. "});
+			" If enabled, the feature will be available in the command palette and as ribbon icon. ", cls: 'setting-item-description'});
 
 		new Setting(containerEl)
 			.setName('Enable Summary Page Creation')
@@ -232,13 +242,27 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 				}));
 		if (!this.plugin.settings.disableCompatibilityMode) {
 			containerEl.createEl('h4', {text: 'Compatible Date Formats', cls: 'setting-item-name'})
-			containerEl.createEl('p', {text: 'The date formats that are compatible with this plugin. ', cls: 'setting-item-description'});
-			containerEl.createEl('p', {text: 'Files created with these formats will be recognized as daily notes. ', cls: 'setting-item-description'});
-			containerEl.createEl('p', {text: 'By default, it will fetch all the date formats from other supported plugins. ', cls: 'setting-item-description'});
-			containerEl.createEl('p', {text: 'You can modify this setting to add or remove date formats, ', cls: 'setting-item-description'});
-			containerEl.createEl('p', {text: 'just separate each format with a comma. ', cls: 'setting-item-description'});
-			containerEl.createEl('p', {text: 'Set to "AUTO" to fetch all the date formats from other supported plugins. ', cls: 'setting-item-description'});
-			containerEl.createEl('p', {text: 'Modify this setting will require restart of the app.', cls: 'setting-item-description'});
+			containerEl.createEl('p', {
+				text: 'The date formats that are compatible with this plugin. ',
+				cls: 'setting-item-description'});
+			containerEl.createEl('p', {
+				text: 'Files created with these formats will be recognized as daily notes. ',
+				cls: 'setting-item-description'});
+			containerEl.createEl('p', {
+				text: 'By default, it will fetch all the date formats from other supported plugins. ',
+				cls: 'setting-item-description'});
+			containerEl.createEl('p', {
+				text: 'You can modify this setting to add or remove date formats, ',
+				cls: 'setting-item-description'});
+			containerEl.createEl('p', {
+				text: 'just separate each format with a comma. ',
+				cls: 'setting-item-description'});
+			containerEl.createEl('p', {
+				text: 'Set to "AUTO" to fetch all the date formats from other supported plugins. ',
+				cls: 'setting-item-description'});
+			containerEl.createEl('p', {
+				text: 'Modify this setting will require restart of the app.',
+				cls: 'setting-item-description'});
 			const input = document.createElement('textarea');
 			input.cols = 15;
 			input.rows = 5;
@@ -246,22 +270,12 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 			input.value = this.plugin.settings.compatibleDateFormats.toString().replaceAll(',', '\n');
 			input.addEventListener('change', async (event) => {
 				this.plugin.settings.compatibleDateFormats =
-					input.value.split('\n').map((format: string) => format.trim()).filter((format: string) => format != '');
-				console.log("compatible formats: ", this.plugin.settings.compatibleDateFormats);
+					input.value.split('\n')
+						.map((format: string) => format.trim())
+						.filter((format: string) => format != '');
 				await this.plugin.saveSettings();
 			});
 			containerEl.appendChild(input);
-
-			// new Setting(containerEl)
-			// 	.addTextArea(text => text
-			// 		.setPlaceholder(this.plugin.settings.compatibleDateFormats.toString().replaceAll(',', '\n'))
-			// 		.setValue(this.plugin.settings.compatibleDateFormats.toString().replaceAll(',', '\n'))
-			// 		.onChange(async (value) => {
-			// 			this.plugin.settings.compatibleDateFormats =
-			// 				value.split('\n').map((format: string) => format.trim()).filter((format: string) => format != '');
-			// 			console.log("compatible formats: ", this.plugin.settings.compatibleDateFormats);
-			// 			await this.plugin.saveSettings();
-			// 		}));
 		}
 
 		containerEl.createEl('hr');
@@ -270,7 +284,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 			'Please do not modify these settings unless you know what you are doing.'});
 		new Setting(containerEl)
 			.setName('Debug Mode')
-			.setDesc('Enable debug mode. This will print debug messages to the console.')
+			.setDesc('Enable debug mode. This will show debug message as Notice (that is really annoying).')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.debugMode)
 				.onChange(async (value) => {

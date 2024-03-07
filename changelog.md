@@ -5,6 +5,10 @@
 ### Features
 - A setting to list data formats that should be considered as a daily note created by external plugin.
 
+### Refactor
+- Make date format preview in settingsTab isolated.
+- Add class to long paragraph in settingsTab.
+
 ### Fixes
 - Compatibility issue with dayjs trying to parse a non Date string
 
