@@ -1,12 +1,13 @@
-import { App, Notice, TFile } from 'obsidian';
+import { Notice, TFile } from 'obsidian';
 import BetterDailyNotePlugin from '../main';
 import dayjs from 'dayjs';
 import { checkValidDailyNote, getDailyNotePath } from '../utils';
-import { createDirIfNotExists, createDirsIfNotExists } from 'src/dailyNotes/fileSystem';
+import { createDirsIfNotExists } from 'src/dailyNotes/fileSystem';
 import { getSettingsFromExternalPlugin } from './utils';
 
 async function checkExternalPlugins(plugin: BetterDailyNotePlugin): Promise<string[]> {
     if (plugin.settings.compatibleDateFormats.length === 0) return [];
+    console.log(plugin.settings.compatibleDateFormats);
     if (plugin.settings.compatibleDateFormats.includes("AUTO")) {
         const externalFormats = await getSettingsFromExternalPlugin(plugin.app, plugin.settings);
         plugin.settings.compatibleDateFormats = Array.from(externalFormats);
