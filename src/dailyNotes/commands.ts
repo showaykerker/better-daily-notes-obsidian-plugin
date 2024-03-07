@@ -96,7 +96,7 @@ export async function openDailyNote(
             new Notice("Daily Note \"" + targetNotePath + "\"" +
                 " with template \"" + settings.templateFile + "\" created!");
         } else {
-            new Notice("Template File " + settings.templateFile + " not found!");
+            // new Notice("Template File " + settings.templateFile + " not found!");
         }
     }
     openOrSwitchToNote(app, targetNotePath);

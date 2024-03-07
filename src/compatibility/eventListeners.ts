@@ -2,7 +2,7 @@ import { App, Notice, TFile } from 'obsidian';
 import BetterDailyNotePlugin from '../main';
 import dayjs from 'dayjs';
 import { checkValidDailyNote, getDailyNotePath } from '../utils';
-import { createDirsIfNotExists } from 'src/dailyNotes/fileSystem';
+import { createDirIfNotExists, createDirsIfNotExists } from 'src/dailyNotes/fileSystem';
 import { getSettingsFromExternalPlugin } from './utils';
 
 async function checkExternalPlugins(plugin: BetterDailyNotePlugin): Promise<string[]> {
@@ -46,6 +46,13 @@ export async function createCompatibilityEventListener(plugin: BetterDailyNotePl
                                 dailyNotePath + " in 1 second.", plugin.settings.debugMode ? 0 : 2500);
                             const dailyNoteDir = dailyNotePath.substring(0, dailyNotePath.lastIndexOf("/"));
                             createDirsIfNotExists(plugin.app, dailyNoteDir);
+                            // add template
+                            const templateFile = plugin.app.vault.getAbstractFileByPath(plugin.settings.templateFile);
+                            if (templateFile instanceof TFile) {
+                                let template = await plugin.app.vault.read(templateFile);
+                                await plugin.app.vault.modify(file, template);
+                                new Notice(`Template "${plugin.settings.templateFile}" applied to ${dailyNotePath}`);
+                            }
                             await new Promise((resolve) => setTimeout(resolve, 1000));
                             await plugin.app.vault.rename(file, dailyNotePath);
                             new Notice("Daily note renamed to " + dailyNotePath, plugin.settings.debugMode ? 0 : 2500);
