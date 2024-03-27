@@ -11,7 +11,7 @@
 
 
 ### Fixes
-
+- Summary page skip some notes when updated before assumeSameDayHours.
 
 ## 0.3.3
 
