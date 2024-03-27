@@ -56,7 +56,7 @@ export async function moveDailyNote(
             if (app.vault.getAbstractFileByPath(dailyNotePath) == null) {
                 if (shouldWait){
                     new Notice(`Daily note ${file.name} created by external plugin, will be renamed to `+
-                        dailyNotePath + " in 1 second.", 2500);
+                        dailyNotePath + " in 1 second.", 5000);
                     await new Promise((resolve) => setTimeout(resolve, 1000));
                 }
                 const dailyNoteDir = dailyNotePath.substring(0, dailyNotePath.lastIndexOf("/"));
@@ -65,18 +65,25 @@ export async function moveDailyNote(
                     // add template
                     const templateFile = app.vault.getAbstractFileByPath(settings.templateFile);
                     if (templateFile instanceof TFile) {
-                        let template = await app.vault.read(templateFile);
-                        await app.vault.modify(file, template);
-                        new Notice(`Template "${settings.templateFile}" applied to ${dailyNotePath}`);
+                        const originalContent = await app.vault.read(file);
+                        if (!originalContent) {
+                            const template = await app.vault.read(templateFile);
+                            await app.vault.modify(file, template);
+                            new Notice(`Template "${settings.templateFile}" applied to ${dailyNotePath}`, 5000);
+                        }
+                        else {
+                            new Notice(`Template "${settings.templateFile}" not applied to ${dailyNotePath} `+
+                                `because the file already contains content.`, 5000);
+                        }
                     }
                 }
                 if (copyInstead) {
                     await app.vault.copy(file, dailyNotePath);
-                    new Notice("Daily note copied to " + dailyNotePath, 2500);
+                    new Notice("Daily note copied to " + dailyNotePath, 5000);
                 }
                 else {
                     await app.vault.rename(file, dailyNotePath);
-                    new Notice("Daily note renamed to " + dailyNotePath, 2500);
+                    new Notice("Daily note renamed to " + dailyNotePath, 5000);
                 }
                 return dailyNotePath;
             }
