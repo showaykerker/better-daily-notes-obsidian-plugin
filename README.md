@@ -74,6 +74,9 @@ The compatibility feature is **experimental** and default set to **enabled**, bu
 
 ![](imgs/day-planner-test.png)
 
+##### [Rollover Daily TODOs](https://github.com/lumoe/obsidian-rollover-daily-todos) :x:
+
+
 ##### Others
 The above list includes plugins that have been tested and experimented with by me. If you are hesitant about the compatibility of a certain plugin and unsure about jumping into this plugin, please feel free to file an issue or find me on Discord.
 

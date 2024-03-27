@@ -68,6 +68,8 @@
 
 ![](imgs/day-planner-test.png)
 
+##### [Rollover Daily TODOs](https://github.com/lumoe/obsidian-rollover-daily-todos) :x:
+
 ##### 其他
 上述列表僅包含我測試和實驗過的外掛程式。如果您對某個外掛程式的相容性感到猶豫，因此不確定是否要使用此外掛程式，請隨時提交issue或在Discord上丟訊息給我。
 
