@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.4
+
+### Features
+- compatibility: isolate main functionality from event listener to utils
+
+### Refactor
+- compatibility: rename rather than fallback when target exists
+- compatibility: use template only when the original file is empty
+
+
+### Fixes
+
+
 ## 0.3.3
 
 ### Features
