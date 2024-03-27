@@ -75,7 +75,7 @@ The compatibility feature is **experimental** and default set to **enabled**, bu
 ![](imgs/day-planner-test.png)
 
 ##### [Rollover Daily TODOs](https://github.com/lumoe/obsidian-rollover-daily-todos) :x:
-
+I'm planning to implement this functionality by myself.
 
 ##### Others
 The above list includes plugins that have been tested and experimented with by me. If you are hesitant about the compatibility of a certain plugin and unsure about jumping into this plugin, please feel free to file an issue or find me on Discord.
@@ -116,6 +116,8 @@ This plugin is built with TypeScript. Here's how to contribute:
 5. Reload Obsidian to load the updated plugin.
 
 ## Roadmap of Features
+- [ ] Migrating existed daily notes.
+- [ ] Rollover daily notes TODOs.
 - [ ] Handle create event and editor-drop event for file management.
 - [ ] Use svelte in configuration interface.
 - [ ] Language support.
@@ -125,7 +127,6 @@ This plugin is built with TypeScript. Here's how to contribute:
 - [ ] Open daily note on startup.
 - [ ] A modal to ask if image compression is required.
 - [ ] Support of month directory custom naming.
-- [ ] Compress images and rename file for existing notes.
 - [ ] Daily note one line summary by LLM.
 - [ ] Generate tags by LLM.
 - [ ] Image one line summary by LLM.
