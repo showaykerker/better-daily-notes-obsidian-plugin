@@ -1,8 +1,9 @@
 import imageCompression from 'browser-image-compression';
-import { App, Editor, MarkdownView, normalizePath, Notice } from "obsidian";
+import { App, Editor, MarkdownView, normalizePath } from "obsidian";
 import { createDirsIfNotExists } from "./fileSystem";
-import { checkValidDailyNote } from "../utils";
+import { createNotice, checkValidDailyNote } from "../utils";
 import { BetterDailyNotesSettings } from "../settings/settings";
+import { create } from 'domain';
 
 export function base64ToArrayBuffer(base64: string): ArrayBuffer {
     const binaryString = window.atob(base64);
@@ -30,16 +31,16 @@ export function getNextNumberedImageIndex(app: App, dirPath: string, prefix: str
     return nextIndex;
 }
 
-export async function limitImageFileSize(file: File, size: number, preserveExifData: boolean): Promise<File> {
-    if (size === -1) {
+export async function limitImageFileSize(settings: BetterDailyNotesSettings, file: File): Promise<File> {
+    if (settings.maxImageSizeKB === -1) {
         return Promise.resolve(file);
     }
     const options = {
-        maxSizeMB: size / 1024.0,
+        maxSizeMB: settings.maxImageSizeKB / 1024.0,
         useWebWorker: true,
-        preserveExifData: preserveExifData,
+        preserveExifData: settings.preserveExifData,
     };
-    new Notice(`Compressing image "${file.name}" to ${size}KB`);
+    createNotice(app, settings, `Compressing image "${file.name}" to ${settings.maxImageSizeKB}KB`, "info");
     const compressedFile = await imageCompression(file, options);
     return compressedFile;
 }
@@ -91,10 +92,10 @@ export async function handleFiles(
     // Check if all file types are supported
     for (let i = 0; i < files.length; i++) {
         if (!isFileSupported(files[i])) {
-            new Notice(
+            createNotice(app, settings,
                 `Only image, pdf, and zip files are supported. ` +
                 `Get file "${files[i]?.name}" with type "${files[i].type}" instead.`,
-                7500);
+                "error");
             return;
         }
     }
@@ -125,9 +126,8 @@ export async function handleSingleFile(
 
     if (file.type.startsWith("image")) {
         file = await limitImageFileSize(
-            file,
-            settings.maxImageSizeKB,
-            settings.preserveExifData);
+            settings,
+            file);
         const getImageNumber = getNextNumberedImageIndex(app, fileSaveSubDir, filePrefix);
         fileSaveSubDir = `${viewParentPath}/${settings.imageSubDir}`;
         filePrefix = `${filePrefix}-image`;
@@ -148,6 +148,7 @@ export async function handleSingleFile(
     reader.onloadend = async (e) => {
         handleSuccess = await createAndInsertWithFileReader(
             app,
+            settings,
             editor,
             reader,
             filePath,
@@ -161,6 +162,7 @@ export async function handleSingleFile(
 
 export async function createAndInsertWithFileReader(
         app: App,
+        settings: BetterDailyNotesSettings,
         editor: Editor,
         reader: FileReader,
         filePath: string,
@@ -170,7 +172,7 @@ export async function createAndInsertWithFileReader(
     const base64 = reader.result?.toString().split(",")[1];
 
     if (!base64) {
-        new Notice(`Failed to create file "${filePath}", base64 is empty.`);
+        createNotice(app, settings, `Failed to create file "${fileName}", base64 is empty.`, "error");
         return false;
     }
 
@@ -179,7 +181,7 @@ export async function createAndInsertWithFileReader(
 
     filePath = filePath[0] === '/' ? filePath.substring(1) : filePath;
     if (app.vault.getAbstractFileByPath(filePath) && returnTrueIfExists) {
-        new Notice(`File "${filePath}" already exists. Inserting link to the existed one.`);
+        createNotice(app, settings, `File "${filePath}" already exists. Inserting link to the existed one.`, "warning");
         editor.replaceSelection(fileLink);
         return true;
     }
@@ -191,7 +193,7 @@ export async function createAndInsertWithFileReader(
         return true;
     }
     catch (e) {
-        new Notice(`Failed to create file "${fileName}".`, 0);
+        createNotice(app, settings, `Failed to create file "${fileName}".`, "error");
         console.error(e);
         editor.replaceSelection(fileLink);
         return false;

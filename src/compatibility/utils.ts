@@ -1,7 +1,7 @@
-import { App, Notice, TFile } from 'obsidian';
+import { App, TFile } from 'obsidian';
 import { BetterDailyNotesSettings } from 'src/settings/settings';
 import dayjs from 'dayjs';
-import { checkValidDailyNote, getDailyNotePath } from '../utils';
+import { checkValidDailyNote, createNotice, getDailyNotePath } from '../utils';
 import { createDirsIfNotExists } from 'src/dailyNotes/fileSystem';
 
 export async function getSettingsFromExternalPlugin(app: App, settings: BetterDailyNotesSettings): Promise<Set<string>> {
@@ -55,8 +55,10 @@ export async function moveDailyNote(
         while (true) {
             if (app.vault.getAbstractFileByPath(dailyNotePath) == null) {
                 if (shouldWait){
-                    new Notice(`Daily note ${file.name} created by external plugin, will be renamed to `+
-                        dailyNotePath + " in 1 second.", 5000);
+                    createNotice(app, settings,
+                        `Daily note ${file.name} created by external plugin, will be renamed to `+
+                            dailyNotePath + " in 1 second.",
+                        'info');
                     await new Promise((resolve) => setTimeout(resolve, 1000));
                 }
                 const dailyNoteDir = dailyNotePath.substring(0, dailyNotePath.lastIndexOf("/"));
@@ -69,21 +71,21 @@ export async function moveDailyNote(
                         if (!originalContent) {
                             const template = await app.vault.read(templateFile);
                             await app.vault.modify(file, template);
-                            new Notice(`Template "${settings.templateFile}" applied to ${dailyNotePath}`, 5000);
+                            createNotice(app, settings, `Template "${settings.templateFile}" applied to ${dailyNotePath}`, 'info');
                         }
                         else {
-                            new Notice(`Template "${settings.templateFile}" not applied to ${dailyNotePath} `+
-                                `because the file already contains content.`, 5000);
+                            createNotice(app, settings, `Template "${settings.templateFile}" not applied to ${dailyNotePath} `+
+                                `because the file already contains content.`, 'warning');
                         }
                     }
                 }
                 if (copyInstead) {
                     await app.vault.copy(file, dailyNotePath);
-                    new Notice("Daily note copied to " + dailyNotePath, 5000);
+                    createNotice(app, settings, `Daily note copied to ${dailyNotePath}`, 'info');
                 }
                 else {
                     await app.vault.rename(file, dailyNotePath);
-                    new Notice("Daily note renamed to " + dailyNotePath, 5000);
+                    createNotice(app, settings, `Daily note renamed to ${dailyNotePath}`, 'info');
                 }
                 return dailyNotePath;
             }
@@ -95,9 +97,9 @@ export async function moveDailyNote(
                 else {
                     dailyNotePath = dailyNotePath.replace(".md", ` ${attempt}.md`);
                 }
-                new Notice(`Daily note ${file.name} created by external plugin, `+
+                createNotice(app, settings, `Daily note ${file.name} created by external plugin, `+
                     `but a daily note with the same name "${dailyNotePath}" already exists. `+
-                    `Will attempt to rename to "${dailyNotePath}"`, 5000);
+                    `Will attempt to rename to "${dailyNotePath}"`, 'warning');
             }
         }
     }

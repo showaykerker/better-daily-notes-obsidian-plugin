@@ -1,6 +1,7 @@
-import {App, normalizePath, Notice, PluginSettingTab, Setting} from 'obsidian';
-import { formatDate, isValidDateFormat } from '../utils';
+import {App, normalizePath, PluginSettingTab, Setting} from 'obsidian';
+import { createNotice, formatDate, isValidDateFormat } from '../utils';
 import { create } from 'domain';
+
 
 export class BetterDailyNotesSettingTab extends PluginSettingTab {
 	plugin: any;
@@ -21,14 +22,44 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 		const {containerEl} = this;
 
 		if (!this.templateExists()) {
-			new Notice(`Template file ${this.plugin.settings.templateFile} not found. `+
-				'Please modify path to the template file.');
+			createNotice(this.app, this.plugin.settings, `Template file ${this.plugin.settings.templateFile} not found. `+
+				'Please modify path to the template file.', 'error');
 			this.plugin.settings.templateFile = '';
 		}
-
 		containerEl.empty();
-		containerEl.createEl('h2', {text: 'Better Daily Notes', cls: 'section-header'});
-		// containerEl.createEl('h2', {text: 'General Configuration', cls: 'section-header'});
+		containerEl.createEl('h1', {text: 'Better Daily Notes', cls: 'section-header'});
+		containerEl.createEl('h2', {text: 'Notice Settings', cls: 'section-header'});
+		new Setting(containerEl)
+			.setName('Notice Level')
+			.setDesc('The level of notices to display.')
+			.addDropdown(dropdown => dropdown
+				.addOptions({
+					0: 'None',
+					1: 'Error',
+					2: 'Warning',
+					3: 'Info',
+				})
+				.setValue(this.plugin.settings.noticeLevel)
+				.onChange(async (value) => {
+					this.plugin.settings.noticeLevel = value;
+					await this.plugin.saveSettings();
+					this.display();
+				}));
+		if (this.plugin.settings.noticeLevel > 0) {
+			new Setting(containerEl)
+				.setName('Notice Duration')
+				.setDesc('The duration of notices to display.')
+				.addText(text => text
+					.setPlaceholder(this.plugin.settings.noticeDuration.toString())
+					.setValue(this.plugin.settings.noticeDuration.toString())
+					.onChange(async (value) => {
+						this.plugin.settings.noticeDuration = parseInt(value);
+						await this.plugin.saveSettings();
+					}));
+		}
+
+		containerEl.createEl('hr');
+		containerEl.createEl('h2', {text: 'Daily Notes Configuration', cls: 'section-header'});
 		new Setting(containerEl)
 			.setName('Date Format')
 			.setDesc('The date format for the daily notes. (Using Dayjs)')
@@ -75,7 +106,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 							templateSetting.settingEl.classList.remove('invalid-path');
 							this.plugin.settings.templateFile = value;
 							await this.plugin.saveSettings();
-							new Notice('Template file set to: ' + value);
+							createNotice(this.app, this.plugin.settings, 'Template file set to: ' + value, 'info');
 						} else {
 							templateSetting.setClass('invalid-path');
 						}

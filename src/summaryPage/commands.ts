@@ -1,7 +1,8 @@
-import { App, Notice, TFile } from 'obsidian';
+import { App, TFile } from 'obsidian';
 import BetterDailyNotePlugin from '../main';
-import { getDailyNotePath, openOrSwitchToNote } from '../utils';
+import { createNotice, getDailyNotePath, openOrSwitchToNote } from '../utils';
 import { BetterDailyNotesSettings } from '../settings/settings';
+import { create } from 'domain';
 
 export async function createSummaryPageCommands(plugin: BetterDailyNotePlugin) {
     plugin.addCommand({
@@ -30,7 +31,7 @@ export async function updateSummaryPage(
         open: boolean): Promise<void> {
 
     if (!settings.enableSummaryPage) {
-        new Notice("Summary Page is disabled. Not opening the summary page.");
+        createNotice(app, settings, "Summary Page is disabled. Not opening the summary page.");
         return;
     }
     const summaryPagePath = settings.rootDir + '/' + settings.summaryPageFile + '.md';

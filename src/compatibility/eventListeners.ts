@@ -1,5 +1,6 @@
 import { Notice, TFile } from 'obsidian';
 import BetterDailyNotePlugin from '../main';
+import { createNotice } from '../utils';
 import { getSettingsFromExternalPlugin, moveDailyNote } from './utils';
 
 async function checkExternalPlugins(plugin: BetterDailyNotePlugin): Promise<string[]> {
@@ -24,9 +25,9 @@ export async function createCompatibilityEventListener(plugin: BetterDailyNotePl
                     let moveResult = await moveDailyNote(plugin.app, plugin.settings, file, true, false, false);
                     if (moveResult.startsWith("already exists")){
                         const dailyNotePath = moveResult.split(": ")[1];
-                        new Notice("Daily note created by external plugin, " +
+                        createNotice(plugin.app, plugin.settings,"Daily note created by external plugin, " +
                             `but a daily note with the same name "${dailyNotePath}" already exists.` +
-                            "No action will be taken.", 2500);
+                            "No action will be taken.", 'warning');
                     }
                 }
             )

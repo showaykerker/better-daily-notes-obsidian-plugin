@@ -1,8 +1,9 @@
-import { App, Notice, TFile } from 'obsidian';
+import { App, TFile } from 'obsidian';
 import { createDirIfNotExists } from './fileSystem';
 import BetterDailyNotePlugin from '../main';
-import { getDailyNotePath, openOrSwitchToNote } from '../utils';
+import { createNotice, getDailyNotePath, openOrSwitchToNote } from '../utils';
 import { BetterDailyNotesSettings } from '../settings/settings';
+import { create } from 'domain';
 
 export async function createDailyNotesCommands(plugin: BetterDailyNotePlugin) {
     plugin.addCommand({
@@ -39,18 +40,17 @@ export async function createDailyNotesCommands(plugin: BetterDailyNotePlugin) {
             const curr = plugin.settings.maxImageSizeKB;
             const cache = plugin.settings.maxImageSizeKBCache;
             if (curr == -1 && cache == -1) {
-                new Notice("Nothing happens because image compression is already disabled.");
+                createNotice(plugin.app, plugin.settings, "Nothing happens because image compression is already disabled.", "error");
                 return;
             }
             else if (curr == -1 && cache != -1) {
-                new Notice(
-                    "Image compression is now ENABLED.\n" +
-                    "Set back to maximum size: " + cache + "KB.", 7500);
+                createNotice(plugin.app, plugin.settings, "Image compression is now ENABLED.\n" +
+                    "Set back to maximum size: " + cache + "KB.", "warning");
             }
             else if (curr != -1 && cache == -1) {
-                new Notice("Image compression is now DISABLED.\n" +
+                createNotice(plugin.app, plugin.settings, "Image compression is now DISABLED.\n" +
                     "Execute the command again to set it back to maximum size: " + curr + "KB.\n" +
-                    "Will be set back automatically when restart.", 7500);
+                    "Will be set back automatically when restart.", "warning");
             }
             plugin.settings.maxImageSizeKB = cache;
             plugin.settings.maxImageSizeKBCache = curr;
@@ -83,7 +83,6 @@ export async function openDailyNote(
         date: Date = new Date()) {
     const rootDir = settings.rootDir;
     const assumeSameDayBeforeHour = settings.assumeSameDayBeforeHour;
-    const dateFormat = settings.dateFormat;
     date.setDate(date.getDate() + dateOffset);
     const targetNotePath = getDailyNotePath(settings, date, true);
 
@@ -93,10 +92,10 @@ export async function openDailyNote(
             let template = await app.vault.read(templateFile);
             await createDirIfNotExists(app, rootDir, assumeSameDayBeforeHour, date);
             await app.vault.create(targetNotePath, template);
-            new Notice("Daily Note \"" + targetNotePath + "\"" +
-                " with template \"" + settings.templateFile + "\" created!");
+            createNotice(app, settings, "Daily Note \"" + targetNotePath + "\"" +
+                " with template \"" + settings.templateFile + "\" created!", "info");
         } else {
-            // new Notice("Template File " + settings.templateFile + " not found!");
+            // createNotice(app, settings, "Template File " + settings.templateFile + " not found!", "warning");
         }
     }
     openOrSwitchToNote(app, targetNotePath);

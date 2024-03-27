@@ -4,6 +4,7 @@
 
 ### Features
 - compatibility: isolate main functionality from event listener to utils
+- logging: add settings for notice level
 
 ### Refactor
 - compatibility: rename rather than fallback when target exists

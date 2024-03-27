@@ -1,5 +1,8 @@
 
 export interface BetterDailyNotesSettings {
+	noticeLevel: number;  // 0: none, 1: error, 2: warning, 3: info
+	noticeDuration: number;
+
 	dateFormat: string;
 	rootDir: string;
 	templateFile: string;
@@ -24,6 +27,9 @@ export interface BetterDailyNotesSettings {
 }
 
 export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
+	noticeLevel: 1,
+	noticeDuration: 5000,
+
 	dateFormat: 'YYYY-MM-DD',
 	rootDir: 'daily-notes',
 	templateFile: '',
