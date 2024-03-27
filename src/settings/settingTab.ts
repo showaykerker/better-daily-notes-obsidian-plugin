@@ -278,18 +278,18 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 			containerEl.appendChild(input);
 		}
 
-		containerEl.createEl('hr');
-		containerEl.createEl('h2', {text: 'Developer Option', cls: 'section-header'});
-		containerEl.createEl('p', {text: 'This section is for debugging purposes. ' +
-			'Please do not modify these settings unless you know what you are doing.'});
-		new Setting(containerEl)
-			.setName('Debug Mode')
-			.setDesc('Enable debug mode. This will show debug message as Notice (that is really annoying).')
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.debugMode)
-				.onChange(async (value) => {
-					this.plugin.settings.debugMode = value;
-					await this.plugin.saveSettings();
-				}));
+		// containerEl.createEl('hr');
+		// containerEl.createEl('h2', {text: 'Developer Option', cls: 'section-header'});
+		// containerEl.createEl('p', {text: 'This section is for debugging purposes. ' +
+		// 	'Please do not modify these settings unless you know what you are doing.'});
+		// new Setting(containerEl)
+		// 	.setName('Debug Mode')
+		// 	.setDesc('Enable debug mode. This will show debug message as Notice (that is really annoying).')
+		// 	.addToggle(toggle => toggle
+		// 		.setValue(this.plugin.settings.debugMode)
+		// 		.onChange(async (value) => {
+		// 			this.plugin.settings.debugMode = value;
+		// 			await this.plugin.saveSettings();
+		// 		}));
 	}
 }

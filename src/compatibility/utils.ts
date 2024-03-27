@@ -23,6 +23,5 @@ async function getDateFormat(
     const externalSettingsDict = JSON.parse(externalSettings);
     const format = keys.reduce((acc, key) => acc[key], externalSettingsDict) || settings.dateFormat;
     console.log(`Better Daily Notes: ${externalPluginName} plugin uses date format: ${format}`);
-    if (settings.debugMode) new Notice(`Better Daily Notes: ${externalPluginName} plugin uses date format: ${format}`);
     return format;
 }
