@@ -50,36 +50,43 @@ export async function moveDailyNote(
 
     if (createdByThisPlugin) return "created by this plugin";
     if (fileBasenameDate?.isValid()) {
-        const dailyNotePath = getDailyNotePath(settings, fileBasenameDate.toDate(), false);
-        if (app.vault.getAbstractFileByPath(dailyNotePath) == null) {
-            if (shouldWait){
-                new Notice(`Daily note ${file.name} created by external plugin, will be renamed to `+
-                    dailyNotePath + " in 1 second.", 2500);
-                await new Promise((resolve) => setTimeout(resolve, 1000));
-            }
-            const dailyNoteDir = dailyNotePath.substring(0, dailyNotePath.lastIndexOf("/"));
-            createDirsIfNotExists(app, dailyNoteDir);
-            if (!noTemplate) {
-                // add template
-                const templateFile = app.vault.getAbstractFileByPath(settings.templateFile);
-                if (templateFile instanceof TFile) {
-                    let template = await app.vault.read(templateFile);
-                    await app.vault.modify(file, template);
-                    new Notice(`Template "${settings.templateFile}" applied to ${dailyNotePath}`);
+        let dailyNotePath = getDailyNotePath(settings, fileBasenameDate.toDate(), false);
+        let attempt = 0;
+        while (true) {
+            if (app.vault.getAbstractFileByPath(dailyNotePath) == null) {
+                if (shouldWait){
+                    new Notice(`Daily note ${file.name} created by external plugin, will be renamed to `+
+                        dailyNotePath + " in 1 second.", 2500);
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
                 }
-            }
-            if (copyInstead) {
-                await app.vault.copy(file, dailyNotePath);
-                new Notice("Daily note copied to " + dailyNotePath, 2500);
+                const dailyNoteDir = dailyNotePath.substring(0, dailyNotePath.lastIndexOf("/"));
+                createDirsIfNotExists(app, dailyNoteDir);
+                if (!noTemplate) {
+                    // add template
+                    const templateFile = app.vault.getAbstractFileByPath(settings.templateFile);
+                    if (templateFile instanceof TFile) {
+                        let template = await app.vault.read(templateFile);
+                        await app.vault.modify(file, template);
+                        new Notice(`Template "${settings.templateFile}" applied to ${dailyNotePath}`);
+                    }
+                }
+                if (copyInstead) {
+                    await app.vault.copy(file, dailyNotePath);
+                    new Notice("Daily note copied to " + dailyNotePath, 2500);
+                }
+                else {
+                    await app.vault.rename(file, dailyNotePath);
+                    new Notice("Daily note renamed to " + dailyNotePath, 2500);
+                }
+                return dailyNotePath;
             }
             else {
-                await app.vault.rename(file, dailyNotePath);
-                new Notice("Daily note renamed to " + dailyNotePath, 2500);
+                attempt += 1;
+                dailyNotePath = dailyNotePath.replace(".md", ` ${attempt}.md`);
+                new Notice(`Daily note ${file.name} created by external plugin, `+
+                    `but a daily note with the same name "${dailyNotePath}" already exists. `+
+                    `Will attempt to rename to "${dailyNotePath}"`, 2500);
             }
-            return dailyNotePath;
-        }
-        else {
-            return `already exists: ${dailyNotePath}`;
         }
     }
     return "not daily note";
