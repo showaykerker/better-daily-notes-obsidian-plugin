@@ -82,10 +82,15 @@ export async function moveDailyNote(
             }
             else {
                 attempt += 1;
-                dailyNotePath = dailyNotePath.replace(".md", ` ${attempt}.md`);
+                if (attempt > 1){
+                    dailyNotePath = dailyNotePath.replace(` ${attempt-1}.md`, ` ${attempt}.md`);
+                }
+                else {
+                    dailyNotePath = dailyNotePath.replace(".md", ` ${attempt}.md`);
+                }
                 new Notice(`Daily note ${file.name} created by external plugin, `+
                     `but a daily note with the same name "${dailyNotePath}" already exists. `+
-                    `Will attempt to rename to "${dailyNotePath}"`, 2500);
+                    `Will attempt to rename to "${dailyNotePath}"`, 5000);
             }
         }
     }
