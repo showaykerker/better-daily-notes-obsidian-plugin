@@ -272,6 +272,17 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					this.display();
 				}));
 		if (!this.plugin.settings.disableCompatibilityMode) {
+			new Setting(containerEl)
+				.setName('Compatibility Wait Time')
+				.setDesc('The time to wait for other plugins to load before rename and/ or moving the file to desired folder. ' +
+					'Increase this value if plugins such as Templater are not working properly.' )
+				.addText(text => text
+					.setPlaceholder(this.plugin.settings.compatibleWaitTime.toString())
+					.setValue(this.plugin.settings.compatibleWaitTime.toString())
+					.onChange(async (value) => {
+						this.plugin.settings.compatibleWaitTime = parseInt(value);
+						await this.plugin.saveSettings();
+					}));
 			containerEl.createEl('h4', {text: 'Compatible Date Formats', cls: 'setting-item-name'})
 			containerEl.createEl('p', {
 				text: 'The date formats that are compatible with this plugin. ',

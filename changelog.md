@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.3.5
+### Features
+- Add setting to change wait time after daily notes created by external plugins.
 
 ## 0.3.4-hf2
 ### Fixes

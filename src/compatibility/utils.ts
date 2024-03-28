@@ -76,9 +76,9 @@ export async function moveDailyNote(
                 if (shouldWait){
                     createNotice(app, settings,
                         `Daily note ${file.name} created by external plugin, will be renamed to `+
-                            dailyNotePath + " in 2 second.",
+                            `${dailyNotePath} in ${settings.compatibleWaitTime/1000} second.`,
                         'info');
-                    await new Promise((resolve) => setTimeout(resolve, 2000));
+                    await new Promise((resolve) => setTimeout(resolve, settings.compatibleWaitTime));
                 }
                 if (copyInstead) {
                     await app.vault.copy(file, dailyNotePath);

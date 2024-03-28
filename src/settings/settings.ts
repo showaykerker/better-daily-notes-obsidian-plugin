@@ -22,6 +22,7 @@ export interface BetterDailyNotesSettings {
 
 	disableCompatibilityMode: boolean;
 	compatibleDateFormats: string[];
+	compatibleWaitTime: number;
 
 	debugMode: boolean;
 }
@@ -49,6 +50,7 @@ export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 
 	disableCompatibilityMode: false,
 	compatibleDateFormats: ["AUTO"],
+	compatibleWaitTime: 2000,
 
 	debugMode: false
 }
