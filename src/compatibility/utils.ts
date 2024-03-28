@@ -36,6 +36,7 @@ export async function moveDailyNote(
         shouldWait: boolean,
         noTemplate: boolean,
         copyInstead: boolean): Promise<string> {
+    console.log(`moveDailyNote: ${file_}. shouldWait: ${shouldWait}. noTemplate: ${noTemplate}. copyInstead: ${copyInstead}`);
     let file = file_ instanceof TFile ? file_ : app.metadataCache.getFirstLinkpathDest(file_, "");
     if (file == null) return "null";
     if (!(file.extension === "md")) return "not .md file";
@@ -54,13 +55,6 @@ export async function moveDailyNote(
         let attempt = 0;
         while (true) {
             if (app.vault.getAbstractFileByPath(dailyNotePath) == null) {
-                if (shouldWait){
-                    createNotice(app, settings,
-                        `Daily note ${file.name} created by external plugin, will be renamed to `+
-                            dailyNotePath + " in 1 second.",
-                        'info');
-                    await new Promise((resolve) => setTimeout(resolve, 1000));
-                }
                 const dailyNoteDir = dailyNotePath.substring(0, dailyNotePath.lastIndexOf("/"));
                 createDirsIfNotExists(app, dailyNoteDir);
                 if (!noTemplate) {
@@ -78,6 +72,13 @@ export async function moveDailyNote(
                                 `because the file already contains content.`, 'warning');
                         }
                     }
+                }
+                if (shouldWait){
+                    createNotice(app, settings,
+                        `Daily note ${file.name} created by external plugin, will be renamed to `+
+                            dailyNotePath + " in 1 second.",
+                        'info');
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
                 }
                 if (copyInstead) {
                     await app.vault.copy(file, dailyNotePath);

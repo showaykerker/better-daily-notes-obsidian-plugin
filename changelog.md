@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.4-hf1
+### Fixes
+- Compatibility mode templater failed issue
+
 ## 0.3.4
 
 ### Features

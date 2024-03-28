@@ -30,7 +30,6 @@ export function createNotice(app: App, settings: BetterDailyNotesSettings, messa
     assert(['none', 'error', 'warning', 'info'].includes(level), `Invalid notice level: ${level}`);
     // level 0: none, 1: error, 2: warning, 3: info
     let noticeLevel = noticeStringToNumber(level);
-    console.log(`noticeLevel: ${noticeLevel}, settings.noticeLevel: ${settings.noticeLevel}`);
     if (noticeLevel <= settings.noticeLevel) {
         new Notice(message, settings.noticeDuration);
     }
