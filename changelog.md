@@ -1,5 +1,10 @@
 # Changelog
 
+
+## 0.3.4-hf2
+### Fixes
+- Compatibility mode templater failed issue. Try to solve be adding wait time before moving.
+
 ## 0.3.4-hf1
 ### Fixes
 - Compatibility mode templater failed issue
