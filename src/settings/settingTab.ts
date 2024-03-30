@@ -27,8 +27,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 			this.plugin.settings.templateFile = '';
 		}
 		containerEl.empty();
-		containerEl.createEl('h1', {text: 'Better Daily Notes', cls: 'section-header'});
-		containerEl.createEl('h2', {text: 'Notice Settings', cls: 'section-header'});
+		new Setting(containerEl).setName('Notice Settings').setHeading();
 		new Setting(containerEl)
 			.setName('Notice Level')
 			.setDesc('The level of notices to display.')
@@ -58,8 +57,9 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					}));
 		}
 
+
 		containerEl.createEl('hr');
-		containerEl.createEl('h2', {text: 'Daily Notes Configuration', cls: 'section-header'});
+		new Setting(containerEl).setName('Daily Notes Configuration').setHeading();
 		new Setting(containerEl)
 			.setName('Date Format')
 			.setDesc('The date format for the daily notes. (Using Dayjs)')
@@ -127,8 +127,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 				}));
 
 		containerEl.createEl('hr');
-		containerEl.createEl('h2', {
-			text: 'File Handling Configuration', cls: 'section-header'});
+		new Setting(containerEl).setName('File Handling Configuration').setHeading();
 		containerEl.createEl('p', {
 			text: 'The plugin handles drop and paste events, ',
 			cls: 'setting-item-description' });
@@ -218,7 +217,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 		}
 
 		containerEl.createEl('hr');
-		containerEl.createEl('h2', {text: 'Summary Page Configuration', cls: 'section-header'});
+		new Setting(containerEl).setName('Summary Page Configuration').setHeading();
 		containerEl.createEl('p', {text: "Summary page is a page that summarizes the daily notes from the past few days. " +
 			" If enabled, the feature will be available in the command palette and as ribbon icon. ", cls: 'setting-item-description'});
 
@@ -257,7 +256,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 		}
 
 		containerEl.createEl('hr');
-		containerEl.createEl('h2', {text: 'Compatibility Mode', cls: 'section-header'});
+		new Setting(containerEl).setName('Compatibility Mode').setHeading();
 		new Setting(containerEl)
 			.setName('Compatibility Mode')
 			.setDesc(
