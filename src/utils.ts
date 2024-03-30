@@ -6,33 +6,9 @@ import { assert } from 'console';
 const customParseFormat = require('dayjs/plugin/customParseFormat');
 dayjs.extend(customParseFormat);
 
-function noticeStringToNumber(level: string): number{
-    let stringToNumberDict: { [key: string]: number } = {
-        'none': 0,
-        'error': 1,
-        'warning': 2,
-        'info': 3
-    };
-    return stringToNumberDict[level];
-}
-
-function noticeNumberToString(level: number): string{
-    let numberToStringDict: { [key: number]: string } = {
-        0: 'none',
-        1: 'error',
-        2: 'warning',
-        3: 'info'
-    }
-    return numberToStringDict[level];
-}
 
 export function createNotice(app: App, settings: BetterDailyNotesSettings, message: string, level: string = 'info') {
-    assert(['none', 'error', 'warning', 'info'].includes(level), `Invalid notice level: ${level}`);
-    // level 0: none, 1: error, 2: warning, 3: info
-    let noticeLevel = noticeStringToNumber(level);
-    if (noticeLevel <= settings.noticeLevel) {
-        new Notice(message, settings.noticeDuration);
-    }
+    new Notice(message, settings.noticeDuration);
 }
 
 export function openOrSwitchToNote(app: App, dailyNotePath: string) {
