@@ -1,24 +1,6 @@
 # Changelog
 
-## 0.3.5
-### Features
-- Add setting to change wait time after daily notes created by external plugins.
-
-### Refactor
-- compatibility: rename configuration.
-- settings: modify from header to .setHeading()
-- settings: disable log level
-
-## 0.3.4-hf2
-### Fixes
-- Compatibility mode templater failed issue. Try to solve be adding wait time before moving.
-
-## 0.3.4-hf1
-### Fixes
-- Compatibility mode templater failed issue
-
-## 0.3.4
-
+## 0.3.6
 ### Features
 - compatibility: isolate main functionality from event listener to utils
 - logging: add settings for notice level
@@ -26,9 +8,12 @@
 ### Refactor
 - compatibility: rename rather than fallback when target exists
 - compatibility: use template only when the original file is empty
-
+- compatibility: rename configuration.
+- settings: modify from header to .setHeading()
+- settings: disable log level
 
 ### Fixes
+- Compatibility mode templater failed issue
 - Summary page skip some notes when updated before assumeSameDayHours.
 
 ## 0.3.3

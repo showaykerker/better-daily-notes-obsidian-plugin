@@ -65,6 +65,10 @@ export async function moveDailyNote(
                         if (!originalContent) {
                             const template = await app.vault.read(templateFile);
                             await app.vault.modify(file, template);
+                            if ("templater-obsidian:replace-in-file-templater" in this.app.commands.commands) {
+                                console.log("moveDailyNote: executing templater-obsidian:replace-in-file-templater command");
+                                await this.app.commands.executeCommandById("templater-obsidian:replace-in-file-templater");
+                            }
                             createNotice(app, settings, `Template "${settings.templateFile}" applied to ${dailyNotePath}`, 'info');
                         }
                         else {
@@ -76,9 +80,9 @@ export async function moveDailyNote(
                 if (shouldWait){
                     createNotice(app, settings,
                         `Daily note ${file.name} created by external plugin, will be renamed to `+
-                            `${dailyNotePath} in ${settings.compatibleWaitTime/1000} second.`,
+                            `${dailyNotePath} in 1 second.`,
                         'info');
-                    await new Promise((resolve) => setTimeout(resolve, settings.compatibleWaitTime));
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
                 }
                 if (copyInstead) {
                     await app.vault.copy(file, dailyNotePath);
