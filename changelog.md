@@ -4,6 +4,7 @@
 
 ### Features
 - Add live preview of date format
+- Add an extra button to clear template file path
 
 ### Refactors
 - Slightly refactor settings for readability

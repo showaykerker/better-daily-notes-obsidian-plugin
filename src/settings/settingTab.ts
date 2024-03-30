@@ -98,6 +98,16 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 				.setName('Template File Location')
 				.setDesc('The location of the template file for the daily notes. ' +
 					'Leave it blank to disable this feature.')
+				.addExtraButton(button => button
+					.setIcon('cross')
+					.setTooltip('Clear')
+					.onClick(async () => {
+						templateSetting.settingEl.classList.remove('invalid-path');
+						this.plugin.settings.templateFile = '';
+						await this.plugin.saveSettings();
+						createNotice(this.plugin.settings, 'Template file disabled.', 2);
+						this.display();
+					}))
 				.addText(text => text
 					.setPlaceholder(this.plugin.settings.templateFile)
 					.setValue(this.plugin.settings.templateFile)
@@ -111,12 +121,14 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 							this.plugin.settings.templateFile = value;
 							await this.plugin.saveSettings();
 							createNotice(this.plugin.settings, 'Template file set to: ' + value, 2);
+							this.display();
 						}
 						else if (value === '/') {
 							templateSetting.settingEl.classList.remove('invalid-path');
 							createNotice(this.plugin.settings, 'Template file disabled.', 2);
 							this.plugin.settings.templateFile = '';
 							await this.plugin.saveSettings();
+							this.display();
 						}
 						else {
 							templateSetting.setClass('invalid-path');
