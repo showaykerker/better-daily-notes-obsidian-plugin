@@ -1,6 +1,8 @@
 # Changelog
 
 ## 0.3.8
+### Features
+- Add live preview of date format
 
 ### Chore
 - Rename from "Better Daily Notes Plugin" to "Better Daily Note"

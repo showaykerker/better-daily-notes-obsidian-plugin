@@ -72,6 +72,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					const preview = containerEl.getElementsByClassName('preview-date-format')[0];
 					preview.setText(`Current format looks like: "${formatDate(this.plugin.settings.dateFormat)}"`);
 					await this.plugin.saveSettings();
+					this.display();
 				}));
 		containerEl.createEl('p', {
 			text: `Current format looks like: "${formatDate(this.plugin.settings.dateFormat)}"`,
