@@ -4,6 +4,9 @@
 ### Features
 - Add setting to change wait time after daily notes created by external plugins.
 
+### Refactor
+- compatibility: rename configuration.
+
 ## 0.3.4-hf2
 ### Fixes
 - Compatibility mode templater failed issue. Try to solve be adding wait time before moving.

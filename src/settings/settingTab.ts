@@ -259,19 +259,19 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 		containerEl.createEl('hr');
 		containerEl.createEl('h2', {text: 'Compatibility Mode', cls: 'section-header'});
 		new Setting(containerEl)
-			.setName('Disable Compatibility Mode')
-			.setDesc('Disable compatibility mode. ' +
+			.setName('Compatibility Mode')
+			.setDesc(
 				'If you don\'t wish to be compatible with other plugins such as "Calendar", ' +
 				'you\'ll need to disable this feature. ' +
 				'Modify this setting will require restart of the app.')
 			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.disableCompatibilityMode)
+				.setValue(this.plugin.settings.compatibilityMode)
 				.onChange(async (value) => {
-					this.plugin.settings.disableCompatibilityMode = value;
+					this.plugin.settings.compatibilityMode = value;
 					await this.plugin.saveSettings();
 					this.display();
 				}));
-		if (!this.plugin.settings.disableCompatibilityMode) {
+		if (this.plugin.settings.compatibilityMode) {
 			new Setting(containerEl)
 				.setName('Compatibility Wait Time')
 				.setDesc('The time to wait for other plugins to load before rename and/ or moving the file to desired folder. ' +

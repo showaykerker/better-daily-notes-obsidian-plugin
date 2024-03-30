@@ -20,7 +20,7 @@ export interface BetterDailyNotesSettings {
 	summaryPageFile: string;
 	summaryOfDaysCount: number;
 
-	disableCompatibilityMode: boolean;
+	compatibilityMode: boolean;
 	compatibleDateFormats: string[];
 	compatibleWaitTime: number;
 
@@ -48,7 +48,7 @@ export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	summaryPageFile: 'summary',
 	summaryOfDaysCount: 7,
 
-	disableCompatibilityMode: false,
+	compatibilityMode: true,
 	compatibleDateFormats: ["AUTO"],
 	compatibleWaitTime: 2000,
 
