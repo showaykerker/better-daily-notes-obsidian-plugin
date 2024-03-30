@@ -119,7 +119,7 @@ This plugin is built with TypeScript. Here's how to contribute:
 - [ ] Migrating existed daily notes.
 - [ ] Rollover daily notes TODOs.
 - [ ] Handle create event and editor-drop event for file management.
-- [ ] Use svelte in configuration interface.
+- [ ] Improve settings interface.
 - [ ] Language support.
 
 ## Feature Ideas
