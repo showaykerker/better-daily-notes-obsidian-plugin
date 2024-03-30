@@ -40,17 +40,17 @@ export async function createDailyNotesCommands(plugin: BetterDailyNotePlugin) {
             const curr = plugin.settings.maxImageSizeKB;
             const cache = plugin.settings.maxImageSizeKBCache;
             if (curr == -1 && cache == -1) {
-                createNotice(plugin.app, plugin.settings, "Nothing happens because image compression is already disabled.", "error");
+                createNotice(plugin.settings, "Nothing happens because image compression is already disabled.", 0);
                 return;
             }
             else if (curr == -1 && cache != -1) {
-                createNotice(plugin.app, plugin.settings, "Image compression is now ENABLED.\n" +
-                    "Set back to maximum size: " + cache + "KB.", "warning");
+                createNotice(plugin.settings, "Image compression is now ENABLED.\n" +
+                    "Set back to maximum size: " + cache + "KB.");
             }
             else if (curr != -1 && cache == -1) {
-                createNotice(plugin.app, plugin.settings, "Image compression is now DISABLED.\n" +
+                createNotice(plugin.settings, "Image compression is now DISABLED.\n" +
                     "Execute the command again to set it back to maximum size: " + curr + "KB.\n" +
-                    "Will be set back automatically when restart.", "warning");
+                    "Will be set back automatically when restart.");
             }
             plugin.settings.maxImageSizeKB = cache;
             plugin.settings.maxImageSizeKBCache = curr;
@@ -87,15 +87,15 @@ export async function openDailyNote(
     const targetNotePath = getDailyNotePath(settings, date, true);
 
     if (!app.vault.getAbstractFileByPath(targetNotePath)) {
+        await createDirIfNotExists(app, rootDir, assumeSameDayBeforeHour, date);
         const templateFile = app.vault.getAbstractFileByPath(settings.templateFile);
         if (templateFile instanceof TFile) {
             let template = await app.vault.read(templateFile);
-            await createDirIfNotExists(app, rootDir, assumeSameDayBeforeHour, date);
             await app.vault.create(targetNotePath, template);
-            createNotice(app, settings, "Daily Note \"" + targetNotePath + "\"" +
-                " with template \"" + settings.templateFile + "\" created!", "info");
+            createNotice(settings, "Daily Note \"" + targetNotePath + "\"" +
+                " with template \"" + settings.templateFile + "\" created!", 0);
         } else {
-            // createNotice(app, settings, "Template File " + settings.templateFile + " not found!", "warning");
+            createNotice(settings, "Daily Note \"" + targetNotePath + "\" created!", 0);
         }
     }
     openOrSwitchToNote(app, targetNotePath);

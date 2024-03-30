@@ -1,7 +1,5 @@
 import {App, normalizePath, PluginSettingTab, Setting} from 'obsidian';
 import { createNotice, formatDate, isValidDateFormat } from '../utils';
-import { create } from 'domain';
-
 
 export class BetterDailyNotesSettingTab extends PluginSettingTab {
 	plugin: any;
@@ -22,29 +20,29 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 		const {containerEl} = this;
 
 		if (!this.templateExists()) {
-			createNotice(this.app, this.plugin.settings, `Template file ${this.plugin.settings.templateFile} not found. `+
-				'Please modify path to the template file.', 'error');
+			createNotice(this.plugin.settings, `Template file ${this.plugin.settings.templateFile} not found. `+
+				'Please modify path to the template file.', 0);
 			this.plugin.settings.templateFile = '';
 		}
 		containerEl.empty();
 		new Setting(containerEl).setName('Notice Settings').setHeading();
-		// new Setting(containerEl)
-		// 	.setName('Notice Level')
-		// 	.setDesc('The level of notices to display.')
-		// 	.addDropdown(dropdown => dropdown
-		// 		.addOptions({
-		// 			0: 'None',
-		// 			1: 'Error',
-		// 			2: 'Warning',
-		// 			3: 'Info',
-		// 		})
-		// 		.setValue(this.plugin.settings.noticeLevel)
-		// 		.onChange(async (value) => {
-		// 			this.plugin.settings.noticeLevel = value;
-		// 			await this.plugin.saveSettings();
-		// 			this.display();
-		// 		}));
-		if (this.plugin.settings.noticeLevel > 0) {
+		new Setting(containerEl)
+			.setName('Notice Level')
+			.setDesc('The level of notices to display.')
+			.addDropdown(dropdown => dropdown
+				.addOptions({
+					0: 'Show Me Everything',
+					1: 'Normal',
+					2: 'Show Me Only Important Things',
+					3: 'Show Me Nothing'
+				})
+				.setValue(this.plugin.settings.noticeLevel)
+				.onChange(async (value) => {
+					this.plugin.settings.noticeLevel = value;
+					await this.plugin.saveSettings();
+					this.display();
+				}));
+		if (this.plugin.settings.noticeLevel < 3) {
 			new Setting(containerEl)
 				.setName('Notice Duration')
 				.setDesc('The duration of notices to display.')

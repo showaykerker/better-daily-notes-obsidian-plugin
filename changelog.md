@@ -1,6 +1,10 @@
 # Changelog
 
 ## 0.3.7
+
+### Refactor
+- Refactor notice levels to be better understood
+
 ### Fixes
 - Fix template not possible to disable error
 

@@ -40,7 +40,7 @@ export async function limitImageFileSize(settings: BetterDailyNotesSettings, fil
         useWebWorker: true,
         preserveExifData: settings.preserveExifData,
     };
-    createNotice(app, settings, `Compressing image "${file.name}" to ${settings.maxImageSizeKB}KB`, "info");
+    createNotice(settings, `Compressing image "${file.name}" to ${settings.maxImageSizeKB}KB`, 0);
     const compressedFile = await imageCompression(file, options);
     return compressedFile;
 }
@@ -92,10 +92,9 @@ export async function handleFiles(
     // Check if all file types are supported
     for (let i = 0; i < files.length; i++) {
         if (!isFileSupported(files[i])) {
-            createNotice(app, settings,
+            createNotice(settings,
                 `Only image, pdf, and zip files are supported. ` +
-                `Get file "${files[i]?.name}" with type "${files[i].type}" instead.`,
-                "error");
+                `Get file "${files[i]?.name}" with type "${files[i].type}" instead.`, 2);
             return;
         }
     }
@@ -172,7 +171,7 @@ export async function createAndInsertWithFileReader(
     const base64 = reader.result?.toString().split(",")[1];
 
     if (!base64) {
-        createNotice(app, settings, `Failed to create file "${fileName}", base64 is empty.`, "error");
+        createNotice(settings, `Failed to create file "${fileName}", base64 is empty.`, 2);
         return false;
     }
 
@@ -181,7 +180,7 @@ export async function createAndInsertWithFileReader(
 
     filePath = filePath[0] === '/' ? filePath.substring(1) : filePath;
     if (app.vault.getAbstractFileByPath(filePath) && returnTrueIfExists) {
-        createNotice(app, settings, `File "${filePath}" already exists. Inserting link to the existed one.`, "warning");
+        createNotice(settings, `File "${filePath}" already exists. Inserting link to the existed one.`);
         editor.replaceSelection(fileLink);
         return true;
     }
@@ -193,7 +192,7 @@ export async function createAndInsertWithFileReader(
         return true;
     }
     catch (e) {
-        createNotice(app, settings, `Failed to create file "${fileName}".`, "error");
+        createNotice(settings, `Failed to create file "${fileName}". Check console for more information or reach the author.`, 2);
         console.error(e);
         editor.replaceSelection(fileLink);
         return false;

@@ -1,6 +1,6 @@
 
 export interface BetterDailyNotesSettings {
-	noticeLevel: number;  // 0: none, 1: error, 2: warning, 3: info
+	noticeLevel: number;  // 0: can be ignored, 1: normal, 2: important
 	noticeDuration: number;
 
 	dateFormat: string;
@@ -27,7 +27,7 @@ export interface BetterDailyNotesSettings {
 }
 
 export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
-	noticeLevel: 3,
+	noticeLevel: 1,
 	noticeDuration: 5000,
 
 	dateFormat: 'YYYY-MM-DD',

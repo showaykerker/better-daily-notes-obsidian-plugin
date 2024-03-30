@@ -7,7 +7,11 @@ const customParseFormat = require('dayjs/plugin/customParseFormat');
 dayjs.extend(customParseFormat);
 
 
-export function createNotice(app: App, settings: BetterDailyNotesSettings, message: string, level: string = 'info') {
+export function createNotice(settings: BetterDailyNotesSettings, message: string, importance: number = 1) {
+    // importance: 0 = can be ignored, 1 = normal, 2 = important
+    if (importance < settings.noticeLevel) {
+        return;
+    }
     new Notice(message, settings.noticeDuration);
 }
 

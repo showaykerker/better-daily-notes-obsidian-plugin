@@ -69,28 +69,27 @@ export async function moveDailyNote(
                                 console.log("moveDailyNote: executing templater-obsidian:replace-in-file-templater command");
                                 await this.app.commands.executeCommandById("templater-obsidian:replace-in-file-templater");
                             }
-                            createNotice(app, settings, `Template "${settings.templateFile}" applied to ${dailyNotePath}`, 'info');
+                            createNotice(settings, `Template "${settings.templateFile}" applied to ${dailyNotePath}`, 0);
                         }
                         else {
-                            createNotice(app, settings, `Template "${settings.templateFile}" not applied to ${dailyNotePath} `+
-                                `because the file already contains content.`, 'warning');
+                            createNotice(settings, `Template "${settings.templateFile}" not applied to ${dailyNotePath} `+
+                                `because the file already contains content.`);
                         }
                     }
                 }
                 if (shouldWait){
-                    createNotice(app, settings,
+                    createNotice(settings,
                         `Daily note ${file.name} created by external plugin, will be renamed to `+
-                            `${dailyNotePath} in 1 second.`,
-                        'info');
+                            `${dailyNotePath} in 1 second.`, 0);
                     await new Promise((resolve) => setTimeout(resolve, 1000));
                 }
                 if (copyInstead) {
                     await app.vault.copy(file, dailyNotePath);
-                    createNotice(app, settings, `Daily note copied to ${dailyNotePath}`, 'info');
+                    createNotice(settings, `Daily note copied to ${dailyNotePath}`, 0);
                 }
                 else {
                     await app.vault.rename(file, dailyNotePath);
-                    createNotice(app, settings, `Daily note renamed to ${dailyNotePath}`, 'info');
+                    createNotice(settings, `Daily note renamed to ${dailyNotePath}`, 0);
                 }
                 return dailyNotePath;
             }
@@ -102,9 +101,9 @@ export async function moveDailyNote(
                 else {
                     dailyNotePath = dailyNotePath.replace(".md", ` ${attempt}.md`);
                 }
-                createNotice(app, settings, `Daily note ${file.name} created by external plugin, `+
+                createNotice(settings, `Daily note ${file.name} created by external plugin, `+
                     `but a daily note with the same name "${dailyNotePath}" already exists. `+
-                    `Will attempt to rename to "${dailyNotePath}"`, 'warning');
+                    `Will attempt to rename to "${dailyNotePath}"`);
             }
         }
     }

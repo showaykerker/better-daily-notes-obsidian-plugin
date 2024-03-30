@@ -24,9 +24,9 @@ export async function createCompatibilityEventListener(plugin: BetterDailyNotePl
                     let moveResult = await moveDailyNote(plugin.app, plugin.settings, file, true, false, false);
                     if (moveResult.startsWith("already exists")){
                         const dailyNotePath = moveResult.split(": ")[1];
-                        createNotice(plugin.app, plugin.settings,"Daily note created by external plugin, " +
+                        createNotice(plugin.settings,"Daily note created by external plugin, " +
                             `but a daily note with the same name "${dailyNotePath}" already exists.` +
-                            "No action will be taken.", 'warning');
+                            "No action will be taken.");
                     }
                 }
             )

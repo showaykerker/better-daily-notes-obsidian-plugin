@@ -31,7 +31,7 @@ export async function updateSummaryPage(
         open: boolean): Promise<void> {
 
     if (!settings.enableSummaryPage) {
-        createNotice(app, settings, "Summary Page is disabled. Not opening the summary page.");
+        createNotice(settings, "Summary Page is disabled. Not opening the summary page.", 0);
         return;
     }
     const summaryPagePath = settings.rootDir + '/' + settings.summaryPageFile + '.md';
