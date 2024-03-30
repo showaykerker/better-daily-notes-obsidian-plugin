@@ -19,12 +19,17 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 	display(): void {
 		const {containerEl} = this;
 
-		if (!this.templateExists()) {
-			createNotice(this.plugin.settings, `Template file ${this.plugin.settings.templateFile} not found. `+
-				'Please modify path to the template file.', 0);
-			this.plugin.settings.templateFile = '';
-		}
 		containerEl.empty();
+
+		this.setNoticeSettings(containerEl);
+		this.setGeneralSettings(containerEl);
+		this.setFileHandlingSettings(containerEl);
+		this.setSummaryPageSettings(containerEl);
+		this.setCompatibilitySettings(containerEl);
+
+	}
+
+	setNoticeSettings(containerEl: HTMLElement) {
 		new Setting(containerEl).setName('Notice Settings').setHeading();
 		new Setting(containerEl)
 			.setName('Notice Level')
@@ -54,9 +59,9 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}));
 		}
+	}
 
-
-		containerEl.createEl('hr');
+	setGeneralSettings(containerEl: HTMLElement) {
 		new Setting(containerEl).setName('Daily Notes Configuration').setHeading();
 		new Setting(containerEl)
 			.setName('Date Format')
@@ -131,8 +136,9 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					this.plugin.settings.assumeSameDayBeforeHour = parseInt(value);
 					await this.plugin.saveSettings();
 				}));
+	}
 
-		containerEl.createEl('hr');
+	setFileHandlingSettings(containerEl: HTMLElement) {
 		new Setting(containerEl).setName('File Handling Configuration').setHeading();
 		containerEl.createEl('p', {
 			text: 'The plugin handles drop and paste events, ',
@@ -221,8 +227,9 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}));
 		}
+	}
 
-		containerEl.createEl('hr');
+	setSummaryPageSettings(containerEl: HTMLElement) {
 		new Setting(containerEl).setName('Summary Page Configuration').setHeading();
 		containerEl.createEl('p', {text: "Summary page is a page that summarizes the daily notes from the past few days. " +
 			" If enabled, the feature will be available in the command palette and as ribbon icon. ", cls: 'setting-item-description'});
@@ -260,8 +267,9 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}));
 		}
+	}
 
-		containerEl.createEl('hr');
+	setCompatibilitySettings(containerEl: HTMLElement) {
 		new Setting(containerEl).setName('Compatibility Mode').setHeading();
 		new Setting(containerEl)
 			.setName('Compatibility Mode')
@@ -313,19 +321,5 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 			});
 			containerEl.appendChild(input);
 		}
-
-		// containerEl.createEl('hr');
-		// containerEl.createEl('h2', {text: 'Developer Option', cls: 'section-header'});
-		// containerEl.createEl('p', {text: 'This section is for debugging purposes. ' +
-		// 	'Please do not modify these settings unless you know what you are doing.'});
-		// new Setting(containerEl)
-		// 	.setName('Debug Mode')
-		// 	.setDesc('Enable debug mode. This will show debug message as Notice (that is really annoying).')
-		// 	.addToggle(toggle => toggle
-		// 		.setValue(this.plugin.settings.debugMode)
-		// 		.onChange(async (value) => {
-		// 			this.plugin.settings.debugMode = value;
-		// 			await this.plugin.saveSettings();
-		// 		}));
 	}
 }

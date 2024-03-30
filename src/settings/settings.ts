@@ -23,7 +23,6 @@ export interface BetterDailyNotesSettings {
 	compatibilityMode: boolean;
 	compatibleDateFormats: string[];
 
-	debugMode: boolean;
 }
 
 export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
@@ -31,13 +30,13 @@ export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	noticeDuration: 5000,
 
 	dateFormat: 'YYYY-MM-DD',
-	rootDir: 'daily-notes',
+	rootDir: 'Daily Notes',
 	templateFile: '',
 	assumeSameDayBeforeHour: 2,
 
 	fileHandlingScenario: 'daily notes only',
 	imageSubDir: 'images',
-	otherFilesSubDir: 'other',
+	otherFilesSubDir: 'attachments',
 	maxImageSizeKB: -1,
 	maxImageSizeKBCache: -1,
 	preserveExifData: true,
@@ -50,5 +49,4 @@ export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	compatibilityMode: true,
 	compatibleDateFormats: ["AUTO"],
 
-	debugMode: false
 }

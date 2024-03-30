@@ -1,11 +1,18 @@
 # Changelog
 
-## 0.3.8
+## 0.3.8 pre-release
+
 ### Features
 - Add live preview of date format
 
+### Refactors
+- Slightly refactor settings for readability
+- Modify default folder name from "daily-notes" to "Daily Notes"
+- Modify default attachments folder name from "other" to "attachments"
+
 ### Chore
 - Rename from "Better Daily Notes Plugin" to "Better Daily Note"
+- Rename header of pre-release in changelog
 
 ## 0.3.7
 
