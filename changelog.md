@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.7
+### Fixes
+- Fix template not possible to disable error
+
+
 ## 0.3.6
 ### Features
 - compatibility: isolate main functionality from event listener to utils

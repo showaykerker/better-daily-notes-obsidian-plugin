@@ -106,8 +106,15 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 							templateSetting.settingEl.classList.remove('invalid-path');
 							this.plugin.settings.templateFile = value;
 							await this.plugin.saveSettings();
-							createNotice(this.app, this.plugin.settings, 'Template file set to: ' + value, 'info');
-						} else {
+							createNotice(this.plugin.settings, 'Template file set to: ' + value, 2);
+						}
+						else if (value === '/') {
+							templateSetting.settingEl.classList.remove('invalid-path');
+							createNotice(this.plugin.settings, 'Template file disabled.', 2);
+							this.plugin.settings.templateFile = '';
+							await this.plugin.saveSettings();
+						}
+						else {
 							templateSetting.setClass('invalid-path');
 						}
 					}));
