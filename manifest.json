@@ -1,6 +1,6 @@
 {
 	"id": "better-daily-notes",
-	"name": "Better Daily Notes Plugin",
+	"name": "Better Daily Notes",
 	"version": "0.3.7",
 	"minAppVersion": "0.15.0",
 	"description": "Enhances the management of daily notes and files in a more structured manner.",

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.8
+
+### Chore
+- Rename from "Better Daily Notes Plugin" to "Better Daily Note"
+
 ## 0.3.7
 
 ### Refactor
