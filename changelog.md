@@ -6,6 +6,8 @@
 
 ### Refactor
 - compatibility: rename configuration.
+- settings: modify from header to .setHeading()
+- settings: disable log level
 
 ## 0.3.4-hf2
 ### Fixes

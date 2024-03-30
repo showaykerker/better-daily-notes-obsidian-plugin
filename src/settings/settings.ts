@@ -28,7 +28,7 @@ export interface BetterDailyNotesSettings {
 }
 
 export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
-	noticeLevel: 1,
+	noticeLevel: 3,
 	noticeDuration: 5000,
 
 	dateFormat: 'YYYY-MM-DD',

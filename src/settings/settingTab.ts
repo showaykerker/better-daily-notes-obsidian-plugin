@@ -28,22 +28,22 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 		}
 		containerEl.empty();
 		new Setting(containerEl).setName('Notice Settings').setHeading();
-		new Setting(containerEl)
-			.setName('Notice Level')
-			.setDesc('The level of notices to display.')
-			.addDropdown(dropdown => dropdown
-				.addOptions({
-					0: 'None',
-					1: 'Error',
-					2: 'Warning',
-					3: 'Info',
-				})
-				.setValue(this.plugin.settings.noticeLevel)
-				.onChange(async (value) => {
-					this.plugin.settings.noticeLevel = value;
-					await this.plugin.saveSettings();
-					this.display();
-				}));
+		// new Setting(containerEl)
+		// 	.setName('Notice Level')
+		// 	.setDesc('The level of notices to display.')
+		// 	.addDropdown(dropdown => dropdown
+		// 		.addOptions({
+		// 			0: 'None',
+		// 			1: 'Error',
+		// 			2: 'Warning',
+		// 			3: 'Info',
+		// 		})
+		// 		.setValue(this.plugin.settings.noticeLevel)
+		// 		.onChange(async (value) => {
+		// 			this.plugin.settings.noticeLevel = value;
+		// 			await this.plugin.saveSettings();
+		// 			this.display();
+		// 		}));
 		if (this.plugin.settings.noticeLevel > 0) {
 			new Setting(containerEl)
 				.setName('Notice Duration')
