@@ -176,7 +176,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 			cls: 'setting-item-description'});
 		containerEl.createEl(
 			'p', {
-			text: 'Currently, the plugin only supports handling of images, pdfs, and zips.',
+			text: 'Currently, the plugin supports handling of images, videos, pdfs, and zips.',
 			cls: 'setting-item-description' });
 		new Setting(containerEl)
 			.setName('File Handling')
@@ -205,6 +205,16 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.imageSubDir)
 					.onChange(async (value) => {
 						this.plugin.settings.imageSubDir = value;
+						await this.plugin.saveSettings();
+					}));
+			new Setting(containerEl)
+				.setName('Video Subdirectory')
+				.setDesc('The subdirectory for video files.')
+				.setClass('video-subdir')
+				.addText(text => text
+					.setValue(this.plugin.settings.videoSubDir)
+					.onChange(async (value) => {
+						this.plugin.settings.videoSubDir = value;
 						await this.plugin.saveSettings();
 					}));
 			new Setting(containerEl)

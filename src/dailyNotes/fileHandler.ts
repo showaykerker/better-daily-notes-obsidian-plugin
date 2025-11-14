@@ -24,7 +24,25 @@ export function getNextNumberedImageIndex(app: App, dirPath: string, prefix: str
         file.path.includes(prefix)
     )
     filteredFiles.forEach(file => {
-        const index = (parseInt(file.path.match(/.*-image(-(\d+))?\..*/)![2]) || 0) + 1;
+        const match = file.path.match(/.*-image(-(\d+))?\..*$/);
+        const index = (match?.[2] ? parseInt(match[2]) : 0) + 1;
+        nextIndex = index > nextIndex ? index : nextIndex;
+    });
+    return nextIndex;
+}
+
+export function getNextNumberedVideoIndex(app: App, dirPath: string, prefix: string): number {
+    const files = app.vault.getFiles();
+    let nextIndex = 0;
+    const filteredFiles = files.filter(file =>
+        file.path.startsWith(dirPath) &&
+        file.path.match(/.*-video(-\d+)?\..*/) &&
+        !file.path.endsWith(".md") &&
+        file.path.includes(prefix)
+    )
+    filteredFiles.forEach(file => {
+        const match = file.path.match(/.*-video(-(\d+))?\..*$/);
+        const index = (match?.[2] ? parseInt(match[2]) : 0) + 1;
         nextIndex = index > nextIndex ? index : nextIndex;
     });
     return nextIndex;
@@ -64,6 +82,7 @@ function isFileSupported(file: File): boolean {
     const fileExtension = file.name.split(".").slice(-1)[0];
 
     return file.type.startsWith("image") ||
+        file.type.startsWith("video") ||
         acceptableFileTypes.includes(file.type) ||
         (acceptableFileExtensionsWithEmptyFileType.includes(fileExtension) && file.type === "");
 }
@@ -92,7 +111,7 @@ export async function handleFiles(
     for (let i = 0; i < files.length; i++) {
         if (!isFileSupported(files[i])) {
             createNotice(settings,
-                `Only image, pdf, and zip files are supported. ` +
+                `Only image, video, pdf, and zip files are supported. ` +
                 `Get file "${files[i]?.name}" with type "${files[i].type}" instead.`, 2);
             return;
         }
@@ -130,6 +149,12 @@ export async function handleSingleFile(
         fileSaveSubDir = `${viewParentPath}/${settings.imageSubDir}`;
         filePrefix = `${filePrefix}-image`;
         fileSuffix = getImageNumber === 0 ? "" : `-${getImageNumber}`;
+    }
+    else if (file.type.startsWith("video")) {
+        const getVideoNumber = getNextNumberedVideoIndex(app, fileSaveSubDir, filePrefix);
+        fileSaveSubDir = `${viewParentPath}/${settings.videoSubDir}`;
+        filePrefix = `${filePrefix}-video`;
+        fileSuffix = getVideoNumber === 0 ? "" : `-${getVideoNumber}`;
     }
     else {
         fileSaveSubDir = `${viewParentPath}/${settings.otherFilesSubDir}`;

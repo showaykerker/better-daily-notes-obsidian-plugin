@@ -11,6 +11,7 @@ export interface BetterDailyNotesSettings {
 
 	fileHandlingScenario: string;
 	imageSubDir: string;
+	videoSubDir: string;
 	otherFilesSubDir: string;
 	maxImageSizeKB: number;
 	maxImageSizeKBCache: number
@@ -38,6 +39,7 @@ export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 
 	fileHandlingScenario: 'daily notes only',
 	imageSubDir: 'images',
+	videoSubDir: 'videos',
 	otherFilesSubDir: 'attachments',
 	maxImageSizeKB: -1,
 	maxImageSizeKBCache: -1,
