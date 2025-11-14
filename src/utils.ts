@@ -39,6 +39,11 @@ export function getDailyNoteName(
 
 export function getDailyNotePath(settings: BetterDailyNotesSettings, date: Date = new Date(), considerAssumeSameDayBeforeHour: boolean = true) {
     const noteName = getDailyNoteName(settings.assumeSameDayBeforeHour, settings.dateFormat, date, considerAssumeSameDayBeforeHour);
+
+    if (!settings.useStructuredFolders) {
+        return `${settings.rootDir}/${noteName}.md`;
+    }
+
     const dirPath = getMonthDirPath(settings.rootDir, settings.assumeSameDayBeforeHour, date, considerAssumeSameDayBeforeHour);
     return `${dirPath}/${noteName}.md`;
 }

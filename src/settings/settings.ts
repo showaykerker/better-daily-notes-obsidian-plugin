@@ -7,6 +7,7 @@ export interface BetterDailyNotesSettings {
 	rootDir: string;
 	templateFile: string;
 	assumeSameDayBeforeHour: number;
+	useStructuredFolders: boolean;
 
 	fileHandlingScenario: string;
 	imageSubDir: string;
@@ -33,6 +34,7 @@ export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	rootDir: 'Daily Notes',
 	templateFile: '',
 	assumeSameDayBeforeHour: 2,
+	useStructuredFolders: true,
 
 	fileHandlingScenario: 'daily notes only',
 	imageSubDir: 'images',

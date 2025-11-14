@@ -148,6 +148,16 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					this.plugin.settings.assumeSameDayBeforeHour = parseInt(value);
 					await this.plugin.saveSettings();
 				}));
+
+		new Setting(containerEl)
+			.setName('Use Structured Folders')
+			.setDesc('Organize daily notes in Year/Month subfolders. When disabled, all notes will be saved directly in the root directory.')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.useStructuredFolders)
+				.onChange(async (value) => {
+					this.plugin.settings.useStructuredFolders = value;
+					await this.plugin.saveSettings();
+				}));
 	}
 
 	setFileHandlingSettings(containerEl: HTMLElement) {
