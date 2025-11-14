@@ -49,12 +49,12 @@ export function getMonthDirPath(
         date: Date = new Date(),
         considerAssumeSameDayBeforeHour: boolean = false) {
     // if the current time is before assumeSameDayBeforeHour, assume it is the previous day
-    if (dayjs().get('hour') + 1 < assumeSameDayBeforeHour &&
+    if (dayjs().get('hour') < assumeSameDayBeforeHour &&
             considerAssumeSameDayBeforeHour) {
         date.setDate(date.getDate() - 1);
     }
     const year = date.getFullYear();
-    const monthStr = date.toLocaleString('en-GB', { month: 'short' });
+    const monthStr = dayjs(date).format('MMM');
     return `${rootDir}/${year}/${monthStr}`;
 }
 
