@@ -1,8 +1,86 @@
 /*
-
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
+Better Daily Notes Plugin Styles
 */
+
+/* Section separators */
+.better-daily-notes-section {
+	margin-top: 2em;
+	margin-bottom: 1em;
+	padding-top: 1em;
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.better-daily-notes-section:first-child {
+	margin-top: 0;
+	padding-top: 0;
+	border-top: none;
+}
+
+/* Collapsible section styles */
+.better-daily-notes-collapsible-header {
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	padding: 0.5em 0;
+	user-select: none;
+}
+
+.better-daily-notes-collapsible-header:hover {
+	color: var(--interactive-accent);
+}
+
+.better-daily-notes-collapsible-icon {
+	margin-right: 0.5em;
+	transition: transform 0.2s;
+}
+
+.better-daily-notes-collapsible-icon.collapsed {
+	transform: rotate(-90deg);
+}
+
+.better-daily-notes-collapsible-content {
+	overflow: hidden;
+	transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.better-daily-notes-collapsible-content.collapsed {
+	max-height: 0 !important;
+	opacity: 0;
+}
+
+/* Preview text styling */
+.preview-folder-structure {
+	font-family: var(--font-monospace);
+	color: var(--text-muted);
+	margin-top: 0.5em;
+}
+
+.preview-date-format {
+	font-family: var(--font-monospace);
+	color: var(--text-muted);
+}
+
+/* Invalid path indicator */
+.invalid-path .setting-item-control input {
+	border-color: var(--background-modifier-error);
+	background-color: var(--background-modifier-error-hover);
+}
+
+/* Valid path indicator */
+.valid-path .setting-item-control input {
+	border-color: var(--interactive-success);
+}
+
+/* Help icon tooltip */
+.better-daily-notes-help-icon {
+	margin-left: 0.5em;
+	cursor: help;
+	color: var(--text-muted);
+	opacity: 0.6;
+	transition: opacity 0.2s;
+}
+
+.better-daily-notes-help-icon:hover {
+	opacity: 1;
+	color: var(--interactive-accent);
+}
