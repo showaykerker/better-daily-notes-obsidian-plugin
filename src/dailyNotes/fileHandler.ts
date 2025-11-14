@@ -3,7 +3,6 @@ import { App, Editor, MarkdownView, normalizePath } from "obsidian";
 import { createDirsIfNotExists } from "./fileSystem";
 import { createNotice, checkValidDailyNote } from "../utils";
 import { BetterDailyNotesSettings } from "../settings/settings";
-import { create } from 'domain';
 
 export function base64ToArrayBuffer(base64: string): ArrayBuffer {
     const binaryString = window.atob(base64);
@@ -108,7 +107,7 @@ export async function handleFiles(
 
 export async function handleSingleFile(
     app: App,
-    settings: any,
+    settings: BetterDailyNotesSettings,
     file: File,
     editor: Editor,
     markdownView: MarkdownView,
