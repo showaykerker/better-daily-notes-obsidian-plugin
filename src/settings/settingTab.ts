@@ -151,7 +151,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Use Structured Folders')
-			.setDesc('Organize daily notes in Year/Month subfolders. When disabled, all notes will be saved directly in the root directory.')
+			.setDesc('Organize daily notes in Year/Month subfolders. When disabled, all notes will be saved directly in the "Root Directory" configured above.')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.useStructuredFolders)
 				.onChange(async (value) => {
