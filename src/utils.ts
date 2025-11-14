@@ -2,9 +2,6 @@ import { App, MarkdownView, normalizePath, Notice, TFile } from 'obsidian';
 import dayjs from 'dayjs';
 import { BetterDailyNotesSettings } from './settings/settings';
 
-const customParseFormat = require('dayjs/plugin/customParseFormat');
-dayjs.extend(customParseFormat);
-
 
 export function createNotice(settings: BetterDailyNotesSettings, message: string, importance: number = 1) {
     // importance: 0 = can be ignored, 1 = normal, 2 = important
