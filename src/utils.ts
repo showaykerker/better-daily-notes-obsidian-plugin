@@ -1,7 +1,6 @@
 import { App, MarkdownView, normalizePath, Notice, TFile } from 'obsidian';
 import dayjs from 'dayjs';
 import { BetterDailyNotesSettings } from './settings/settings';
-import { assert } from 'console';
 
 const customParseFormat = require('dayjs/plugin/customParseFormat');
 dayjs.extend(customParseFormat);
