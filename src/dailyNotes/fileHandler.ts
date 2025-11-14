@@ -14,38 +14,32 @@ export function base64ToArrayBuffer(base64: string): ArrayBuffer {
     return bytes.buffer;
 }
 
-export function getNextNumberedImageIndex(app: App, dirPath: string, prefix: string): number {
+export function getNextNumberedFileIndex(app: App, dirPath: string, prefix: string, fileType: string): number {
     const files = app.vault.getFiles();
     let nextIndex = 0;
+    const pattern = new RegExp(`.*-${fileType}(-\\d+)?\\..*`);
+    const capturePattern = new RegExp(`.*-${fileType}(-(\\d+))?\\..*$`);
+
     const filteredFiles = files.filter(file =>
         file.path.startsWith(dirPath) &&
-        file.path.match(/.*-image(-\d+)?\..*/) &&
+        file.path.match(pattern) &&
         !file.path.endsWith(".md") &&
         file.path.includes(prefix)
     )
     filteredFiles.forEach(file => {
-        const match = file.path.match(/.*-image(-(\d+))?\..*$/);
+        const match = file.path.match(capturePattern);
         const index = (match?.[2] ? parseInt(match[2]) : 0) + 1;
         nextIndex = index > nextIndex ? index : nextIndex;
     });
     return nextIndex;
 }
 
+export function getNextNumberedImageIndex(app: App, dirPath: string, prefix: string): number {
+    return getNextNumberedFileIndex(app, dirPath, prefix, "image");
+}
+
 export function getNextNumberedVideoIndex(app: App, dirPath: string, prefix: string): number {
-    const files = app.vault.getFiles();
-    let nextIndex = 0;
-    const filteredFiles = files.filter(file =>
-        file.path.startsWith(dirPath) &&
-        file.path.match(/.*-video(-\d+)?\..*/) &&
-        !file.path.endsWith(".md") &&
-        file.path.includes(prefix)
-    )
-    filteredFiles.forEach(file => {
-        const match = file.path.match(/.*-video(-(\d+))?\..*$/);
-        const index = (match?.[2] ? parseInt(match[2]) : 0) + 1;
-        nextIndex = index > nextIndex ? index : nextIndex;
-    });
-    return nextIndex;
+    return getNextNumberedFileIndex(app, dirPath, prefix, "video");
 }
 
 export async function limitImageFileSize(settings: BetterDailyNotesSettings, file: File): Promise<File> {
