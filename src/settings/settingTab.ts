@@ -21,7 +21,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 		if (this.plugin.settings.useStructuredFolders) {
 			const now = new Date();
 			const year = now.getFullYear();
-			const month = now.toLocaleString('en-US', { month: 'short' });
+			const month = formatDate('MMM', now);
 			return `${this.plugin.settings.rootDir}/${year}/${month}/${exampleDate}.md`;
 		} else {
 			return `${this.plugin.settings.rootDir}/${exampleDate}.md`;
@@ -36,7 +36,13 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 		const sectionEl = containerEl.createDiv('better-daily-notes-section');
 
 		const headerEl = sectionEl.createDiv('better-daily-notes-collapsible-header');
+		// Add accessibility attributes
+		headerEl.setAttribute('role', 'button');
+		headerEl.setAttribute('tabindex', '0');
+		headerEl.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+
 		const iconEl = headerEl.createSpan('better-daily-notes-collapsible-icon');
+		iconEl.setAttribute('aria-hidden', 'true');
 		iconEl.setText(collapsed ? '▶' : '▼');
 		if (collapsed) iconEl.addClass('collapsed');
 
@@ -50,21 +56,41 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 			contentEl.addClass('collapsed');
 			contentEl.style.maxHeight = '0px';
 		} else {
-			contentEl.style.maxHeight = contentEl.scrollHeight + 1000 + 'px';
+			// Calculate proper maxHeight after a brief delay to allow rendering
+			setTimeout(() => {
+				contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
+			}, 0);
 		}
 
-		headerEl.addEventListener('click', () => {
+		const toggleSection = () => {
 			const isCollapsed = contentEl.hasClass('collapsed');
 			if (isCollapsed) {
 				contentEl.removeClass('collapsed');
 				iconEl.removeClass('collapsed');
 				iconEl.setText('▼');
-				contentEl.style.maxHeight = contentEl.scrollHeight + 1000 + 'px';
+				headerEl.setAttribute('aria-expanded', 'true');
+				// Recalculate height on expand
+				setTimeout(() => {
+					contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
+				}, 0);
 			} else {
+				// Set to current height first for smooth transition
+				contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
+				// Force reflow
+				contentEl.offsetHeight;
 				contentEl.addClass('collapsed');
 				iconEl.addClass('collapsed');
 				iconEl.setText('▶');
+				headerEl.setAttribute('aria-expanded', 'false');
 				contentEl.style.maxHeight = '0px';
+			}
+		};
+
+		headerEl.addEventListener('click', toggleSection);
+		headerEl.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter' || e.key === ' ') {
+				e.preventDefault();
+				toggleSection();
 			}
 		});
 
@@ -140,8 +166,14 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						return;
 					}
 					this.plugin.settings.dateFormat = value.trim();
-					const preview = content.getElementsByClassName('preview-date-format')[0];
-					preview.setText(`Current format looks like: "${formatDate(this.plugin.settings.dateFormat)}"`);
+					const datePreview = content.getElementsByClassName('preview-date-format')[0];
+					datePreview.setText(`Current format looks like: "${formatDate(this.plugin.settings.dateFormat)}"`);
+					// Also update folder structure preview
+					const folderPreview = content.getElementsByClassName('preview-folder-structure')[0];
+					if (folderPreview) {
+						const examplePath = this.getFolderStructurePreview();
+						folderPreview.setText(`Example: ${examplePath}`);
+					}
 					await this.plugin.saveSettings();
 					this.display();
 				}));

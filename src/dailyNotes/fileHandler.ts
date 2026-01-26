@@ -139,14 +139,14 @@ export async function handleSingleFile(
         file = await limitImageFileSize(
             settings,
             file);
-        const getImageNumber = getNextNumberedImageIndex(app, fileSaveSubDir, filePrefix);
         fileSaveSubDir = `${viewParentPath}/${settings.imageSubDir}`;
+        const getImageNumber = getNextNumberedImageIndex(app, fileSaveSubDir, filePrefix);
         filePrefix = `${filePrefix}-image`;
         fileSuffix = getImageNumber === 0 ? "" : `-${getImageNumber}`;
     }
     else if (file.type.startsWith("video")) {
-        const getVideoNumber = getNextNumberedVideoIndex(app, fileSaveSubDir, filePrefix);
         fileSaveSubDir = `${viewParentPath}/${settings.videoSubDir}`;
+        const getVideoNumber = getNextNumberedVideoIndex(app, fileSaveSubDir, filePrefix);
         filePrefix = `${filePrefix}-video`;
         fileSuffix = getVideoNumber === 0 ? "" : `-${getVideoNumber}`;
     }
