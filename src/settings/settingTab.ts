@@ -3,6 +3,7 @@ import { createNotice, formatDate, isValidDateFormat } from '../utils';
 
 export class BetterDailyNotesSettingTab extends PluginSettingTab {
 	plugin: any;
+	private collapsibleStates: Map<string, boolean> = new Map();
 
 	constructor(app: App, plugin: any) {
 		super(app, plugin);
@@ -31,9 +32,14 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 	createCollapsibleSection(
 		containerEl: HTMLElement,
 		title: string,
-		collapsed: boolean = false
+		defaultCollapsed: boolean = false
 	): { header: HTMLElement; content: HTMLElement } {
 		const sectionEl = containerEl.createDiv('better-daily-notes-section');
+
+		// Check if we have a saved state for this section
+		const collapsed = this.collapsibleStates.has(title)
+			? this.collapsibleStates.get(title)!
+			: defaultCollapsed;
 
 		const headerEl = sectionEl.createDiv('better-daily-notes-collapsible-header');
 		// Add accessibility attributes
@@ -56,10 +62,12 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 			contentEl.addClass('collapsed');
 			contentEl.style.maxHeight = '0px';
 		} else {
-			// Calculate proper maxHeight after a brief delay to allow rendering
-			setTimeout(() => {
-				contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
-			}, 0);
+			// Use requestAnimationFrame for more accurate height calculation
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
+				});
+			});
 		}
 
 		const toggleSection = () => {
@@ -69,10 +77,14 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 				iconEl.removeClass('collapsed');
 				iconEl.setText('▼');
 				headerEl.setAttribute('aria-expanded', 'true');
-				// Recalculate height on expand
-				setTimeout(() => {
-					contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
-				}, 0);
+				// Save expanded state
+				this.collapsibleStates.set(title, false);
+				// Recalculate height on expand with double RAF for accuracy
+				requestAnimationFrame(() => {
+					requestAnimationFrame(() => {
+						contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
+					});
+				});
 			} else {
 				// Set to current height first for smooth transition
 				contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
@@ -83,6 +95,8 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 				iconEl.setText('▶');
 				headerEl.setAttribute('aria-expanded', 'false');
 				contentEl.style.maxHeight = '0px';
+				// Save collapsed state
+				this.collapsibleStates.set(title, true);
 			}
 		};
 

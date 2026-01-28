@@ -87,7 +87,7 @@ export async function openDailyNote(
     const targetNotePath = getDailyNotePath(settings, date, true);
 
     if (!app.vault.getAbstractFileByPath(targetNotePath)) {
-        await createDirIfNotExists(app, rootDir, assumeSameDayBeforeHour, date);
+        await createDirIfNotExists(app, rootDir, assumeSameDayBeforeHour, settings.useStructuredFolders, date);
         const templateFile = app.vault.getAbstractFileByPath(settings.templateFile);
         if (templateFile instanceof TFile) {
             let template = await app.vault.read(templateFile);

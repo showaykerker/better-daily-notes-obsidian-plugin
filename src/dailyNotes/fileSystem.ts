@@ -20,8 +20,14 @@ export async function createImageDirIfNotExists(
         rootDir: string,
         assumeSameDayBeforeHour: number,
         imageSubDirName: string,
+        useStructuredFolders: boolean,
         date: Date = new Date()) {
-    const imgDirPath = `${getMonthDirPath(rootDir, assumeSameDayBeforeHour, date)}/${imageSubDirName}`;
+    let imgDirPath: string;
+    if (useStructuredFolders) {
+        imgDirPath = `${getMonthDirPath(rootDir, assumeSameDayBeforeHour, date)}/${imageSubDirName}`;
+    } else {
+        imgDirPath = `${rootDir}/${imageSubDirName}`;
+    }
     const imgDirPathNormalized = normalizePath(imgDirPath);
     createDirsIfNotExists(app, imgDirPathNormalized);
 }
@@ -30,8 +36,14 @@ export async function createDirIfNotExists(
         app:App,
         rootDir: string,
         assumeSameDayBeforeHour: number,
+        useStructuredFolders: boolean,
         date: Date = new Date()) {
-    const dirPath = getMonthDirPath(rootDir, assumeSameDayBeforeHour, date, true);
+    let dirPath: string;
+    if (useStructuredFolders) {
+        dirPath = getMonthDirPath(rootDir, assumeSameDayBeforeHour, date, true);
+    } else {
+        dirPath = rootDir;
+    }
     const dirPathNormalized = normalizePath(dirPath);
     await createDirsIfNotExists(app, dirPathNormalized);
 }
