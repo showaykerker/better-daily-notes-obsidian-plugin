@@ -111,16 +111,6 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 		return { header: headerEl, content: contentEl };
 	}
 
-	addHelpIcon(settingEl: HTMLElement, helpText: string): void {
-		const nameEl = settingEl.querySelector('.setting-item-name');
-		if (nameEl) {
-			const helpIcon = nameEl.createSpan('better-daily-notes-help-icon');
-			helpIcon.setText('?');
-			helpIcon.setAttribute('aria-label', helpText);
-			helpIcon.setAttribute('title', helpText);
-		}
-	}
-
 	display(): void {
 		const {containerEl} = this;
 
@@ -171,7 +161,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 
 		const dateFormatSetting = new Setting(content)
 			.setName('Date Format')
-			.setDesc('The date format for the daily notes. Uses Dayjs format.')
+			.setDesc('The date format for the daily notes. Uses Dayjs format. Format tokens: YYYY (year), MM (month), DD (day). See Dayjs documentation for more options.')
 			.addText(text => text
 				.setPlaceholder(this.plugin.settings.dateFormat)
 				.setValue(this.plugin.settings.dateFormat)
@@ -191,7 +181,6 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 					this.display();
 				}));
-		this.addHelpIcon(dateFormatSetting.settingEl, 'Format tokens: YYYY (year), MM (month), DD (day). See Dayjs documentation for more options.');
 
 		content.createEl('p', {
 			text: `Current format looks like: "${formatDate(this.plugin.settings.dateFormat)}"`,
@@ -260,7 +249,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 
 		const assumeDayHourSetting = new Setting(content)
 			.setName('Assume Same Day Before Hour')
-			.setDesc('If the current time is before this hour, assume it is the previous day.')
+			.setDesc('If the current time is before this hour, assume it is the previous day. For example, if set to 2, notes created at 1:30 AM will be dated for the previous day.')
 			.addDropdown(dropdown => {
 				// Populate options 0-23
 				const options: Record<string, string> = {};
@@ -276,7 +265,6 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					});
 				return dropdown;
 			});
-		this.addHelpIcon(assumeDayHourSetting.settingEl, 'For example, if set to 2, notes created at 1:30 AM will be dated for the previous day.');
 
 		new Setting(content)
 			.setName('Use Structured Folders')
