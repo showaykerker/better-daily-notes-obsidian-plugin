@@ -261,14 +261,21 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 		const assumeDayHourSetting = new Setting(content)
 			.setName('Assume Same Day Before Hour')
 			.setDesc('If the current time is before this hour, assume it is the previous day.')
-			.addSlider(slider => slider
-				.setLimits(0, 23, 1)
-				.setValue(this.plugin.settings.assumeSameDayBeforeHour)
-				.setDynamicTooltip()
-				.onChange(async (value) => {
-					this.plugin.settings.assumeSameDayBeforeHour = value;
-					await this.plugin.saveSettings();
-				}));
+			.addDropdown(dropdown => {
+				// Populate options 0-23
+				const options: Record<string, string> = {};
+				for (let i = 0; i <= 23; i++) {
+					options[i.toString()] = i.toString();
+				}
+				dropdown
+					.addOptions(options)
+					.setValue(this.plugin.settings.assumeSameDayBeforeHour.toString())
+					.onChange(async (value) => {
+						this.plugin.settings.assumeSameDayBeforeHour = parseInt(value, 10);
+						await this.plugin.saveSettings();
+					});
+				return dropdown;
+			});
 		this.addHelpIcon(assumeDayHourSetting.settingEl, 'For example, if set to 2, notes created at 1:30 AM will be dated for the previous day.');
 
 		new Setting(content)
