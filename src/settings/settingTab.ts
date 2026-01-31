@@ -422,6 +422,28 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 
 		if (this.plugin.settings.enableSummaryPage) {
 			new Setting(content)
+				.setName('Summarize Existing Notes Only')
+				.setDesc('When enabled, instead of using consecutive dates, the summary will include the latest existing daily notes found by scanning backwards up to the configured number of months.')
+				.addToggle(toggle => toggle
+					.setValue(this.plugin.settings.summarizeByExistence ?? false)
+					.onChange(async (value) => {
+						this.plugin.settings.summarizeByExistence = value;
+						await this.plugin.saveSettings();
+					}));
+
+			new Setting(content)
+				.setName('Lookback Months')
+				.setDesc('How many months back to search when collecting existing daily notes for the summary. Used only when "Summarize Existing Notes Only" is enabled.')
+				.addText(text => text
+					.setPlaceholder(((this.plugin.settings.summaryLookbackMonths ?? 2)).toString())
+					.setValue(((this.plugin.settings.summaryLookbackMonths ?? 2)).toString())
+					.onChange(async (value) => {
+						const n = parseInt(value, 10);
+						this.plugin.settings.summaryLookbackMonths = isNaN(n) || n < 0 ? 2 : n;
+						await this.plugin.saveSettings();
+					}));
+
+			new Setting(content)
 				.setName('Summary Page File')
 				.setDesc('The file name for the summary page.')
 				.addText(text => text
