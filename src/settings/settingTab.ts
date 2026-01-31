@@ -1,5 +1,33 @@
-import {App, normalizePath, PluginSettingTab, Setting} from 'obsidian';
+import {App, normalizePath, PluginSettingTab, Setting, AbstractInputSuggest, TFile} from 'obsidian';
 import { createNotice, formatDate, isValidDateFormat } from '../utils';
+
+class TemplateFileSuggester extends AbstractInputSuggest<TFile> {
+  private inputRef: HTMLInputElement;
+  constructor(app: App, inputEl: HTMLInputElement) {
+    super(app, inputEl);
+    this.inputRef = inputEl;
+  }
+
+  getSuggestions(query: string): TFile[] {
+    const lower = query.toLowerCase();
+    return this.app.vault
+      .getAllLoadedFiles()
+      .filter((f): f is TFile => f instanceof TFile)
+      .filter((f) => f.extension === 'md' && f.path.toLowerCase().includes(lower));
+  }
+
+  renderSuggestion(file: TFile, el: HTMLElement): void {
+    el.setText(file.path);
+  }
+
+  selectSuggestion(file: TFile): void {
+    this.inputRef.value = file.path;
+    this.inputRef.dispatchEvent(new Event('input'));
+    this.inputRef.dispatchEvent(new Event('change'));
+    this.close();
+    this.inputRef.focus();
+  }
+}
 
 export class BetterDailyNotesSettingTab extends PluginSettingTab {
 	plugin: any;
@@ -213,33 +241,37 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						createNotice(this.plugin.settings, 'Template file disabled.', 2);
 						this.display();
 					}))
-				.addText(text => text
-					.setPlaceholder(this.plugin.settings.templateFile)
-					.setValue(this.plugin.settings.templateFile)
-					.onChange(async (value) => {
-						if (value != '' && !value.endsWith('.md')) {
-							value = value + '.md';
-						}
-						value = normalizePath(value);
-						if (await this.app.vault.adapter.exists(value) && value.endsWith('.md')) {
-							templateSetting.settingEl.classList.remove('invalid-path');
-							templateSetting.settingEl.classList.add('valid-path');
-							this.plugin.settings.templateFile = value;
-							await this.plugin.saveSettings();
-							createNotice(this.plugin.settings, 'Template file set to: ' + value, 2);
-						}
-						else if (value === '/') {
-							templateSetting.settingEl.classList.remove('invalid-path');
-							templateSetting.settingEl.classList.remove('valid-path');
-							createNotice(this.plugin.settings, 'Template file disabled.', 2);
-							this.plugin.settings.templateFile = '';
-							await this.plugin.saveSettings();
-						}
-						else {
-							templateSetting.settingEl.classList.add('invalid-path');
-							templateSetting.settingEl.classList.remove('valid-path');
-						}
-					}));
+				.addText(text => {
+					text
+						.setPlaceholder(this.plugin.settings.templateFile)
+						.setValue(this.plugin.settings.templateFile)
+						.onChange(async (value) => {
+							if (value != '' && !value.endsWith('.md')) {
+								value = value + '.md';
+							}
+							value = normalizePath(value);
+							if (await this.app.vault.adapter.exists(value) && value.endsWith('.md')) {
+								templateSetting.settingEl.classList.remove('invalid-path');
+								templateSetting.settingEl.classList.add('valid-path');
+								this.plugin.settings.templateFile = value;
+								await this.plugin.saveSettings();
+								createNotice(this.plugin.settings, 'Template file set to: ' + value, 2);
+							}
+							else if (value === '/') {
+								templateSetting.settingEl.classList.remove('invalid-path');
+								templateSetting.settingEl.classList.remove('valid-path');
+								createNotice(this.plugin.settings, 'Template file disabled.', 2);
+								this.plugin.settings.templateFile = '';
+								await this.plugin.saveSettings();
+							}
+							else {
+								templateSetting.settingEl.classList.add('invalid-path');
+								templateSetting.settingEl.classList.remove('valid-path');
+							}
+					});
+					new TemplateFileSuggester(this.app, (text as any).inputEl);
+					return text;
+				});
 
 		const assumeDayHourSetting = new Setting(content)
 			.setName('Assume Same Day Before Hour')
