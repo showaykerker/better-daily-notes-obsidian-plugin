@@ -166,9 +166,6 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 				.setPlaceholder(this.plugin.settings.dateFormat)
 				.setValue(this.plugin.settings.dateFormat)
 				.onChange(async (value) => {
-					if (!isValidDateFormat(value)) {
-						return;
-					}
 					this.plugin.settings.dateFormat = value.trim();
 					const datePreview = content.getElementsByClassName('preview-date-format')[0];
 					datePreview.setText(`Current format looks like: "${formatDate(this.plugin.settings.dateFormat)}"`);
@@ -179,7 +176,6 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						folderPreview.setText(`Example: ${examplePath}`);
 					}
 					await this.plugin.saveSettings();
-					this.display();
 				}));
 
 		content.createEl('p', {
@@ -231,7 +227,6 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 							this.plugin.settings.templateFile = value;
 							await this.plugin.saveSettings();
 							createNotice(this.plugin.settings, 'Template file set to: ' + value, 2);
-							this.display();
 						}
 						else if (value === '/') {
 							templateSetting.settingEl.classList.remove('invalid-path');
@@ -239,7 +234,6 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 							createNotice(this.plugin.settings, 'Template file disabled.', 2);
 							this.plugin.settings.templateFile = '';
 							await this.plugin.saveSettings();
-							this.display();
 						}
 						else {
 							templateSetting.settingEl.classList.add('invalid-path');
