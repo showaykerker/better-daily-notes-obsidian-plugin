@@ -1,10 +1,6 @@
 import { App, MarkdownView, normalizePath, Notice, TFile } from 'obsidian';
 import dayjs from 'dayjs';
 import { BetterDailyNotesSettings } from './settings/settings';
-import { assert } from 'console';
-
-const customParseFormat = require('dayjs/plugin/customParseFormat');
-dayjs.extend(customParseFormat);
 
 
 export function createNotice(settings: BetterDailyNotesSettings, message: string, importance: number = 1) {
@@ -43,6 +39,11 @@ export function getDailyNoteName(
 
 export function getDailyNotePath(settings: BetterDailyNotesSettings, date: Date = new Date(), considerAssumeSameDayBeforeHour: boolean = true) {
     const noteName = getDailyNoteName(settings.assumeSameDayBeforeHour, settings.dateFormat, date, considerAssumeSameDayBeforeHour);
+
+    if (!settings.useStructuredFolders) {
+        return `${settings.rootDir}/${noteName}.md`;
+    }
+
     const dirPath = getMonthDirPath(settings.rootDir, settings.assumeSameDayBeforeHour, date, considerAssumeSameDayBeforeHour);
     return `${dirPath}/${noteName}.md`;
 }
@@ -53,12 +54,12 @@ export function getMonthDirPath(
         date: Date = new Date(),
         considerAssumeSameDayBeforeHour: boolean = false) {
     // if the current time is before assumeSameDayBeforeHour, assume it is the previous day
-    if (dayjs().get('hour') + 1 < assumeSameDayBeforeHour &&
+    if (dayjs().get('hour') < assumeSameDayBeforeHour &&
             considerAssumeSameDayBeforeHour) {
         date.setDate(date.getDate() - 1);
     }
     const year = date.getFullYear();
-    const monthStr = date.toLocaleString('en-GB', { month: 'short' });
+    const monthStr = dayjs(date).format('MMM');
     return `${rootDir}/${year}/${monthStr}`;
 }
 

@@ -3,7 +3,6 @@ import { App, Editor, MarkdownView, normalizePath } from "obsidian";
 import { createDirsIfNotExists } from "./fileSystem";
 import { createNotice, checkValidDailyNote } from "../utils";
 import { BetterDailyNotesSettings } from "../settings/settings";
-import { create } from 'domain';
 
 export function base64ToArrayBuffer(base64: string): ArrayBuffer {
     const binaryString = window.atob(base64);
@@ -15,20 +14,32 @@ export function base64ToArrayBuffer(base64: string): ArrayBuffer {
     return bytes.buffer;
 }
 
-export function getNextNumberedImageIndex(app: App, dirPath: string, prefix: string): number {
+export function getNextNumberedFileIndex(app: App, dirPath: string, prefix: string, fileType: string): number {
     const files = app.vault.getFiles();
     let nextIndex = 0;
+    const pattern = new RegExp(`.*-${fileType}(-\\d+)?\\..*`);
+    const capturePattern = new RegExp(`.*-${fileType}(-(\\d+))?\\..*$`);
+
     const filteredFiles = files.filter(file =>
         file.path.startsWith(dirPath) &&
-        file.path.match(/.*-image(-\d+)?\..*/) &&
+        file.path.match(pattern) &&
         !file.path.endsWith(".md") &&
         file.path.includes(prefix)
     )
     filteredFiles.forEach(file => {
-        const index = (parseInt(file.path.match(/.*-image(-(\d+))?\..*/)![2]) || 0) + 1;
+        const match = file.path.match(capturePattern);
+        const index = (match?.[2] ? parseInt(match[2]) : 0) + 1;
         nextIndex = index > nextIndex ? index : nextIndex;
     });
     return nextIndex;
+}
+
+export function getNextNumberedImageIndex(app: App, dirPath: string, prefix: string): number {
+    return getNextNumberedFileIndex(app, dirPath, prefix, "image");
+}
+
+export function getNextNumberedVideoIndex(app: App, dirPath: string, prefix: string): number {
+    return getNextNumberedFileIndex(app, dirPath, prefix, "video");
 }
 
 export async function limitImageFileSize(settings: BetterDailyNotesSettings, file: File): Promise<File> {
@@ -65,6 +76,7 @@ function isFileSupported(file: File): boolean {
     const fileExtension = file.name.split(".").slice(-1)[0];
 
     return file.type.startsWith("image") ||
+        file.type.startsWith("video") ||
         acceptableFileTypes.includes(file.type) ||
         (acceptableFileExtensionsWithEmptyFileType.includes(fileExtension) && file.type === "");
 }
@@ -93,7 +105,7 @@ export async function handleFiles(
     for (let i = 0; i < files.length; i++) {
         if (!isFileSupported(files[i])) {
             createNotice(settings,
-                `Only image, pdf, and zip files are supported. ` +
+                `Only image, video, pdf, and zip files are supported. ` +
                 `Get file "${files[i]?.name}" with type "${files[i].type}" instead.`, 2);
             return;
         }
@@ -108,7 +120,7 @@ export async function handleFiles(
 
 export async function handleSingleFile(
     app: App,
-    settings: any,
+    settings: BetterDailyNotesSettings,
     file: File,
     editor: Editor,
     markdownView: MarkdownView,
@@ -127,10 +139,16 @@ export async function handleSingleFile(
         file = await limitImageFileSize(
             settings,
             file);
-        const getImageNumber = getNextNumberedImageIndex(app, fileSaveSubDir, filePrefix);
         fileSaveSubDir = `${viewParentPath}/${settings.imageSubDir}`;
+        const getImageNumber = getNextNumberedImageIndex(app, fileSaveSubDir, filePrefix);
         filePrefix = `${filePrefix}-image`;
         fileSuffix = getImageNumber === 0 ? "" : `-${getImageNumber}`;
+    }
+    else if (file.type.startsWith("video")) {
+        fileSaveSubDir = `${viewParentPath}/${settings.videoSubDir}`;
+        const getVideoNumber = getNextNumberedVideoIndex(app, fileSaveSubDir, filePrefix);
+        filePrefix = `${filePrefix}-video`;
+        fileSuffix = getVideoNumber === 0 ? "" : `-${getVideoNumber}`;
     }
     else {
         fileSaveSubDir = `${viewParentPath}/${settings.otherFilesSubDir}`;

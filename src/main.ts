@@ -1,5 +1,6 @@
 import { Plugin } from 'obsidian';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { DEFAULT_SETTINGS, BetterDailyNotesSettings } from './settings/settings';
 import { BetterDailyNotesSettingTab } from './settings/settingTab';
 import { createCompatibilityEventListener } from './compatibility/eventListeners';
@@ -15,7 +16,6 @@ export default class BetterDailyNotes extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		const customParseFormat = require('dayjs/plugin/customParseFormat');
 		dayjs.extend(customParseFormat);
 
 		createDailyNotesCommands(this);

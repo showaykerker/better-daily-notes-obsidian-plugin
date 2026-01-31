@@ -14,18 +14,21 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
 ## Features
 
 ### Features
-- **Structured Daily Notes:** Organizes daily notes in a structured folder format `[DailyNoteRootDirectory]/[Mon.]/[DateFormat].md`.
+- **Flexible Daily Notes Organization:** Organizes daily notes with flexible folder structures.
+  - **Structured Mode** (default): `[DailyNoteRootDirectory]/[Year]/[Month]/[DateFormat].md`
+  - **Flat Mode** (optional): `[DailyNoteRootDirectory]/[DateFormat].md`
   - Customize the root directory and date format in the settings.
   - Month represented in short form (e.g., Jan, Feb, Mar).
 - **Files Management:** Handle files dropped or pasted to your notes.
-  - Supported file format: `images`, `json`, `pdf`, `zip`, `.dill`, `.dmg`, `.kml`, `.pickle`
+  - Supported file formats: `images`, `videos` (.mp4, .mov, .webm), `json`, `pdf`, `zip`, `.dill`, `.dmg`, `.kml`, `.pickle`
   - Configuration of files handling scenario.
     - `Disable All Handling`: No file handling. If you have another plugin such as automatic image upload, you should disable the handling from this plugin.
     - `Only in Daily Notes`: Only files added to a valid daily-note name will be handled.
     - `Handle in All Files`: Handle all files added to your notes.
-  - Images dropped or pasted are saved to a *"image subdirectory"* under the same parent of current note, and renamed to `[CurrentNoteBasename]-image#.[OriginalExt]`
-  - Files other than images dropped or pasted are saved to *"other files subdirectory"* under the same parent of current note, and renamed to `[CurrentNoteBasename]-[OriginFileBaseName].[OriginalExt]`. If there exists a file with the same name, this plugin simply adds a link pointing to that file, no file will be added.
-  - Customize image and other files' folder name in the settings.
+  - Images dropped or pasted are saved to *"image subdirectory"* under the same parent of current note, and renamed to `[CurrentNoteBasename]-image#.[OriginalExt]`
+  - Videos dropped or pasted are saved to *"video subdirectory"* under the same parent of current note, and renamed to `[CurrentNoteBasename]-video#.[OriginalExt]`
+  - Files other than images/videos dropped or pasted are saved to *"other files subdirectory"* under the same parent of current note, and renamed to `[CurrentNoteBasename]-[OriginFileBaseName].[OriginalExt]`. If there exists a file with the same name, this plugin simply adds a link pointing to that file, no file will be added.
+  - Customize image, video, and other files' folder names in the settings.
   - Images are compressed using [browser-image-compression](https://github.com/Donaldcwl/browser-image-compression#readme). Adjust compression settings like max image size and EXIF data removal.
     - A command `Toggle image compression` to toggle image compression.
   - Images and pdfs can be resized with markdown syntax to a specified width. Customize resizing width in the settings.
@@ -33,6 +36,7 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
   - Considers it the same day before a specified hour after midnight.
 - **Create Daily Note From Template:**
   - Manually assign the full path of the template to use when creating a daily note.
+  - Autocomplete suggestions when entering template file path.
 - **Convenient Navigation:**
   - Adds a ribbon icon to quickly open today's daily note.
   - Provides commands to open today's, yesterday's, and tomorrow's daily notes.
@@ -42,6 +46,7 @@ Seamlessly integrated, this plugin empowers you to organize and manage your dail
     2. When creating a daily note.
     3. When removing a daily note.
     4. When renaming a daily note or renaming it as a daily note. (Note: Moving files also count as renaming)
+  - **Summarize Existing Notes Only**: Option to search for actual existing daily notes within a configurable lookback period instead of consecutive dates.
 
 ### Commands
 - **Open yesterday's daily note:** Opens yesterday's daily note.
@@ -119,7 +124,7 @@ This plugin is built with TypeScript. Here's how to contribute:
 - [ ] Migrating existed daily notes.
 - [ ] Rollover daily notes TODOs.
 - [ ] Handle create event and editor-drop event for file management.
-- [ ] Improve settings interface.
+- [x] ~~Improve settings interface.~~ (Completed in 0.3.9)
 - [ ] Language support.
 
 ## Feature Ideas

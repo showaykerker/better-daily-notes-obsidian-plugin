@@ -1,8 +1,37 @@
-import {App, normalizePath, PluginSettingTab, Setting} from 'obsidian';
+import {App, normalizePath, PluginSettingTab, Setting, AbstractInputSuggest, TFile} from 'obsidian';
 import { createNotice, formatDate, isValidDateFormat } from '../utils';
+
+class TemplateFileSuggester extends AbstractInputSuggest<TFile> {
+  private inputRef: HTMLInputElement;
+  constructor(app: App, inputEl: HTMLInputElement) {
+    super(app, inputEl);
+    this.inputRef = inputEl;
+  }
+
+  getSuggestions(query: string): TFile[] {
+    const lower = query.toLowerCase();
+    return this.app.vault
+      .getAllLoadedFiles()
+      .filter((f): f is TFile => f instanceof TFile)
+      .filter((f) => f.extension === 'md' && f.path.toLowerCase().includes(lower));
+  }
+
+  renderSuggestion(file: TFile, el: HTMLElement): void {
+    el.setText(file.path);
+  }
+
+  selectSuggestion(file: TFile): void {
+    this.inputRef.value = file.path;
+    this.inputRef.dispatchEvent(new Event('input'));
+    this.inputRef.dispatchEvent(new Event('change'));
+    this.close();
+    this.inputRef.focus();
+  }
+}
 
 export class BetterDailyNotesSettingTab extends PluginSettingTab {
 	plugin: any;
+	private collapsibleStates: Map<string, boolean> = new Map();
 
 	constructor(app: App, plugin: any) {
 		super(app, plugin);
@@ -14,6 +43,100 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 		const templateFile = normalizePath(this.plugin.settings.templateFile);
 		const abstract = this.app.vault.getAbstractFileByPath(templateFile);
 		return this.plugin.settings.templateFile != '' && abstract != null;
+	}
+
+	getFolderStructurePreview = (): string => {
+		const exampleDate = formatDate(this.plugin.settings.dateFormat);
+		if (this.plugin.settings.useStructuredFolders) {
+			const now = new Date();
+			const year = now.getFullYear();
+			const month = formatDate('MMM', now);
+			return `${this.plugin.settings.rootDir}/${year}/${month}/${exampleDate}.md`;
+		} else {
+			return `${this.plugin.settings.rootDir}/${exampleDate}.md`;
+		}
+	}
+
+	createCollapsibleSection(
+		containerEl: HTMLElement,
+		title: string,
+		defaultCollapsed: boolean = false
+	): { header: HTMLElement; content: HTMLElement } {
+		const sectionEl = containerEl.createDiv('better-daily-notes-section');
+
+		// Check if we have a saved state for this section
+		const collapsed = this.collapsibleStates.has(title)
+			? this.collapsibleStates.get(title)!
+			: defaultCollapsed;
+
+		const headerEl = sectionEl.createDiv('better-daily-notes-collapsible-header');
+		// Add accessibility attributes
+		headerEl.setAttribute('role', 'button');
+		headerEl.setAttribute('tabindex', '0');
+		headerEl.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+
+		const iconEl = headerEl.createSpan('better-daily-notes-collapsible-icon');
+		iconEl.setAttribute('aria-hidden', 'true');
+		iconEl.setText(collapsed ? '▶' : '▼');
+		if (collapsed) iconEl.addClass('collapsed');
+
+		const titleEl = headerEl.createEl('h3');
+		titleEl.setText(title);
+		titleEl.style.margin = '0';
+		titleEl.style.display = 'inline';
+
+		const contentEl = sectionEl.createDiv('better-daily-notes-collapsible-content');
+		if (collapsed) {
+			contentEl.addClass('collapsed');
+			contentEl.style.maxHeight = '0px';
+		} else {
+			// Use requestAnimationFrame for more accurate height calculation
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
+				});
+			});
+		}
+
+		const toggleSection = () => {
+			const isCollapsed = contentEl.hasClass('collapsed');
+			if (isCollapsed) {
+				contentEl.removeClass('collapsed');
+				iconEl.removeClass('collapsed');
+				iconEl.setText('▼');
+				headerEl.setAttribute('aria-expanded', 'true');
+				// Save expanded state
+				this.collapsibleStates.set(title, false);
+				// Recalculate height on expand with double RAF for accuracy
+				requestAnimationFrame(() => {
+					requestAnimationFrame(() => {
+						contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
+					});
+				});
+			} else {
+				// Set to current height first for smooth transition
+				contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
+				// Force reflow
+				contentEl.offsetHeight;
+				contentEl.addClass('collapsed');
+				iconEl.addClass('collapsed');
+				iconEl.setText('▶');
+				headerEl.setAttribute('aria-expanded', 'false');
+				contentEl.style.maxHeight = '0px';
+				// Save collapsed state
+				this.collapsibleStates.set(title, true);
+			}
+		};
+
+		headerEl.addEventListener('click', toggleSection);
+		headerEl.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter' || e.key === ' ') {
+				e.preventDefault();
+				toggleSection();
+			}
+		});
+
+		return { header: headerEl, content: contentEl };
 	}
 
 	display(): void {
@@ -30,8 +153,8 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 	}
 
 	setNoticeSettings(containerEl: HTMLElement) {
-		new Setting(containerEl).setName('Notice Settings').setHeading();
-		new Setting(containerEl)
+		const { content } = this.createCollapsibleSection(containerEl, 'Notice Settings', true);
+		new Setting(content)
 			.setName('Notice Level')
 			.setDesc('The level of notices to display.')
 			.addDropdown(dropdown => dropdown
@@ -48,9 +171,9 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					this.display();
 				}));
 		if (this.plugin.settings.noticeLevel < 3) {
-			new Setting(containerEl)
+			new Setting(content)
 				.setName('Notice Duration')
-				.setDesc('The duration of notices to display.')
+				.setDesc('The duration of notices to display (in milliseconds).')
 				.addText(text => text
 					.setPlaceholder(this.plugin.settings.noticeDuration.toString())
 					.setValue(this.plugin.settings.noticeDuration.toString())
@@ -62,28 +185,32 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 	}
 
 	setGeneralSettings(containerEl: HTMLElement) {
-		new Setting(containerEl).setName('Daily Notes Configuration').setHeading();
-		new Setting(containerEl)
+		const { content } = this.createCollapsibleSection(containerEl, 'Daily Notes Configuration', false);
+
+		const dateFormatSetting = new Setting(content)
 			.setName('Date Format')
-			.setDesc('The date format for the daily notes. (Using Dayjs)')
+			.setDesc('The date format for the daily notes. Uses Dayjs format. Format tokens: YYYY (year), MM (month), DD (day). See Dayjs documentation for more options.')
 			.addText(text => text
 				.setPlaceholder(this.plugin.settings.dateFormat)
 				.setValue(this.plugin.settings.dateFormat)
 				.onChange(async (value) => {
-					if (!isValidDateFormat(value)) {
-						return;
-					}
 					this.plugin.settings.dateFormat = value.trim();
-					const preview = containerEl.getElementsByClassName('preview-date-format')[0];
-					preview.setText(`Current format looks like: "${formatDate(this.plugin.settings.dateFormat)}"`);
+					const datePreview = content.getElementsByClassName('preview-date-format')[0];
+					datePreview.setText(`Current format looks like: "${formatDate(this.plugin.settings.dateFormat)}"`);
+					// Also update folder structure preview
+					const folderPreview = content.getElementsByClassName('preview-folder-structure')[0];
+					if (folderPreview) {
+						const examplePath = this.getFolderStructurePreview();
+						folderPreview.setText(`Example: ${examplePath}`);
+					}
 					await this.plugin.saveSettings();
-					this.display();
 				}));
-		containerEl.createEl('p', {
+
+		content.createEl('p', {
 			text: `Current format looks like: "${formatDate(this.plugin.settings.dateFormat)}"`,
 			cls: 'setting-item-description preview-date-format'});
 
-		new Setting(containerEl)
+		new Setting(content)
 			.setName('Root Directory')
 			.setDesc('The root directory for the daily notes.')
 			.addText(text => text
@@ -92,83 +219,108 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.rootDir = value;
 					await this.plugin.saveSettings();
+					// Update folder structure preview to reflect new root directory
+					const folderPreview = content.getElementsByClassName('preview-folder-structure')[0];
+					if (folderPreview) {
+						const examplePath = this.getFolderStructurePreview();
+						folderPreview.setText(`Example: ${examplePath}`);
+					}
 				}));
 
-		let templateSetting = new Setting(containerEl)
+		let templateSetting = new Setting(content)
 				.setName('Template File Location')
-				.setDesc('The location of the template file for the daily notes. ' +
-					'Leave it blank to disable this feature.')
+				.setDesc('The location of the template file for the daily notes. Leave it blank to disable this feature.')
 				.addExtraButton(button => button
 					.setIcon('cross')
 					.setTooltip('Clear')
 					.onClick(async () => {
 						templateSetting.settingEl.classList.remove('invalid-path');
+						templateSetting.settingEl.classList.remove('valid-path');
 						this.plugin.settings.templateFile = '';
 						await this.plugin.saveSettings();
 						createNotice(this.plugin.settings, 'Template file disabled.', 2);
 						this.display();
 					}))
-				.addText(text => text
-					.setPlaceholder(this.plugin.settings.templateFile)
-					.setValue(this.plugin.settings.templateFile)
-					.onChange(async (value) => {
-						if (value != '' && !value.endsWith('.md')) {
-							value = value + '.md';
-						}
-						value = normalizePath(value);
-						if (await this.app.vault.adapter.exists(value) && value.endsWith('.md')) {
-							templateSetting.settingEl.classList.remove('invalid-path');
-							this.plugin.settings.templateFile = value;
-							await this.plugin.saveSettings();
-							createNotice(this.plugin.settings, 'Template file set to: ' + value, 2);
-							this.display();
-						}
-						else if (value === '/') {
-							templateSetting.settingEl.classList.remove('invalid-path');
-							createNotice(this.plugin.settings, 'Template file disabled.', 2);
-							this.plugin.settings.templateFile = '';
-							await this.plugin.saveSettings();
-							this.display();
-						}
-						else {
-							templateSetting.setClass('invalid-path');
-						}
-					}));
+				.addText(text => {
+					text
+						.setPlaceholder(this.plugin.settings.templateFile)
+						.setValue(this.plugin.settings.templateFile)
+						.onChange(async (value) => {
+							if (value != '' && !value.endsWith('.md')) {
+								value = value + '.md';
+							}
+							value = normalizePath(value);
+							if (await this.app.vault.adapter.exists(value) && value.endsWith('.md')) {
+								templateSetting.settingEl.classList.remove('invalid-path');
+								templateSetting.settingEl.classList.add('valid-path');
+								this.plugin.settings.templateFile = value;
+								await this.plugin.saveSettings();
+								createNotice(this.plugin.settings, 'Template file set to: ' + value, 2);
+							}
+							else if (value === '/') {
+								templateSetting.settingEl.classList.remove('invalid-path');
+								templateSetting.settingEl.classList.remove('valid-path');
+								createNotice(this.plugin.settings, 'Template file disabled.', 2);
+								this.plugin.settings.templateFile = '';
+								await this.plugin.saveSettings();
+							}
+							else {
+								templateSetting.settingEl.classList.add('invalid-path');
+								templateSetting.settingEl.classList.remove('valid-path');
+							}
+					});
+					new TemplateFileSuggester(this.app, (text as any).inputEl);
+					return text;
+				});
 
-		new Setting(containerEl)
+		const assumeDayHourSetting = new Setting(content)
 			.setName('Assume Same Day Before Hour')
-			.setDesc('If the current time is before this hour, assume it is the previous day. (Range: 0-23)')
-			.addText(text => text
-				.setPlaceholder(this.plugin.settings.assumeSameDayBeforeHour.toString())
-				.setValue(this.plugin.settings.assumeSameDayBeforeHour.toString())
+			.setDesc('If the current time is before this hour, assume it is the previous day. For example, if set to 2, notes created at 1:30 AM will be dated for the previous day.')
+			.addDropdown(dropdown => {
+				// Populate options 0-23
+				const options: Record<string, string> = {};
+				for (let i = 0; i <= 23; i++) {
+					options[i.toString()] = i.toString();
+				}
+				dropdown
+					.addOptions(options)
+					.setValue(this.plugin.settings.assumeSameDayBeforeHour.toString())
+					.onChange(async (value) => {
+						this.plugin.settings.assumeSameDayBeforeHour = parseInt(value, 10);
+						await this.plugin.saveSettings();
+					});
+				return dropdown;
+			});
+
+		new Setting(content)
+			.setName('Use Structured Folders')
+			.setDesc('Organize daily notes in Year/Month subfolders. When disabled, all notes will be saved directly in the "Root Directory" configured above.')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.useStructuredFolders)
 				.onChange(async (value) => {
-					if (parseInt(value) < 0) { value = "0"; }
-					if (parseInt(value) > 23) { value = "23"; }
-					value = parseInt(value).toString();
-					this.plugin.settings.assumeSameDayBeforeHour = parseInt(value);
+					this.plugin.settings.useStructuredFolders = value;
 					await this.plugin.saveSettings();
+					const preview = content.getElementsByClassName('preview-folder-structure')[0];
+					const examplePath = this.getFolderStructurePreview();
+					preview.setText(`Example: ${examplePath}`);
 				}));
+
+		const examplePath = this.getFolderStructurePreview();
+		content.createEl('p', {
+			text: `Example: ${examplePath}`,
+			cls: 'setting-item-description preview-folder-structure'
+		});
 	}
 
 	setFileHandlingSettings(containerEl: HTMLElement) {
-		new Setting(containerEl).setName('File Handling Configuration').setHeading();
-		containerEl.createEl('p', {
-			text: 'The plugin handles drop and paste events, ',
-			cls: 'setting-item-description' });
-		containerEl.createEl('p', {
-			text: "if you already have other plugins that handle these events, ",
-			cls: 'setting-item-description'});
-		containerEl.createEl('p', {
-			text: "such as automatic image upload, ",
-			cls: 'setting-item-description' });
-		containerEl.createEl('p', {
-			text: "you may want to disable file handling from this plugin.",
-			cls: 'setting-item-description'});
-		containerEl.createEl(
-			'p', {
-			text: 'Currently, the plugin only supports handling of images, pdfs, and zips.',
-			cls: 'setting-item-description' });
-		new Setting(containerEl)
+		const { content } = this.createCollapsibleSection(containerEl, 'File Handling Configuration', false);
+
+		content.createDiv({
+			text: 'The plugin handles drop and paste events. If you already have other plugins that handle these events (such as automatic image upload), you may want to disable file handling from this plugin. Currently, the plugin supports handling of images, videos, pdfs, and zips.',
+			cls: 'setting-item-description'
+		});
+
+		new Setting(content)
 			.setName('File Handling')
 			.setDesc('Select how files should be handled.' +
 				'This will disable all the settings below' +
@@ -187,7 +339,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 				}));
 
 		if (this.plugin.settings.fileHandlingScenario != 'disabled') {
-			new Setting(containerEl)
+			new Setting(content)
 				.setName('Image Subdirectory')
 				.setDesc('The subdirectory for images.')
 				.setClass('image-subdir')
@@ -197,7 +349,17 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						this.plugin.settings.imageSubDir = value;
 						await this.plugin.saveSettings();
 					}));
-			new Setting(containerEl)
+			new Setting(content)
+				.setName('Video Subdirectory')
+				.setDesc('The subdirectory for video files.')
+				.setClass('video-subdir')
+				.addText(text => text
+					.setValue(this.plugin.settings.videoSubDir)
+					.onChange(async (value) => {
+						this.plugin.settings.videoSubDir = value;
+						await this.plugin.saveSettings();
+					}));
+			new Setting(content)
 				.setName('Other Files Subdirectory')
 				.setDesc('The subdirectory for other files.')
 				.setClass('other-files-subdir')
@@ -207,7 +369,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						this.plugin.settings.otherFilesSubDir = value;
 						await this.plugin.saveSettings();
 					}));
-			new Setting(containerEl)
+			new Setting(content)
 				.setName('Max Image Size (KB)')
 				.setDesc('Compress images added to the daily note to this size. -1 means no compression.')
 				.addText(text => text
@@ -217,7 +379,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						this.plugin.settings.maxImageSizeKB = parseInt(value);
 						await this.plugin.saveSettings();
 					}));
-			new Setting(containerEl)
+			new Setting(content)
 				.setName('Preserve EXIF Data')
 				.setDesc('Preserve EXIF data when compressing images.')
 				.addToggle(toggle => toggle
@@ -226,11 +388,9 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						this.plugin.settings.preserveExifData = value;
 						await this.plugin.saveSettings();
 					}));
-			new Setting(containerEl)
+			new Setting(content)
 				.setName('Resize Width')
-				.setDesc('The width to resize images and pdfs. -1 means no resizing. ' +
-					'This only add a suffix to the images\' and pdfs\' markdown link. ' +
-					'No compression is done.')
+				.setDesc('The width to resize images and pdfs. -1 means no resizing. This only adds a suffix to the images\' and pdfs\' markdown link. No compression is done.')
 				.addText(text => text
 					.setPlaceholder(this.plugin.settings.resizeWidth.toString())
 					.setValue(this.plugin.settings.resizeWidth.toString())
@@ -242,14 +402,16 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 	}
 
 	setSummaryPageSettings(containerEl: HTMLElement) {
-		new Setting(containerEl).setName('Summary Page Configuration').setHeading();
-		containerEl.createEl('p', {text: "Summary page is a page that summarizes the daily notes from the past few days. " +
-			" If enabled, the feature will be available in the command palette and as ribbon icon. ", cls: 'setting-item-description'});
+		const { content } = this.createCollapsibleSection(containerEl, 'Summary Page Configuration', true);
 
-		new Setting(containerEl)
+		content.createDiv({
+			text: 'Summary page is a page that summarizes the daily notes from the past few days. If enabled, the feature will be available in the command palette and as ribbon icon.',
+			cls: 'setting-item-description'
+		});
+
+		new Setting(content)
 			.setName('Enable Summary Page Creation')
-			.setDesc('Enable the command to create / update summary page. ' +
-				"Requires restart of th app to take effect.")
+			.setDesc('Enable the command to create / update summary page. Requires restart of the app to take effect.')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.enableSummaryPage)
 				.onChange(async (value) => {
@@ -259,7 +421,29 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 				}));
 
 		if (this.plugin.settings.enableSummaryPage) {
-			new Setting(containerEl)
+			new Setting(content)
+				.setName('Summarize Existing Notes Only')
+				.setDesc('When enabled, instead of using consecutive dates, the summary will include the latest existing daily notes found by scanning backwards up to the configured number of months.')
+				.addToggle(toggle => toggle
+					.setValue(this.plugin.settings.summarizeByExistence ?? false)
+					.onChange(async (value) => {
+						this.plugin.settings.summarizeByExistence = value;
+						await this.plugin.saveSettings();
+					}));
+
+			new Setting(content)
+				.setName('Lookback Months')
+				.setDesc('How many months back to search when collecting existing daily notes for the summary. Used only when "Summarize Existing Notes Only" is enabled.')
+				.addText(text => text
+					.setPlaceholder(((this.plugin.settings.summaryLookbackMonths ?? 2)).toString())
+					.setValue(((this.plugin.settings.summaryLookbackMonths ?? 2)).toString())
+					.onChange(async (value) => {
+						const n = parseInt(value, 10);
+						this.plugin.settings.summaryLookbackMonths = isNaN(n) || n < 0 ? 2 : n;
+						await this.plugin.saveSettings();
+					}));
+
+			new Setting(content)
 				.setName('Summary Page File')
 				.setDesc('The file name for the summary page.')
 				.addText(text => text
@@ -268,7 +452,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						this.plugin.settings.summaryPageFile = value;
 						await this.plugin.saveSettings();
 					}));
-			new Setting(containerEl)
+			new Setting(content)
 				.setName('Number of Days to Summarize')
 				.setDesc('The number of days to summarize.')
 				.addText(text => text
@@ -282,13 +466,11 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 	}
 
 	setCompatibilitySettings(containerEl: HTMLElement) {
-		new Setting(containerEl).setName('Compatibility Mode').setHeading();
-		new Setting(containerEl)
-			.setName('Compatibility Mode')
-			.setDesc(
-				'If you don\'t wish to be compatible with other plugins such as "Calendar", ' +
-				'you\'ll need to disable this feature. ' +
-				'Modify this setting will require restart of the app.')
+		const { content } = this.createCollapsibleSection(containerEl, 'Compatibility Mode', true);
+
+		new Setting(content)
+			.setName('Enable Compatibility Mode')
+			.setDesc('If you don\'t wish to be compatible with other plugins such as "Calendar", you\'ll need to disable this feature. Modifying this setting will require restart of the app.')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.compatibilityMode)
 				.onChange(async (value) => {
@@ -296,29 +478,14 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 					this.display();
 				}));
+
 		if (this.plugin.settings.compatibilityMode) {
-			containerEl.createEl('h4', {text: 'Compatible Date Formats', cls: 'setting-item-name'})
-			containerEl.createEl('p', {
-				text: 'The date formats that are compatible with this plugin. ',
-				cls: 'setting-item-description'});
-			containerEl.createEl('p', {
-				text: 'Files created with these formats will be recognized as daily notes. ',
-				cls: 'setting-item-description'});
-			containerEl.createEl('p', {
-				text: 'By default, it will fetch all the date formats from other supported plugins. ',
-				cls: 'setting-item-description'});
-			containerEl.createEl('p', {
-				text: 'You can modify this setting to add or remove date formats, ',
-				cls: 'setting-item-description'});
-			containerEl.createEl('p', {
-				text: 'just separate each format with a comma. ',
-				cls: 'setting-item-description'});
-			containerEl.createEl('p', {
-				text: 'Set to "AUTO" to fetch all the date formats from other supported plugins. ',
-				cls: 'setting-item-description'});
-			containerEl.createEl('p', {
-				text: 'Modify this setting will require restart of the app.',
-				cls: 'setting-item-description'});
+			content.createEl('h4', {text: 'Compatible Date Formats', cls: 'setting-item-name'});
+			content.createDiv({
+				text: 'The date formats that are compatible with this plugin. Files created with these formats will be recognized as daily notes. By default, it will fetch all the date formats from other supported plugins. You can modify this setting to add or remove date formats, just separate each format with a newline. Set to "AUTO" to fetch all the date formats from other supported plugins. Modifying this setting will require restart of the app.',
+				cls: 'setting-item-description'
+			});
+
 			const input = document.createElement('textarea');
 			input.cols = 15;
 			input.rows = 5;
@@ -331,7 +498,7 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 						.filter((format: string) => format != '');
 				await this.plugin.saveSettings();
 			});
-			containerEl.appendChild(input);
+			content.appendChild(input);
 		}
 	}
 }

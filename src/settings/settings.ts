@@ -7,9 +7,11 @@ export interface BetterDailyNotesSettings {
 	rootDir: string;
 	templateFile: string;
 	assumeSameDayBeforeHour: number;
+	useStructuredFolders: boolean;
 
 	fileHandlingScenario: string;
 	imageSubDir: string;
+	videoSubDir: string;
 	otherFilesSubDir: string;
 	maxImageSizeKB: number;
 	maxImageSizeKBCache: number
@@ -19,6 +21,10 @@ export interface BetterDailyNotesSettings {
 	enableSummaryPage: boolean;
 	summaryPageFile: string;
 	summaryOfDaysCount: number;
+
+	// Summary by existence options
+	summarizeByExistence: boolean;
+	summaryLookbackMonths: number;
 
 	compatibilityMode: boolean;
 	compatibleDateFormats: string[];
@@ -33,9 +39,11 @@ export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	rootDir: 'Daily Notes',
 	templateFile: '',
 	assumeSameDayBeforeHour: 2,
+	useStructuredFolders: true,
 
 	fileHandlingScenario: 'daily notes only',
 	imageSubDir: 'images',
+	videoSubDir: 'videos',
 	otherFilesSubDir: 'attachments',
 	maxImageSizeKB: -1,
 	maxImageSizeKBCache: -1,
@@ -45,6 +53,10 @@ export const DEFAULT_SETTINGS: BetterDailyNotesSettings = {
 	enableSummaryPage: true,
 	summaryPageFile: 'summary',
 	summaryOfDaysCount: 7,
+
+	// Summary by existence defaults
+	summarizeByExistence: false,
+	summaryLookbackMonths: 2,
 
 	compatibilityMode: true,
 	compatibleDateFormats: ["AUTO"],
