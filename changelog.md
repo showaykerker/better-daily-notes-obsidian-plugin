@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.3.9
+
+### Features
+- **Video File Support**: Added support for video files (.mp4, .mov, .webm, etc.) with automatic naming and dedicated subdirectory
+- **Flexible Folder Structure**: Added option to use flat folder structure instead of Year/Month hierarchy
+- **Template File Autocomplete**: Added intelligent file suggestions when entering template file path
+- **Enhanced Summary Page**: Added "Summarize Existing Notes Only" option to search for actual existing notes within a configurable lookback period
+- **Improved Settings UI**:
+  - Dropdown menu for "Assume Same Day Before Hour" setting (0-23 hours) for better precision
+  - Live folder structure preview that updates dynamically with configuration changes
+  - Collapsible sections with keyboard navigation and ARIA attributes for accessibility
+  - Visual separators between setting groups
+  - Valid/invalid path indicators with color coding
+
+### Fixes
+- **Date Logic**: Fixed date logic inconsistency in month directory creation
+- **Date Formatting**: Fixed "Sept" vs "Sep" naming inconsistency by using dayjs consistently throughout codebase
+- **Settings UI**: Fixed folder structure preview to update when root directory changes
+- **UI State**: Fixed collapsible section state preservation across settings refreshes
+- **Animations**: Improved animation height calculations using `requestAnimationFrame` for accuracy
+- **Video Indexing**: Fixed video file indexing bug that was scanning entire vault instead of target directory
+- **Display Updates**: Removed rapid display updates for better user experience
+
+### Refactors
+- **TypeScript Improvements**:
+  - Replaced `any` type with proper `BetterDailyNotesSettings` interface
+  - Removed unused imports (`assert` module)
+  - Replaced CommonJS `require()` with ES6 `import` statements
+  - Removed duplicate dayjs plugin loading
+- **Code Organization**: Extracted common logic from `getNextNumberedImageIndex` and `getNextNumberedVideoIndex` into generic `getNextNumberedFileIndex` function
+
 ## 0.3.8 pre-release
 
 ### Features
