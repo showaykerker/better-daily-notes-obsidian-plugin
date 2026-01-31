@@ -206,6 +206,12 @@ export class BetterDailyNotesSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.rootDir = value;
 					await this.plugin.saveSettings();
+					// Update folder structure preview to reflect new root directory
+					const folderPreview = content.getElementsByClassName('preview-folder-structure')[0];
+					if (folderPreview) {
+						const examplePath = this.getFolderStructurePreview();
+						folderPreview.setText(`Example: ${examplePath}`);
+					}
 				}));
 
 		let templateSetting = new Setting(content)
