@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.10
+
+### Fixes
+- **Metadata Version Sync**: Fixed version mismatch in package.json and manifest.json (were stuck at 0.3.7)
+
 ## 0.3.9
 
 ### Features
